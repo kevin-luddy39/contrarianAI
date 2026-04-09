@@ -30,10 +30,3 @@ services:
         sync: false
       - key: NOTIFY_EMAIL
         value: kevin.luddy39@gmail.com
-    headers:
-      - path: /*
-        name: X-Frame-Options
-        value: DENY
-      - path: /*
-        name: X-Content-Type-Options
-        value: nosniff

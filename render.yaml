@@ -1,12 +1,25 @@
+databases:
+  - name: contrarianai-db
+    plan: free
+    region: oregon
+    postgresMajorVersion: 16
+    databaseName: contrarianai
+    user: contrarianai_user
+
 services:
   - type: web
     runtime: node
     name: contrarianai-landing
+    plan: free
     buildCommand: npm install
     startCommand: node server.js
     envVars:
       - key: NODE_ENV
         value: production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: contrarianai-db
+          property: connectionString
       - key: SMTP_HOST
         value: smtp.gmail.com
       - key: SMTP_PORT
@@ -17,10 +30,6 @@ services:
         sync: false
       - key: NOTIFY_EMAIL
         value: kevin.luddy39@gmail.com
-    disk:
-      name: data
-      mountPath: /opt/render/project/src/data
-      sizeGB: 1
     headers:
       - path: /*
         name: X-Frame-Options

@@ -1,44 +1,29 @@
 const express = require('express');
-const path = require('path');
-const fs = require('fs');
-const initSqlJs = require('sql.js');
+const { Pool } = require('pg');
 const nodemailer = require('nodemailer');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Ensure data directory exists
-const dataDir = path.join(__dirname, 'data');
-if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir);
-const dbPath = path.join(dataDir, 'audit_requests.db');
-
-let db;
+// PostgreSQL setup
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+});
 
 async function initDb() {
-  const SQL = await initSqlJs();
-  if (fs.existsSync(dbPath)) {
-    db = new SQL.Database(fs.readFileSync(dbPath));
-  } else {
-    db = new SQL.Database();
-  }
-  db.run(`
+  await pool.query(`
     CREATE TABLE IF NOT EXISTS audit_requests (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      id SERIAL PRIMARY KEY,
       name TEXT NOT NULL,
       email TEXT NOT NULL,
       company TEXT NOT NULL,
       role TEXT,
       ai_stack TEXT,
       pain TEXT,
-      created_at TEXT DEFAULT (datetime('now'))
+      created_at TIMESTAMPTZ DEFAULT NOW()
     )
   `);
-  saveDb();
-}
-
-function saveDb() {
-  const data = db.export();
-  fs.writeFileSync(dbPath, Buffer.from(data));
 }
 
 // Email setup
@@ -68,7 +53,7 @@ app.use(express.json());
 app.use(express.static('landing'));
 
 // Form submission endpoint
-app.post('/api/audit-request', (req, res) => {
+app.post('/api/audit-request', async (req, res) => {
   const { name, email, company, role, ai_stack, pain } = req.body;
 
   if (!name || !email || !company) {
@@ -76,11 +61,10 @@ app.post('/api/audit-request', (req, res) => {
   }
 
   try {
-    db.run(
-      'INSERT INTO audit_requests (name, email, company, role, ai_stack, pain) VALUES (?, ?, ?, ?, ?, ?)',
+    await pool.query(
+      'INSERT INTO audit_requests (name, email, company, role, ai_stack, pain) VALUES ($1, $2, $3, $4, $5, $6)',
       [name, email, company, role || null, ai_stack || null, pain || null]
     );
-    saveDb();
   } catch (err) {
     console.error('DB insert error:', err);
     return res.status(500).json({ error: 'Failed to save submission.' });

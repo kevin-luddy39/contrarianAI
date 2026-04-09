@@ -32,6 +32,8 @@ I now offer a paid AI Risk & Readiness Audit with a personal guarantee: if I don
 
 Every audit I've done so far has found more than 3.
 
+Request your audit here: https://contrarianai-landing.onrender.com/
+
 DM me "AUDIT" or comment below if you want details.
 
 #AI #AIEngineering #ProductionAI #AIFailure #MachineLearning #TechLeadership
@@ -59,6 +61,8 @@ Your AI is giving wrong answers because:
 A better model just gives you wrong answers faster and with more confidence.
 
 I audit AI systems and find exactly these problems. Paid engagement, personal guarantee: if I don't find at least 3 issues that are costing you money right now, the audit is free.
+
+Request your audit: https://contrarianai-landing.onrender.com/
 
 DM "AUDIT" to learn more.
 
@@ -90,6 +94,8 @@ Result: 60% cost reduction. Fewer wrong answers. Happier users.
 This is what I do. I find the structural problems that demos hide and production reveals.
 
 Paid AI Risk & Readiness Audit. Personal guarantee: 3+ production issues found, or you don't pay.
+
+Request your audit: https://contrarianai-landing.onrender.com/
 
 Interested? DM "AUDIT" or drop a comment.
 
@@ -125,6 +131,8 @@ Personal guarantee: if I can't find at least 3 production-impacting issues, you 
 
 So far, no one has gotten a free audit.
 
+Request your audit: https://contrarianai-landing.onrender.com/
+
 Comment "SCORE" and I'll send you the self-assessment version.
 
 #AI #SoftwareEngineering #DevOps #QualityAssurance #ProductionReadiness
@@ -156,6 +164,8 @@ Here's exactly what you get:
 → Enterprises deploying AI internally
 → CTOs who suspect their AI "works" but don't trust it
 
-5 slots. This month. DM "AUDIT" to claim one.
+5 slots. This month. Request yours: https://contrarianai-landing.onrender.com/
+
+DM "AUDIT" to claim one.
 
 #AI #AIAudit #EngineeringLeadership #CTO #ProductionAI #AIStrategy

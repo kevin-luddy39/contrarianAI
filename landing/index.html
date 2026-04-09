@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>contrarianAI — AI Risk & Readiness Audit</title>
+    <meta name="description" content="We find what's actually wrong with your AI before your users do. Paid AI audit with a personal guarantee: 3+ production issues found, or you don't pay.">
+    <meta property="og:title" content="contrarianAI — AI Risk & Readiness Audit">
+    <meta property="og:description" content="If your AI looked great in the demo but struggles in production, the model isn't the problem. We find the structural failures that demos hide.">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+    <style>
+        :root {
+            --bg: #0a0a0a;
+            --surface: #141414;
+            --border: #262626;
+            --text: #e5e5e5;
+            --text-muted: #a3a3a3;
+            --accent: #f97316;
+            --accent-hover: #fb923c;
+            --danger: #ef4444;
+            --success: #22c55e;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* NAV */
+        nav {
+            border-bottom: 1px solid var(--border);
+            padding: 16px 0;
+        }
+        nav .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo {
+            font-size: 1.25rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+        .logo span { color: var(--accent); }
+        nav a {
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        /* HERO */
+        .hero {
+            padding: 80px 0 60px;
+            text-align: center;
+        }
+        .hero h1 {
+            font-size: clamp(2rem, 5vw, 3rem);
+            font-weight: 800;
+            line-height: 1.15;
+            letter-spacing: -0.03em;
+            margin-bottom: 24px;
+        }
+        .hero h1 .highlight {
+            color: var(--accent);
+        }
+        .hero .subtitle {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            max-width: 600px;
+            margin: 0 auto 40px;
+        }
+        .cta-primary {
+            display: inline-block;
+            background: var(--accent);
+            color: #000;
+            font-weight: 700;
+            font-size: 1.1rem;
+            padding: 16px 40px;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: background 0.2s;
+        }
+        .cta-primary:hover { background: var(--accent-hover); }
+
+        .guarantee-badge {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 8px 20px;
+            border: 2px solid var(--success);
+            border-radius: 6px;
+            color: var(--success);
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        /* PAIN SECTION */
+        .pain {
+            padding: 60px 0;
+            border-top: 1px solid var(--border);
+        }
+        .pain h2 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 32px;
+            letter-spacing: -0.02em;
+        }
+        .pain-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+        }
+        .pain-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-left: 4px solid var(--danger);
+            border-radius: 8px;
+            padding: 20px 24px;
+        }
+        .pain-card .stat {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--danger);
+            margin-bottom: 4px;
+        }
+        .pain-card p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        /* WHAT WE FIND */
+        .findings {
+            padding: 60px 0;
+            border-top: 1px solid var(--border);
+        }
+        .findings h2 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+        .findings .lead {
+            color: var(--text-muted);
+            margin-bottom: 32px;
+            font-size: 1.05rem;
+        }
+        .finding-item {
+            display: flex;
+            gap: 16px;
+            padding: 20px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        .finding-item:last-child { border-bottom: none; }
+        .finding-icon {
+            flex-shrink: 0;
+            width: 40px;
+            height: 40px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+        .finding-item h3 {
+            font-size: 1.05rem;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        .finding-item p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        /* GUARANTEE */
+        .guarantee-section {
+            padding: 60px 0;
+            border-top: 1px solid var(--border);
+        }
+        .guarantee-box {
+            background: var(--surface);
+            border: 2px solid var(--success);
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+        }
+        .guarantee-box h2 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+        .guarantee-box p {
+            color: var(--text-muted);
+            font-size: 1.05rem;
+            max-width: 560px;
+            margin: 0 auto 24px;
+        }
+        .guarantee-box .fine-print {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
+        /* DELIVERABLES */
+        .deliverables {
+            padding: 60px 0;
+            border-top: 1px solid var(--border);
+        }
+        .deliverables h2 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 32px;
+        }
+        .del-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+        }
+        .del-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 24px;
+        }
+        .del-card h3 {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--accent);
+        }
+        .del-card p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        /* WHO */
+        .who {
+            padding: 60px 0;
+            border-top: 1px solid var(--border);
+        }
+        .who h2 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 24px;
+        }
+        .who-list {
+            list-style: none;
+        }
+        .who-list li {
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+            font-size: 1.05rem;
+        }
+        .who-list li:last-child { border-bottom: none; }
+        .who-list li::before {
+            content: "\2192";
+            color: var(--accent);
+            margin-right: 12px;
+            font-weight: 700;
+        }
+
+        /* CONTRARIAN POSITIONS */
+        .positions {
+            padding: 60px 0;
+            border-top: 1px solid var(--border);
+        }
+        .positions h2 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 32px;
+        }
+        .position-item {
+            padding: 20px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        .position-item:last-child { border-bottom: none; }
+        .position-item blockquote {
+            font-size: 1.15rem;
+            font-weight: 600;
+            font-style: italic;
+            border-left: 3px solid var(--accent);
+            padding-left: 16px;
+            margin-bottom: 8px;
+        }
+        .position-item p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            padding-left: 19px;
+        }
+
+        /* CTA FINAL */
+        .cta-final {
+            padding: 80px 0;
+            border-top: 1px solid var(--border);
+            text-align: center;
+        }
+        .cta-final h2 {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 16px;
+        }
+        .cta-final p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            margin-bottom: 32px;
+        }
+
+        /* FORM */
+        .audit-form {
+            max-width: 480px;
+            margin: 0 auto;
+            text-align: left;
+        }
+        .form-group {
+            margin-bottom: 16px;
+        }
+        .form-group label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: var(--text-muted);
+        }
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text);
+            font-size: 1rem;
+            font-family: inherit;
+        }
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+        .form-group textarea { resize: vertical; min-height: 80px; }
+        .form-submit {
+            width: 100%;
+            padding: 16px;
+            background: var(--accent);
+            color: #000;
+            font-weight: 700;
+            font-size: 1.1rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-top: 8px;
+        }
+        .form-submit:hover { background: var(--accent-hover); }
+        .form-note {
+            text-align: center;
+            margin-top: 12px;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        /* FOOTER */
+        footer {
+            border-top: 1px solid var(--border);
+            padding: 32px 0;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 600px) {
+            .hero { padding: 48px 0 40px; }
+            .guarantee-box { padding: 28px 20px; }
+            .del-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<nav>
+    <div class="container">
+        <div class="logo">contrarian<span>AI</span></div>
+        <a href="#audit-form">Request Audit</a>
+    </div>
+</nav>
+
+<section class="hero">
+    <div class="container">
+        <h1>Your AI <span class="highlight">looked great in the demo.</span><br>How's it doing in production?</h1>
+        <p class="subtitle">We find the structural failures that demos hide and production reveals. Paid AI Risk & Readiness Audit with a personal guarantee.</p>
+        <a href="#audit-form" class="cta-primary">Request Your Audit</a>
+        <br>
+        <div class="guarantee-badge">3+ issues found or you don't pay</div>
+    </div>
+</section>
+
+<section class="pain">
+    <div class="container">
+        <h2>If you've lost money on AI, it probably wasn't the model's fault.</h2>
+        <div class="pain-grid">
+            <div class="pain-card">
+                <div class="stat">90%</div>
+                <p>of "AI agents" are deterministic workflows in disguise — burning tokens on reasoning that should be an if/else statement.</p>
+            </div>
+            <div class="pain-card">
+                <div class="stat">147K</div>
+                <p>tokens is where context actually degrades — not the 200K advertised. Your AI is losing critical data before hitting the limit on the box.</p>
+            </div>
+            <div class="pain-card">
+                <div class="stat">40x</div>
+                <p>cost difference between running every subagent on Opus vs. right-sizing to Haiku. Most teams use the expensive model for everything.</p>
+            </div>
+            <div class="pain-card">
+                <div class="stat">0</div>
+                <p>errors logged when tool descriptions silently misroute calls. No alerts. No logs. Just wrong answers delivered with total confidence.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="findings">
+    <div class="container">
+        <h2>What the audit finds</h2>
+        <p class="lead">Every engagement so far has uncovered more than 3 production-impacting issues. Here's what we typically find:</p>
+
+        <div class="finding-item">
+            <div class="finding-icon">1</div>
+            <div>
+                <h3>Agent Architecture Failures</h3>
+                <p>Agents parsing natural language for completion signals instead of using stop_reason. Subagents assuming shared memory with coordinators. Self-evaluation bias — the builder grading its own homework.</p>
+            </div>
+        </div>
+
+        <div class="finding-item">
+            <div class="finding-icon">2</div>
+            <div>
+                <h3>Context Rot</h3>
+                <p>Progressive summarization destroying dollar amounts, order numbers, and dates. Lost-in-the-middle effect burying critical instructions. Memory systems accumulating contradictions until they're useless.</p>
+            </div>
+        </div>
+
+        <div class="finding-item">
+            <div class="finding-icon">3</div>
+            <div>
+                <h3>Tool & MCP Misconfigurations</h3>
+                <p>Tool descriptions causing silent misroutes. More than 4-5 tools per agent degrading selection reliability. No structured error responses — your AI can't tell the difference between "nothing found" and "the API failed."</p>
+            </div>
+        </div>
+
+        <div class="finding-item">
+            <div class="finding-icon">4</div>
+            <div>
+                <h3>Semantic Layer Gaps</h3>
+                <p>"Revenue" means 3 different things across 3 teams. Column names only make sense to employees who left 2 years ago. The AI picks a table and gives confident, plausible, wrong answers.</p>
+            </div>
+        </div>
+
+        <div class="finding-item">
+            <div class="finding-icon">5</div>
+            <div>
+                <h3>Token Waste</h3>
+                <p>Full file reads at 3,000 tokens when targeted grep costs 200. MCP servers consuming 2,000-8,000 tokens before any work starts. No batch API usage on latency-tolerant workflows.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="guarantee-section">
+    <div class="container">
+        <div class="guarantee-box">
+            <h2>The Personal Guarantee</h2>
+            <p>If I don't find at least 3 production-impacting issues in your AI stack, you don't pay. Period.</p>
+            <p class="fine-print">Every audit I've done so far has found more than 3. The structural failures are that common.</p>
+        </div>
+    </div>
+</section>
+
+<section class="deliverables">
+    <div class="container">
+        <h2>What you get</h2>
+        <div class="del-grid">
+            <div class="del-card">
+                <h3>Agent Architecture Review</h3>
+                <p>Multi-agent orchestration assessment. Loop design, context management, tool routing, session continuity. Agent-vs-workflow classification for every automation.</p>
+            </div>
+            <div class="del-card">
+                <h3>Context Rot Diagnostic</h3>
+                <p>Token usage analysis and context flow mapping. Where data degrades, what gets lost, and how to prevent it.</p>
+            </div>
+            <div class="del-card">
+                <h3>Tool & MCP Audit</h3>
+                <p>Tool description quality review, error taxonomy, config restructuring. Eliminate silent misroutes.</p>
+            </div>
+            <div class="del-card">
+                <h3>Token Economics Report</h3>
+                <p>Real cost per action, model selection efficiency, batch API eligibility, waste identification with dollar amounts.</p>
+            </div>
+            <div class="del-card">
+                <h3>Production Readiness Scorecard</h3>
+                <p>12-point assessment separating demos from products. Covers visibility, security, error handling, evaluation, and session continuity.</p>
+            </div>
+            <div class="del-card">
+                <h3>Prioritized Fix List</h3>
+                <p>Not a slide deck. Not a strategy document. A written report with prioritized, actionable fixes ordered by impact.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="who">
+    <div class="container">
+        <h2>Who this is for</h2>
+        <ul class="who-list">
+            <li>Engineering teams shipping AI products that work in demos but stumble in production</li>
+            <li>Enterprises deploying AI internally who suspect something is off but can't pinpoint it</li>
+            <li>CTOs and VPs of Engineering who need an independent, evidence-based assessment</li>
+            <li>Teams spending more on AI infrastructure than expected with unclear ROI</li>
+            <li>Anyone who's been told "just upgrade the model" and knows that's not the answer</li>
+        </ul>
+    </div>
+</section>
+
+<section class="positions">
+    <div class="container">
+        <h2>What we believe (that most vendors won't say)</h2>
+
+        <div class="position-item">
+            <blockquote>"A smarter model doesn't fix agent failures. A smarter environment does."</blockquote>
+            <p>Model upgrades are the most expensive way to avoid fixing your architecture.</p>
+        </div>
+
+        <div class="position-item">
+            <blockquote>"90% of automation needs are workflows, not agents."</blockquote>
+            <p>If you can draw the decision tree, you don't need an AI agent. You need an if/else statement that costs nothing to run.</p>
+        </div>
+
+        <div class="position-item">
+            <blockquote>"Agents cannot reliably judge their own output."</blockquote>
+            <p>If the same session that wrote the code is evaluating the code, you have no evaluation. You have confirmation bias with a GPU.</p>
+        </div>
+
+        <div class="position-item">
+            <blockquote>"More data degrades AI performance when context isn't managed."</blockquote>
+            <p>Throwing more information at the model doesn't make it smarter. Past a threshold, it makes it worse.</p>
+        </div>
+    </div>
+</section>
+
+<section class="cta-final" id="audit-form">
+    <div class="container">
+        <h2>Request your AI Risk & Readiness Audit</h2>
+        <p>Limited slots available. Personal guarantee applies to every engagement.</p>
+
+        <form class="audit-form" action="https://formspree.io/f/YOUR_FORM_ID" method="POST">
+            <div class="form-group">
+                <label for="name">Name</label>
+                <input type="text" id="name" name="name" required placeholder="Your full name">
+            </div>
+            <div class="form-group">
+                <label for="email">Work Email</label>
+                <input type="email" id="email" name="email" required placeholder="you@company.com">
+            </div>
+            <div class="form-group">
+                <label for="company">Company</label>
+                <input type="text" id="company" name="company" required placeholder="Company name">
+            </div>
+            <div class="form-group">
+                <label for="role">Role</label>
+                <input type="text" id="role" name="role" placeholder="CTO, VP Engineering, etc.">
+            </div>
+            <div class="form-group">
+                <label for="ai_stack">What AI are you running in production?</label>
+                <textarea id="ai_stack" name="ai_stack" placeholder="e.g., Multi-agent system on Claude, RAG pipeline on GPT-4, internal copilot, etc."></textarea>
+            </div>
+            <div class="form-group">
+                <label for="pain">What's not working as expected?</label>
+                <textarea id="pain" name="pain" placeholder="e.g., Wrong answers, high costs, trust issues, slow performance..."></textarea>
+            </div>
+            <button type="submit" class="form-submit">Request Audit</button>
+            <p class="form-note">I'll respond within 24 hours. No spam. No sales sequences.</p>
+        </form>
+    </div>
+</section>
+
+<footer>
+    <div class="container">
+        <p>&copy; 2026 contrarianAI. We find what's actually wrong with your AI before your users do.</p>
+    </div>
+</footer>
+
+</body>
+</html>

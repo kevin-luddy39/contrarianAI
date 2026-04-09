@@ -1,0 +1,14 @@
+services:
+  - type: web
+    runtime: static
+    name: contrarianai-landing
+    buildCommand: echo "Static site - no build needed"
+    staticPublishPath: ./landing
+    envVars: []
+    headers:
+      - path: /*
+        name: X-Frame-Options
+        value: DENY
+      - path: /*
+        name: X-Content-Type-Options
+        value: nosniff

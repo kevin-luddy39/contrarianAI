@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "render": {
+      "type": "url",
+      "url": "https://mcp.render.com/mcp"
+    }
+  }
+}

@@ -9,6 +9,7 @@
   "dependencies": {
     "express": "^4.21.0",
     "pg": "^8.13.0",
+    "ua-parser-js": "^1.0.39",
     "nodemailer": "^6.9.0"
   }
 }

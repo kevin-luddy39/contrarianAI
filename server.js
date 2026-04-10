@@ -166,6 +166,10 @@ app.use((req, res, next) => {
 });
 
 // Visit tracking
+const EXCLUDED_IPS = new Set(
+  (process.env.EXCLUDED_IPS || '98.24.147.4').split(',').map(s => s.trim()).filter(Boolean)
+);
+
 function isPageRequest(req) {
   if (req.method !== 'GET') return false;
   if (req.path.startsWith('/api/')) return false;
@@ -177,6 +181,7 @@ function isPageRequest(req) {
 app.use((req, res, next) => {
   if (isPageRequest(req)) {
     const ip = (req.headers['x-forwarded-for'] || '').split(',')[0].trim() || req.ip || '';
+    if (EXCLUDED_IPS.has(ip)) return next();
     const ua = req.headers['user-agent'] || '';
     const parser = new UAParser(ua);
     const browser = parser.getBrowser();

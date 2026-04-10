@@ -3,9 +3,12 @@ const path = require('path');
 const { Pool } = require('pg');
 const nodemailer = require('nodemailer');
 const UAParser = require('ua-parser-js');
+const Stripe = require('stripe');
+const { renderAdminPage } = require('./admin');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const PUBLIC_URL = process.env.PUBLIC_URL || 'https://contrarianai-landing.onrender.com';
 
 app.set('trust proxy', true);
 
@@ -26,6 +29,22 @@ async function initDb() {
       ai_stack TEXT,
       pain TEXT,
       created_at TIMESTAMPTZ DEFAULT NOW()
+    )
+  `);
+  await pool.query(`ALTER TABLE audit_requests ADD COLUMN IF NOT EXISTS status TEXT DEFAULT 'new'`);
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS payments (
+      id SERIAL PRIMARY KEY,
+      audit_request_id INTEGER REFERENCES audit_requests(id) ON DELETE CASCADE,
+      amount_cents INTEGER NOT NULL,
+      currency TEXT DEFAULT 'usd',
+      description TEXT,
+      stripe_session_id TEXT UNIQUE,
+      stripe_session_url TEXT,
+      stripe_payment_intent_id TEXT,
+      status TEXT DEFAULT 'pending',
+      created_at TIMESTAMPTZ DEFAULT NOW(),
+      paid_at TIMESTAMPTZ
     )
   `);
   await pool.query(`
@@ -68,17 +87,89 @@ if (process.env.SMTP_USER && process.env.SMTP_PASS) {
   console.warn('SMTP_USER/SMTP_PASS not set — email notifications disabled');
 }
 
-// Security headers
+// Stripe setup
+let stripe = null;
+if (process.env.STRIPE_SECRET_KEY) {
+  stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+  console.log('Stripe enabled');
+} else {
+  console.warn('STRIPE_SECRET_KEY not set — payments disabled');
+}
+
+// ============================================================
+// STRIPE WEBHOOK — must use raw body, mounted BEFORE express.json()
+// ============================================================
+app.post('/api/stripe/webhook', express.raw({ type: 'application/json' }), async (req, res) => {
+  if (!stripe || !process.env.STRIPE_WEBHOOK_SECRET) {
+    return res.status(503).send('Stripe webhook not configured');
+  }
+
+  const sig = req.headers['stripe-signature'];
+  let event;
+  try {
+    event = stripe.webhooks.constructEvent(req.body, sig, process.env.STRIPE_WEBHOOK_SECRET);
+  } catch (err) {
+    console.error('Webhook signature verification failed:', err.message);
+    return res.status(400).send(`Webhook Error: ${err.message}`);
+  }
+
+  if (event.type === 'checkout.session.completed') {
+    const session = event.data.object;
+    try {
+      const result = await pool.query(
+        `UPDATE payments
+         SET status = 'paid', paid_at = NOW(), stripe_payment_intent_id = $1
+         WHERE stripe_session_id = $2
+         RETURNING audit_request_id, amount_cents`,
+        [session.payment_intent, session.id]
+      );
+
+      if (result.rows.length > 0) {
+        const { audit_request_id, amount_cents } = result.rows[0];
+        await pool.query(`UPDATE audit_requests SET status = 'paid' WHERE id = $1`, [audit_request_id]);
+
+        if (transporter) {
+          const r = await pool.query('SELECT name, email, company FROM audit_requests WHERE id = $1', [audit_request_id]);
+          const lead = r.rows[0];
+          transporter.sendMail({
+            from: `"contrarianAI" <${process.env.SMTP_USER}>`,
+            to: NOTIFY_EMAIL,
+            subject: `Payment received: $${(amount_cents / 100).toFixed(2)} from ${lead.name} at ${lead.company}`,
+            text: [
+              `Payment confirmed.`,
+              ``,
+              `Customer: ${lead.name} <${lead.email}>`,
+              `Company:  ${lead.company}`,
+              `Amount:   $${(amount_cents / 100).toFixed(2)}`,
+              `Stripe PI: ${session.payment_intent}`,
+              ``,
+              `Next: schedule kickoff call.`,
+            ].join('\n'),
+          }).catch(err => console.error('Payment notify error:', err));
+        }
+      }
+    } catch (err) {
+      console.error('Payment update error:', err);
+    }
+  }
+
+  res.json({ received: true });
+});
+
+// ============================================================
+// Standard middleware
+// ============================================================
 app.use((req, res, next) => {
   res.set('X-Frame-Options', 'DENY');
   res.set('X-Content-Type-Options', 'nosniff');
   next();
 });
 
-// Visit tracking middleware — only counts page views, not assets
+// Visit tracking
 function isPageRequest(req) {
   if (req.method !== 'GET') return false;
   if (req.path.startsWith('/api/')) return false;
+  if (req.path.startsWith('/admin')) return false;
   const ext = path.extname(req.path);
   return !ext || ext === '.html';
 }
@@ -113,9 +204,12 @@ app.use((req, res, next) => {
 });
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(express.static('landing'));
 
-// Form submission endpoint
+// ============================================================
+// Form submission
+// ============================================================
 app.post('/api/audit-request', async (req, res) => {
   const { name, email, company, role, ai_stack, pain } = req.body;
 
@@ -154,7 +248,123 @@ app.post('/api/audit-request', async (req, res) => {
   res.json({ success: true });
 });
 
+// ============================================================
+// Admin (basic auth)
+// ============================================================
+function requireAdmin(req, res, next) {
+  if (!process.env.ADMIN_USER || !process.env.ADMIN_PASS) {
+    return res.status(503).send('Admin not configured. Set ADMIN_USER and ADMIN_PASS env vars.');
+  }
+  const auth = req.headers.authorization || '';
+  const [type, encoded] = auth.split(' ');
+  if (type === 'Basic' && encoded) {
+    const [user, pass] = Buffer.from(encoded, 'base64').toString().split(':');
+    if (user === process.env.ADMIN_USER && pass === process.env.ADMIN_PASS) {
+      return next();
+    }
+  }
+  res.set('WWW-Authenticate', 'Basic realm="contrarianAI Admin"');
+  return res.status(401).send('Authentication required');
+}
+
+app.get('/admin', requireAdmin, async (req, res) => {
+  try {
+    const requestsResult = await pool.query(`
+      SELECT
+        r.id, r.name, r.email, r.company, r.role, r.ai_stack, r.pain, r.status, r.created_at,
+        p.id as payment_id,
+        p.amount_cents,
+        p.status as payment_status,
+        p.stripe_session_url,
+        p.created_at as payment_created_at,
+        p.paid_at
+      FROM audit_requests r
+      LEFT JOIN LATERAL (
+        SELECT * FROM payments WHERE audit_request_id = r.id ORDER BY created_at DESC LIMIT 1
+      ) p ON true
+      ORDER BY r.created_at DESC
+    `);
+
+    const totalsResult = await pool.query(`
+      SELECT
+        (SELECT COUNT(*)::int FROM audit_requests) as total_leads,
+        (SELECT COUNT(*)::int FROM audit_requests WHERE status = 'new') as new_leads,
+        (SELECT COUNT(*)::int FROM audit_requests WHERE status = 'payment_sent') as payment_sent,
+        (SELECT COUNT(*)::int FROM audit_requests WHERE status = 'paid') as paid_leads,
+        (SELECT COALESCE(SUM(amount_cents), 0)::int FROM payments WHERE status = 'paid') as total_revenue_cents
+    `);
+    const t = totalsResult.rows[0];
+
+    res.send(renderAdminPage({
+      requests: requestsResult.rows,
+      totals: {
+        totalLeads: t.total_leads,
+        newLeads: t.new_leads,
+        paymentSent: t.payment_sent,
+        paidLeads: t.paid_leads,
+        totalRevenueCents: t.total_revenue_cents,
+      },
+      stripeEnabled: !!stripe,
+    }));
+  } catch (err) {
+    console.error('Admin error:', err);
+    res.status(500).send('Internal server error');
+  }
+});
+
+app.post('/admin/payment', requireAdmin, async (req, res) => {
+  if (!stripe) return res.status(503).send('Stripe not configured');
+
+  const { audit_request_id, amount_usd, description } = req.body;
+  const amountCents = Math.round(parseFloat(amount_usd) * 100);
+
+  if (!audit_request_id || isNaN(amountCents) || amountCents < 100) {
+    return res.status(400).send('Invalid request: amount must be at least $1.00');
+  }
+
+  try {
+    const reqResult = await pool.query('SELECT email, name FROM audit_requests WHERE id = $1', [audit_request_id]);
+    if (reqResult.rows.length === 0) return res.status(404).send('Audit request not found');
+    const customer = reqResult.rows[0];
+
+    const session = await stripe.checkout.sessions.create({
+      mode: 'payment',
+      payment_method_types: ['card'],
+      customer_email: customer.email,
+      line_items: [{
+        price_data: {
+          currency: 'usd',
+          unit_amount: amountCents,
+          product_data: {
+            name: description || 'AI Risk & Readiness Audit',
+            description: 'contrarianAI engagement',
+          },
+        },
+        quantity: 1,
+      }],
+      success_url: `${PUBLIC_URL}/payment-success.html`,
+      cancel_url: `${PUBLIC_URL}/`,
+      metadata: { audit_request_id: String(audit_request_id) },
+    });
+
+    await pool.query(
+      `INSERT INTO payments (audit_request_id, amount_cents, description, stripe_session_id, stripe_session_url)
+       VALUES ($1, $2, $3, $4, $5)`,
+      [audit_request_id, amountCents, description || 'AI Risk & Readiness Audit', session.id, session.url]
+    );
+
+    await pool.query(`UPDATE audit_requests SET status = 'payment_sent' WHERE id = $1`, [audit_request_id]);
+
+    res.redirect('/admin');
+  } catch (err) {
+    console.error('Stripe session error:', err);
+    res.status(500).send('Failed to create payment session: ' + err.message);
+  }
+});
+
+// ============================================================
 // Visit reporting
+// ============================================================
 let reportInFlight = false;
 
 async function buildVisitReport(since) {
@@ -224,11 +434,11 @@ async function buildVisitReport(since) {
     `contrarianAI — Visit Report`,
     `===========================`,
     ``,
-    `Window:          ${new Date(since).toISOString()}  →  ${new Date().toISOString()}`,
+    `Window:          ${new Date(since).toISOString()}  ->  ${new Date().toISOString()}`,
     `Total visits:    ${t.total}`,
     `Unique visitors: ${t.unique_visitors}`,
-    `First visit:     ${t.first_visit ? new Date(t.first_visit).toISOString() : '—'}`,
-    `Last visit:      ${t.last_visit ? new Date(t.last_visit).toISOString() : '—'}`,
+    `First visit:     ${t.first_visit ? new Date(t.first_visit).toISOString() : '-'}`,
+    `Last visit:      ${t.last_visit ? new Date(t.last_visit).toISOString() : '-'}`,
     ``,
     `Top Referrers`,
     `-------------`,
@@ -287,10 +497,8 @@ async function sendVisitReport(reason) {
     console.log(`Visit report sent (${count} visits, ${reason})`);
   } else {
     console.log(`Would send visit report (${count} visits, ${reason}) but SMTP not configured`);
-    console.log(body);
   }
 
-  // Reset window
   await pool.query('UPDATE report_state SET last_report_at = NOW() WHERE id = 1');
 }
 
@@ -324,7 +532,6 @@ async function checkReport() {
   }
 }
 
-// Check every 60 seconds
 setInterval(checkReport, 60 * 1000);
 
 // Start server after DB is ready

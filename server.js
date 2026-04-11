@@ -48,6 +48,18 @@ async function initDb() {
     )
   `);
   await pool.query(`
+    CREATE TABLE IF NOT EXISTS assessments (
+      id SERIAL PRIMARY KEY,
+      name TEXT NOT NULL,
+      email TEXT NOT NULL,
+      company TEXT NOT NULL,
+      score INTEGER NOT NULL,
+      band TEXT NOT NULL,
+      answers JSONB,
+      created_at TIMESTAMPTZ DEFAULT NOW()
+    )
+  `);
+  await pool.query(`
     CREATE TABLE IF NOT EXISTS visits (
       id SERIAL PRIMARY KEY,
       ip TEXT,
@@ -248,6 +260,131 @@ app.post('/api/audit-request', async (req, res) => {
         `Pain:     ${pain || '(not provided)'}`,
       ].join('\n'),
     }).catch(err => console.error('Email send error:', err));
+  }
+
+  res.json({ success: true });
+});
+
+// ============================================================
+// Self-assessment submission
+// ============================================================
+const QUESTION_TITLES = {
+  observability: 'Observability',
+  env_separation: 'Environment separation',
+  secrets: 'Secrets management',
+  rate_limiting: 'Rate limiting',
+  unhappy_paths: 'Unhappy path testing',
+  config_separation: 'Config separation',
+  error_surfacing: 'Error surfacing',
+  cost_controls: 'Cost controls',
+  external_eval: 'External evaluation',
+  session_continuity: 'Session continuity',
+  compaction: 'Compaction resilience',
+  escalation: 'Escalation logic',
+};
+
+function buildAssessmentEmail(name, score, band, answers) {
+  const lines = [
+    `Hi ${name},`,
+    ``,
+    `Here are your AI Production Readiness Self-Assessment results:`,
+    ``,
+    `Score: ${score} / 24`,
+    `Band:  ${band}`,
+    ``,
+    `Breakdown:`,
+    ...Object.entries(answers).map(([key, val]) => {
+      const title = QUESTION_TITLES[key] || key;
+      return `  ${title.padEnd(28)} ${val} / 2`;
+    }),
+    ``,
+    `What this means:`,
+    ``,
+  ];
+
+  if (score >= 20) {
+    lines.push(
+      `You're in the top ~5% of teams running AI in production. The paid audit will still find 3+ issues — we always do — but they'll be subtler: tool description routing, context rot patterns, semantic layer gaps. Worth doing if you're scaling past $50K/month in AI spend.`
+    );
+  } else if (score >= 14) {
+    lines.push(
+      `You have the basics right but are exposed in 3-5 specific areas. A targeted audit will recover 5-10x its cost in the first quarter, usually through cost optimization or reducing silent failure rates. This is our most common client profile.`
+    );
+  } else if (score >= 8) {
+    lines.push(
+      `You're running what most vendors would call a "working AI product," but it's structurally brittle. You almost certainly have active incidents you can't diagnose, high spend you can't explain, and users losing trust for reasons you can't pinpoint. The audit will find 10+ fixable issues.`
+    );
+  } else {
+    lines.push(
+      `Stop. Before you add features, fix the foundation. If you're generating revenue on this stack, you're running on borrowed time. The audit becomes a mandatory step before your next release — not a nice-to-have.`
+    );
+  }
+
+  lines.push(
+    ``,
+    `Lowest-scoring items (where I'd start):`,
+    ...Object.entries(answers)
+      .filter(([, val]) => val <= 1)
+      .sort((a, b) => a[1] - b[1])
+      .slice(0, 3)
+      .map(([key, val]) => `  - ${QUESTION_TITLES[key] || key} (${val}/2)`),
+    ``,
+    `If you want the full audit — with prioritized fixes, a written report, and the personal guarantee that I find 3+ production-impacting issues or you don't pay:`,
+    ``,
+    `  https://contrarianai-landing.onrender.com/#audit-form`,
+    ``,
+    `— Kevin`,
+    `contrarianAI`
+  );
+
+  return lines.join('\n');
+}
+
+app.post('/api/assessment', async (req, res) => {
+  const { name, email, company, score, band, answers } = req.body;
+
+  if (!name || !email || !company || typeof score !== 'number' || !band || !answers) {
+    return res.status(400).json({ error: 'Missing required fields.' });
+  }
+
+  try {
+    await pool.query(
+      'INSERT INTO assessments (name, email, company, score, band, answers) VALUES ($1, $2, $3, $4, $5, $6)',
+      [name, email, company, score, band, JSON.stringify(answers)]
+    );
+  } catch (err) {
+    console.error('Assessment insert error:', err);
+    return res.status(500).json({ error: 'Failed to save assessment.' });
+  }
+
+  if (transporter) {
+    // Send results to the user
+    transporter.sendMail({
+      from: `"contrarianAI" <${process.env.SMTP_USER}>`,
+      to: email,
+      bcc: NOTIFY_EMAIL,
+      subject: `Your AI Production Readiness Score: ${score}/24 — ${band}`,
+      text: buildAssessmentEmail(name, score, band, answers),
+    }).catch(err => console.error('Assessment email error:', err));
+
+    // Lead notification (separate so subject is distinct)
+    transporter.sendMail({
+      from: `"contrarianAI" <${process.env.SMTP_USER}>`,
+      to: NOTIFY_EMAIL,
+      subject: `New Assessment Lead: ${name} at ${company} — ${score}/24`,
+      text: [
+        `Self-assessment completed:`,
+        ``,
+        `Name:    ${name}`,
+        `Email:   ${email}`,
+        `Company: ${company}`,
+        `Score:   ${score} / 24`,
+        `Band:    ${band}`,
+        ``,
+        `Answers:`,
+        ...Object.entries(answers).map(([k, v]) => `  ${(QUESTION_TITLES[k] || k).padEnd(28)} ${v}/2`),
+      ].join('\n'),
+    }).catch(err => console.error('Assessment notify error:', err));
   }
 
   res.json({ success: true });

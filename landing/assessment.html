@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Production Readiness Self-Assessment — contrarianAI</title>
+    <meta name="description" content="12-question diagnostic that maps your AI stack against the structural failures that production reveals. Get your score in 10 minutes.">
+    <meta property="og:title" content="AI Production Readiness Self-Assessment">
+    <meta property="og:description" content="12 questions. 10 minutes. Find out if your AI is production-grade or a demo in disguise.">
+    <style>
+        :root {
+            --bg: #0a0a0a;
+            --surface: #141414;
+            --surface-2: #1f1f1f;
+            --border: #262626;
+            --text: #e5e5e5;
+            --text-muted: #a3a3a3;
+            --accent: #f97316;
+            --accent-hover: #fb923c;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --success: #22c55e;
+            --info: #3b82f6;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 760px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+        nav {
+            border-bottom: 1px solid var(--border);
+            padding: 16px 0;
+        }
+        nav .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo {
+            font-size: 1.25rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            text-decoration: none;
+            color: var(--text);
+        }
+        .logo span { color: var(--accent); }
+        nav a.cta {
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .hero {
+            padding: 60px 0 40px;
+            text-align: center;
+        }
+        .hero h1 {
+            font-size: clamp(1.8rem, 4vw, 2.4rem);
+            font-weight: 800;
+            line-height: 1.15;
+            letter-spacing: -0.03em;
+            margin-bottom: 16px;
+        }
+        .hero h1 span { color: var(--accent); }
+        .hero .subtitle {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            max-width: 560px;
+            margin: 0 auto 24px;
+        }
+        .hero .meta {
+            display: inline-flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            justify-content: center;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+        .hero .meta span::before {
+            content: "→";
+            color: var(--accent);
+            margin-right: 6px;
+            font-weight: 700;
+        }
+
+        .intro {
+            padding: 40px 0 20px;
+            border-top: 1px solid var(--border);
+        }
+        .intro p {
+            color: var(--text-muted);
+            margin-bottom: 12px;
+        }
+        .intro strong { color: var(--text); }
+
+        .section-title {
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--accent);
+            margin: 40px 0 16px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .question {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 24px;
+            margin-bottom: 16px;
+        }
+        .question.answered {
+            border-color: var(--accent);
+        }
+        .question-number {
+            display: inline-block;
+            background: var(--surface-2);
+            color: var(--accent);
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+        .question h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+        .question p.prompt {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            margin-bottom: 16px;
+        }
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .option {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 12px 14px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .option:hover {
+            border-color: var(--text-muted);
+        }
+        .option input[type="radio"] {
+            accent-color: var(--accent);
+            margin-top: 3px;
+            flex-shrink: 0;
+        }
+        .option input[type="radio"]:checked ~ .option-label {
+            color: var(--text);
+        }
+        .option:has(input:checked) {
+            border-color: var(--accent);
+            background: #1a0f03;
+        }
+        .option-score {
+            display: inline-block;
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            background: var(--surface-2);
+            padding: 2px 8px;
+            border-radius: 3px;
+            margin-right: 8px;
+        }
+        .option-label {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        .submit-area {
+            padding: 32px 0 60px;
+            text-align: center;
+        }
+        .progress {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 16px;
+        }
+        .progress strong { color: var(--accent); }
+        .btn-primary {
+            background: var(--accent);
+            color: #000;
+            font-weight: 700;
+            font-size: 1.05rem;
+            padding: 16px 40px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn-primary:hover:not(:disabled) { background: var(--accent-hover); }
+        .btn-primary:disabled {
+            background: var(--surface-2);
+            color: var(--text-muted);
+            cursor: not-allowed;
+        }
+
+        /* Results */
+        .results {
+            display: none;
+            padding: 60px 0 40px;
+        }
+        .results.visible { display: block; }
+        .score-card {
+            background: var(--surface);
+            border: 2px solid var(--accent);
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            margin-bottom: 32px;
+        }
+        .score-card .label {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 8px;
+        }
+        .score-value {
+            font-size: 4rem;
+            font-weight: 800;
+            color: var(--accent);
+            line-height: 1;
+            margin-bottom: 8px;
+        }
+        .score-value .denom {
+            font-size: 1.5rem;
+            color: var(--text-muted);
+        }
+        .band {
+            display: inline-block;
+            font-size: 1rem;
+            font-weight: 700;
+            padding: 6px 16px;
+            border-radius: 6px;
+            margin-top: 8px;
+        }
+        .band.grade-a { background: var(--success); color: #000; }
+        .band.grade-b { background: var(--info); color: #000; }
+        .band.grade-c { background: var(--warning); color: #000; }
+        .band.grade-d { background: var(--danger); color: #fff; }
+
+        .band-description {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-left: 4px solid var(--accent);
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+        .band-description h3 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+        .band-description p {
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+
+        .breakdown {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 32px;
+        }
+        .breakdown h3 {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+        }
+        .breakdown-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.9rem;
+        }
+        .breakdown-item:last-child { border-bottom: none; }
+        .breakdown-item .q-title { color: var(--text); }
+        .breakdown-item .q-score {
+            font-weight: 700;
+            font-family: monospace;
+        }
+        .q-score.s0 { color: var(--danger); }
+        .q-score.s1 { color: var(--warning); }
+        .q-score.s2 { color: var(--success); }
+
+        .email-form {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 32px;
+        }
+        .email-form h3 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        .email-form p {
+            color: var(--text-muted);
+            margin-bottom: 20px;
+            font-size: 0.95rem;
+        }
+        .email-form .form-group {
+            margin-bottom: 14px;
+        }
+        .email-form label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: var(--text-muted);
+        }
+        .email-form input {
+            width: 100%;
+            padding: 12px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text);
+            font-size: 1rem;
+            font-family: inherit;
+        }
+        .email-form input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+        .email-form button {
+            width: 100%;
+            margin-top: 8px;
+            padding: 14px;
+            background: var(--accent);
+            color: #000;
+            font-weight: 700;
+            font-size: 1rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        .email-form button:hover:not(:disabled) { background: var(--accent-hover); }
+        .email-form button:disabled {
+            background: var(--surface-2);
+            color: var(--text-muted);
+            cursor: not-allowed;
+        }
+        .email-status {
+            margin-top: 12px;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            display: none;
+        }
+        .email-status.success {
+            display: block;
+            background: #062013;
+            border: 1px solid var(--success);
+            color: var(--success);
+        }
+        .email-status.error {
+            display: block;
+            background: #200606;
+            border: 1px solid var(--danger);
+            color: var(--danger);
+        }
+
+        .next-cta {
+            margin-top: 32px;
+            text-align: center;
+            padding: 24px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+        }
+        .next-cta a {
+            color: var(--accent);
+            font-weight: 700;
+            text-decoration: none;
+        }
+        .next-cta a:hover { color: var(--accent-hover); }
+
+        footer {
+            border-top: 1px solid var(--border);
+            padding: 32px 0;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-top: 60px;
+        }
+
+        @media (max-width: 600px) {
+            .question { padding: 18px; }
+            .score-card { padding: 28px 20px; }
+            .score-value { font-size: 3rem; }
+        }
+    </style>
+</head>
+<body>
+
+<nav>
+    <div class="container">
+        <a href="/" class="logo">contrarian<span>AI</span></a>
+        <a href="/#audit-form" class="cta">Request Audit</a>
+    </div>
+</nav>
+
+<section class="hero">
+    <div class="container">
+        <h1>AI Production Readiness <span>Self-Assessment</span></h1>
+        <p class="subtitle">12 questions. 10 minutes. Find out if your AI stack is production-grade or a demo in disguise.</p>
+        <div class="meta">
+            <span>Based on real audit findings</span>
+            <span>Scored out of 24</span>
+            <span>Instant results</span>
+        </div>
+    </div>
+</section>
+
+<form id="assessment-form" class="container">
+
+<div class="intro">
+    <p><strong>How this works:</strong> Each question has three options worth 0, 1, or 2 points. Answer honestly — the point is to find gaps, not defend them.</p>
+    <p>If a question makes you think "let me check" — that's itself a finding. Pick the middle option and come back to it later.</p>
+</div>
+
+<div class="section-title">Part 1 — The Basics (demo vs. product)</div>
+
+<!-- Questions will be injected here -->
+<div id="questions-container"></div>
+
+<div class="submit-area">
+    <div class="progress">Answered <strong id="answered-count">0</strong> of <strong>12</strong> questions</div>
+    <button type="button" id="submit-btn" class="btn-primary" disabled>See My Score</button>
+</div>
+
+</form>
+
+<section class="results container" id="results">
+    <div class="score-card">
+        <div class="label">Your Score</div>
+        <div class="score-value"><span id="score-num">0</span><span class="denom">/24</span></div>
+        <div class="band" id="band-badge">Band</div>
+    </div>
+
+    <div class="band-description" id="band-description"></div>
+
+    <div class="breakdown">
+        <h3>Your Answers</h3>
+        <div id="breakdown-list"></div>
+    </div>
+
+    <div class="email-form">
+        <h3>Email me my results</h3>
+        <p>We'll send your full scored report + a PDF version you can share with your team. You'll also hear from us if you want help on the lowest-scoring items.</p>
+        <form id="email-results-form">
+            <div class="form-group">
+                <label for="r-name">Name</label>
+                <input type="text" id="r-name" name="name" required placeholder="Your full name">
+            </div>
+            <div class="form-group">
+                <label for="r-email">Work Email</label>
+                <input type="email" id="r-email" name="email" required placeholder="you@company.com">
+            </div>
+            <div class="form-group">
+                <label for="r-company">Company</label>
+                <input type="text" id="r-company" name="company" required placeholder="Company name">
+            </div>
+            <button type="submit" id="email-submit-btn">Send me my results</button>
+            <div id="email-status" class="email-status"></div>
+        </form>
+    </div>
+
+    <div class="next-cta">
+        <p>Ready to fix what's broken? <a href="/#audit-form">Request the paid AI Risk &amp; Readiness Audit →</a></p>
+    </div>
+</section>
+
+<footer>
+    <div class="container">
+        <p>&copy; 2026 contrarianAI. We find what's actually wrong with your AI before your users do.</p>
+    </div>
+</footer>
+
+<script>
+const questions = [
+    {
+        id: 'observability',
+        category: 'basics',
+        title: 'Observability',
+        prompt: 'Do you have structured logs AND active alerting for errors in your AI pipeline?',
+        options: [
+            { score: 0, label: 'No structured logs, no alerts. Errors are discovered by users telling you.' },
+            { score: 1, label: 'You log to stdout or a file, but nothing pages you when something breaks.' },
+            { score: 2, label: 'Structured logs (JSON) + alerting on error rate, latency, and cost anomalies.' }
+        ]
+    },
+    {
+        id: 'env_separation',
+        category: 'basics',
+        title: 'Environment separation',
+        prompt: 'Do you have a staging environment that mirrors production, with its own credentials?',
+        options: [
+            { score: 0, label: 'You deploy straight to prod. "Staging" is your laptop.' },
+            { score: 1, label: 'You have a staging environment but it shares prod credentials, data, or keys.' },
+            { score: 2, label: 'Fully separated envs with distinct credentials, isolated data, distinct API keys.' }
+        ]
+    },
+    {
+        id: 'secrets',
+        category: 'basics',
+        title: 'Secrets management',
+        prompt: 'Where are your API keys, model provider tokens, and credentials stored?',
+        options: [
+            { score: 0, label: 'In code, committed to git, or in plaintext config files.' },
+            { score: 1, label: 'In environment variables, but shared across the team via Slack/email.' },
+            { score: 2, label: 'In a proper secret manager with access audited.' }
+        ]
+    },
+    {
+        id: 'rate_limiting',
+        category: 'basics',
+        title: 'Rate limiting',
+        prompt: 'Do your public-facing and AI-calling endpoints enforce rate limits?',
+        options: [
+            { score: 0, label: 'No rate limiting. A single user could spike your token bill 100x in an hour.' },
+            { score: 1, label: 'Some endpoints (e.g., login) are limited, but AI endpoints aren\'t.' },
+            { score: 2, label: 'All endpoints — especially AI calls — enforce per-user and per-endpoint limits.' }
+        ]
+    },
+    {
+        id: 'unhappy_paths',
+        category: 'basics',
+        title: 'Unhappy path testing',
+        prompt: 'Have you explicitly tested empty submissions, double-clicks, expired sessions, malformed inputs, timeouts, and provider failures?',
+        options: [
+            { score: 0, label: 'You\'ve tested the happy path. "It works in the demo."' },
+            { score: 1, label: 'You test some failure modes but not systematically.' },
+            { score: 2, label: 'You have automated tests for each unhappy path, and they run on every deploy.' }
+        ]
+    },
+    {
+        id: 'config_separation',
+        category: 'basics',
+        title: 'Config separation',
+        prompt: 'Are your dev, staging, and prod configs distinct files with separate credentials and endpoints?',
+        options: [
+            { score: 0, label: 'One config file. You change env vars when you want to "switch" environments.' },
+            { score: 1, label: 'Separate configs for dev and prod, but models/keys are the same.' },
+            { score: 2, label: 'Separate configs AND separate credentials AND separate model accounts.' }
+        ]
+    },
+    {
+        id: 'error_surfacing',
+        category: 'basics',
+        title: 'Error surfacing',
+        prompt: 'Are errors surfaced to your logs and alerting, or do catch blocks silently swallow them?',
+        options: [
+            { score: 0, label: 'Silent try/except everywhere. Users see wrong answers with no trace in logs.' },
+            { score: 1, label: 'Errors are logged, but nothing alerts you when the rate spikes.' },
+            { score: 2, label: 'Every caught error is logged with context AND contributes to an error-rate alert.' }
+        ]
+    },
+    {
+        id: 'cost_controls',
+        category: 'basics',
+        title: 'Cost controls',
+        prompt: 'Do you track AI spend AND enforce per-user or per-endpoint token limits?',
+        options: [
+            { score: 0, label: 'You find out your token bill at the end of the month.' },
+            { score: 1, label: 'You track spend in a dashboard but don\'t enforce any limits.' },
+            { score: 2, label: 'Tracking + per-user limits + billing alerts that fire BEFORE you blow budget.' }
+        ]
+    },
+    {
+        id: 'external_eval',
+        category: 'advanced',
+        title: 'External evaluation',
+        prompt: 'When your AI produces output, is it judged by something OTHER than the same session that produced it?',
+        options: [
+            { score: 0, label: 'The AI writes the code and the same AI says "looks good." Confirmation bias with a GPU.' },
+            { score: 1, label: 'Sometimes a different prompt/session evaluates, but not systematically.' },
+            { score: 2, label: 'External evaluator runs on every generation. Builder and judge are never the same entity.' }
+        ]
+    },
+    {
+        id: 'session_continuity',
+        category: 'advanced',
+        title: 'Session continuity',
+        prompt: 'When a session ends, do you have a structured handoff artifact — not just a raw transcript?',
+        options: [
+            { score: 0, label: 'Every new session starts blind. Users explain the problem all over again.' },
+            { score: 1, label: 'You keep conversation history but the next session has to re-read 10K tokens to orient.' },
+            { score: 2, label: 'Structured handoff: state, decisions, completed work, next actions — persisted as a compact artifact.' }
+        ]
+    },
+    {
+        id: 'compaction',
+        category: 'advanced',
+        title: 'Compaction resilience',
+        prompt: 'When context gets summarized or compacted, do your plans, checklists, and critical constraints survive intact?',
+        options: [
+            { score: 0, label: 'Not thought about. Summarization destroys dollar amounts, order numbers, and the original plan.' },
+            { score: 1, label: 'You\'ve noticed the problem but haven\'t fixed it.' },
+            { score: 2, label: 'Critical state is persisted outside the context window and re-injected on each turn.' }
+        ]
+    },
+    {
+        id: 'escalation',
+        category: 'advanced',
+        title: 'Escalation logic',
+        prompt: 'When your AI escalates to a human, is the trigger a structured event — or is it based on sentiment?',
+        options: [
+            { score: 0, label: 'Sentiment-based. You\'re using the AI to guess when the AI is failing.' },
+            { score: 1, label: 'Some structured triggers (e.g., retry count) but sentiment is still in the mix.' },
+            { score: 2, label: 'Escalations fire on explicit structured conditions: retries, confidence, validator failed.' }
+        ]
+    }
+];
+
+const bands = [
+    {
+        min: 20, max: 24, grade: 'a', title: 'Production-grade',
+        description: 'You\'re in the top ~5% of teams running AI in production. The paid audit will still find 3+ issues — we always do — but they\'ll be subtler: tool description routing, context rot patterns, semantic layer gaps. Worth doing if you\'re scaling past $50K/month in AI spend.'
+    },
+    {
+        min: 14, max: 19, grade: 'b', title: 'Mostly there, notable gaps',
+        description: 'You have the basics right but are exposed in 3–5 specific areas. A targeted audit will recover 5–10x its cost in the first quarter, usually through cost optimization or reducing silent failure rates. This is our most common client profile.'
+    },
+    {
+        min: 8, max: 13, grade: 'c', title: 'Significant risk',
+        description: 'You\'re running what most vendors would call a "working AI product," but it\'s structurally brittle. You almost certainly have active incidents you can\'t diagnose, high spend you can\'t explain, and users losing trust for reasons you can\'t pinpoint. The audit will find 10+ fixable issues.'
+    },
+    {
+        min: 0, max: 7, grade: 'd', title: 'You\'re shipping a prototype',
+        description: 'Stop. Before you add features, fix the foundation. If you\'re generating revenue on this stack, you\'re running on borrowed time. The audit becomes a MANDATORY step before your next release — not a nice-to-have.'
+    }
+];
+
+// Render questions
+const container = document.getElementById('questions-container');
+let lastCategory = 'basics';
+questions.forEach((q, idx) => {
+    if (q.category !== lastCategory) {
+        const title = document.createElement('div');
+        title.className = 'section-title';
+        title.textContent = 'Part 2 — The Advanced Checks (what most teams miss)';
+        container.appendChild(title);
+        lastCategory = q.category;
+    }
+    const div = document.createElement('div');
+    div.className = 'question';
+    div.id = 'q-' + q.id;
+    div.innerHTML = `
+        <span class="question-number">Q${idx + 1}</span>
+        <h3>${q.title}</h3>
+        <p class="prompt">${q.prompt}</p>
+        <div class="options">
+            ${q.options.map(opt => `
+                <label class="option">
+                    <input type="radio" name="${q.id}" value="${opt.score}" data-idx="${idx}">
+                    <span class="option-label"><span class="option-score">${opt.score} pts</span>${opt.label}</span>
+                </label>
+            `).join('')}
+        </div>
+    `;
+    container.appendChild(div);
+});
+
+// Track answers
+const answers = {};
+document.querySelectorAll('input[type="radio"]').forEach(input => {
+    input.addEventListener('change', (e) => {
+        answers[e.target.name] = parseInt(e.target.value);
+        document.getElementById('q-' + e.target.name).classList.add('answered');
+        const count = Object.keys(answers).length;
+        document.getElementById('answered-count').textContent = count;
+        document.getElementById('submit-btn').disabled = count < questions.length;
+    });
+});
+
+// Submit → show results
+document.getElementById('submit-btn').addEventListener('click', () => {
+    const score = Object.values(answers).reduce((a, b) => a + b, 0);
+    const band = bands.find(b => score >= b.min && score <= b.max);
+
+    document.getElementById('score-num').textContent = score;
+    const badge = document.getElementById('band-badge');
+    badge.textContent = band.title;
+    badge.className = 'band grade-' + band.grade;
+
+    document.getElementById('band-description').innerHTML = `
+        <h3>${band.title}</h3>
+        <p>${band.description}</p>
+    `;
+
+    const breakdown = document.getElementById('breakdown-list');
+    breakdown.innerHTML = questions.map(q => `
+        <div class="breakdown-item">
+            <span class="q-title">${q.title}</span>
+            <span class="q-score s${answers[q.id]}">${answers[q.id]} / 2</span>
+        </div>
+    `).join('');
+
+    document.getElementById('assessment-form').style.display = 'none';
+    document.getElementById('results').classList.add('visible');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+
+// Email results
+document.getElementById('email-results-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const form = e.target;
+    const btn = document.getElementById('email-submit-btn');
+    const status = document.getElementById('email-status');
+    btn.disabled = true;
+    btn.textContent = 'Sending...';
+    status.className = 'email-status';
+    status.textContent = '';
+
+    const score = Object.values(answers).reduce((a, b) => a + b, 0);
+    const band = bands.find(b => score >= b.min && score <= b.max);
+
+    const payload = {
+        name: form.name.value,
+        email: form.email.value,
+        company: form.company.value,
+        score: score,
+        band: band.title,
+        answers: answers,
+    };
+
+    try {
+        const res = await fetch('/api/assessment', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+        });
+        if (!res.ok) throw new Error('Server error');
+        status.className = 'email-status success';
+        status.textContent = 'Sent. Check your inbox in the next minute or two.';
+        btn.textContent = 'Sent';
+    } catch (err) {
+        status.className = 'email-status error';
+        status.textContent = 'Something went wrong. Email kevin.luddy39@gmail.com directly.';
+        btn.disabled = false;
+        btn.textContent = 'Send me my results';
+    }
+});
+</script>
+
+</body>
+</html>

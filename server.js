@@ -174,7 +174,16 @@ app.post('/api/stripe/webhook', express.raw({ type: 'application/json' }), async
 app.use((req, res, next) => {
   res.set('X-Frame-Options', 'DENY');
   res.set('X-Content-Type-Options', 'nosniff');
+  // Trigger report check on every request (rate-limited to 30s internally).
+  // Ensures the first request after a Render free-tier sleep fires a report.
+  checkReport().catch(err => console.error('Wakeup check error:', err));
   next();
+});
+
+// Ping endpoint for external uptime monitors (UptimeRobot, cron-job.org, etc.)
+// Hitting this keeps the service awake AND triggers the report check.
+app.get('/api/ping', (req, res) => {
+  res.json({ ok: true, ts: new Date().toISOString() });
 });
 
 // Visit tracking
@@ -625,15 +634,27 @@ async function sendVisitReport(reason) {
   );
   const count = countResult.rows[0].c;
 
-  if (count === 0) return;
+  const body = count === 0
+    ? [
+        `contrarianAI — Visit Report (Heartbeat)`,
+        `=======================================`,
+        ``,
+        `Window: ${new Date(since).toISOString()}  ->  ${new Date().toISOString()}`,
+        `Total visits: 0`,
+        ``,
+        `No traffic in this window. Service is alive and reporting.`,
+      ].join('\n')
+    : await buildVisitReport(since);
 
-  const body = await buildVisitReport(since);
+  const subject = count === 0
+    ? `[contrarianAI] Heartbeat — 0 visits`
+    : `[contrarianAI] ${count} visit${count === 1 ? '' : 's'} — ${reason}`;
 
   if (transporter) {
     await transporter.sendMail({
       from: `"contrarianAI Stats" <${process.env.SMTP_USER}>`,
       to: STATS_EMAIL,
-      subject: `[contrarianAI] ${count} visits — ${reason}`,
+      subject,
       text: body,
     });
     console.log(`Visit report sent (${count} visits, ${reason})`);
@@ -644,8 +665,17 @@ async function sendVisitReport(reason) {
   await pool.query('UPDATE report_state SET last_report_at = NOW() WHERE id = 1');
 }
 
+// Rate-limit checkReport to avoid hammering the DB on every incoming request
+let lastCheckAt = 0;
+const CHECK_DEBOUNCE_MS = 30 * 1000;
+const HEARTBEAT_HOURS = 6;
+
 async function checkReport() {
   if (reportInFlight) return;
+  const now = Date.now();
+  if (now - lastCheckAt < CHECK_DEBOUNCE_MS) return;
+  lastCheckAt = now;
+
   try {
     const stateResult = await pool.query('SELECT last_report_at FROM report_state WHERE id = 1');
     const lastReport = stateResult.rows[0].last_report_at;
@@ -657,12 +687,13 @@ async function checkReport() {
     const count = countResult.rows[0].c;
     const hoursSince = (Date.now() - new Date(lastReport).getTime()) / 3600000;
 
-    const shouldSend = count >= 10 || (count > 0 && hoursSince >= 3);
+    // Send if: 10+ visits (threshold) OR 6+ hours elapsed (heartbeat, even with 0 visits)
+    const shouldSend = count >= 10 || hoursSince >= HEARTBEAT_HOURS;
 
     if (shouldSend) {
       reportInFlight = true;
       try {
-        const reason = count >= 10 ? 'threshold' : 'scheduled';
+        const reason = count >= 10 ? 'threshold' : 'heartbeat';
         await sendVisitReport(reason);
       } finally {
         reportInFlight = false;
@@ -674,6 +705,7 @@ async function checkReport() {
   }
 }
 
+// Run the timer while the service is awake
 setInterval(checkReport, 60 * 1000);
 
 // Start server after DB is ready

@@ -1,6 +1,6 @@
 # AI Production Readiness Self-Assessment
 
-*From contrarianAI — the diagnostic version of our paid AI Risk & Readiness Audit.*
+*From contrarianAI — the diagnostic version of our paid AI Production Diagnostic.*
 
 ---
 
@@ -174,13 +174,13 @@ Every item above is something I've seen break in production — not theoreticall
 
 **Personal guarantee:** If I don't find at least 3 production-impacting issues in your AI stack, you don't pay. Every audit I've run so far has found more than 3.
 
-**Request your audit:** https://contrarianai-landing.onrender.com/
+**Request your diagnostic:** https://contrarianai-landing.onrender.com/
 
 ---
 
 ## If you scored over 20
 
-You don't need the full audit. You might benefit from a targeted 3–5 day engagement on whatever single dimension concerns you most — usually Token Economics, Context Rot, or Tool & MCP Configuration. DM me and we'll scope it together.
+You don't need the full diagnostic. You might benefit from a targeted 3–5 day engagement on whatever single dimension concerns you most — usually Token Economics, Context Rot, or Tool & MCP Configuration. DM me and we'll scope it together.
 
 ---
 

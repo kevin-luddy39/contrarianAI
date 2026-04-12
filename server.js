@@ -257,9 +257,9 @@ app.post('/api/audit-request', async (req, res) => {
     transporter.sendMail({
       from: `"contrarianAI" <${process.env.SMTP_USER}>`,
       to: NOTIFY_EMAIL,
-      subject: `New Audit Request: ${name} at ${company}`,
+      subject: `New Diagnostic Request: ${name} at ${company}`,
       text: [
-        'New audit request submitted:',
+        'New diagnostic request submitted:',
         '',
         `Name:     ${name}`,
         `Email:    ${email}`,
@@ -313,19 +313,19 @@ function buildAssessmentEmail(name, score, band, answers) {
 
   if (score >= 20) {
     lines.push(
-      `You're in the top ~5% of teams running AI in production. The paid audit will still find 3+ issues — we always do — but they'll be subtler: tool description routing, context rot patterns, semantic layer gaps. Worth doing if you're scaling past $50K/month in AI spend.`
+      `You're in the top ~5% of teams running AI in production. The full diagnostic will still find 3+ issues — we always do — but they'll be subtler: tool description routing, context rot patterns, semantic layer gaps. Worth doing if you're scaling past $50K/month in AI spend.`
     );
   } else if (score >= 14) {
     lines.push(
-      `You have the basics right but are exposed in 3-5 specific areas. A targeted audit will recover 5-10x its cost in the first quarter, usually through cost optimization or reducing silent failure rates. This is our most common client profile.`
+      `You have the basics right but are exposed in 3-5 specific areas. A targeted diagnostic will recover 5-10x its cost in the first quarter, usually through cost optimization or reducing silent failure rates. This is our most common client profile.`
     );
   } else if (score >= 8) {
     lines.push(
-      `You're running what most vendors would call a "working AI product," but it's structurally brittle. You almost certainly have active incidents you can't diagnose, high spend you can't explain, and users losing trust for reasons you can't pinpoint. The audit will find 10+ fixable issues.`
+      `You're running what most vendors would call a "working AI product," but it's structurally brittle. You almost certainly have active incidents you can't diagnose, high spend you can't explain, and users losing trust for reasons you can't pinpoint. The diagnostic will find 10+ fixable issues.`
     );
   } else {
     lines.push(
-      `Stop. Before you add features, fix the foundation. If you're generating revenue on this stack, you're running on borrowed time. The audit becomes a mandatory step before your next release — not a nice-to-have.`
+      `Stop. Before you add features, fix the foundation. If you're generating revenue on this stack, you're running on borrowed time. The diagnostic becomes a mandatory step before your next release — not a nice-to-have.`
     );
   }
 
@@ -338,7 +338,7 @@ function buildAssessmentEmail(name, score, band, answers) {
       .slice(0, 3)
       .map(([key, val]) => `  - ${QUESTION_TITLES[key] || key} (${val}/2)`),
     ``,
-    `If you want the full audit — with prioritized fixes, a written report, and the personal guarantee that I find 3+ production-impacting issues or you don't pay:`,
+    `If you want the full diagnostic — with prioritized fixes, a written report, and the personal guarantee that I find 3+ production-impacting issues or you don't pay:`,
     ``,
     `  https://contrarianai-landing.onrender.com/#audit-form`,
     ``,
@@ -475,7 +475,7 @@ app.post('/admin/payment', requireAdmin, async (req, res) => {
 
   try {
     const reqResult = await pool.query('SELECT email, name FROM audit_requests WHERE id = $1', [audit_request_id]);
-    if (reqResult.rows.length === 0) return res.status(404).send('Audit request not found');
+    if (reqResult.rows.length === 0) return res.status(404).send('Request not found');
     const customer = reqResult.rows[0];
 
     const session = await stripe.checkout.sessions.create({
@@ -487,7 +487,7 @@ app.post('/admin/payment', requireAdmin, async (req, res) => {
           currency: 'usd',
           unit_amount: amountCents,
           product_data: {
-            name: description || 'AI Risk & Readiness Audit',
+            name: description || 'AI Production Diagnostic',
             description: 'contrarianAI engagement',
           },
         },
@@ -501,7 +501,7 @@ app.post('/admin/payment', requireAdmin, async (req, res) => {
     await pool.query(
       `INSERT INTO payments (audit_request_id, amount_cents, description, stripe_session_id, stripe_session_url)
        VALUES ($1, $2, $3, $4, $5)`,
-      [audit_request_id, amountCents, description || 'AI Risk & Readiness Audit', session.id, session.url]
+      [audit_request_id, amountCents, description || 'AI Production Diagnostic', session.id, session.url]
     );
 
     await pool.query(`UPDATE audit_requests SET status = 'payment_sent' WHERE id = $1`, [audit_request_id]);

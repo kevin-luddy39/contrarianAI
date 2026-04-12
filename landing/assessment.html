@@ -426,7 +426,7 @@
 <nav>
     <div class="container">
         <a href="/" class="logo">contrarian<span>AI</span></a>
-        <a href="/#audit-form" class="cta">Request Audit</a>
+        <a href="/#audit-form" class="cta">Request Diagnostic</a>
     </div>
 </nav>
 
@@ -435,7 +435,7 @@
         <h1>AI Production Readiness <span>Self-Assessment</span></h1>
         <p class="subtitle">12 questions. 10 minutes. Find out if your AI stack is production-grade or a demo in disguise.</p>
         <div class="meta">
-            <span>Based on real audit findings</span>
+            <span>Based on real diagnostic findings</span>
             <span>Scored out of 24</span>
             <span>Instant results</span>
         </div>
@@ -497,7 +497,7 @@
     </div>
 
     <div class="next-cta">
-        <p>Ready to fix what's broken? <a href="/#audit-form">Request the paid AI Risk &amp; Readiness Audit →</a></p>
+        <p>Ready to fix what's broken? <a href="/#audit-form">Request the paid AI Production Diagnostic →</a></p>
     </div>
 </section>
 
@@ -646,19 +646,19 @@ const questions = [
 const bands = [
     {
         min: 20, max: 24, grade: 'a', title: 'Production-grade',
-        description: 'You\'re in the top ~5% of teams running AI in production. The paid audit will still find 3+ issues — we always do — but they\'ll be subtler: tool description routing, context rot patterns, semantic layer gaps. Worth doing if you\'re scaling past $50K/month in AI spend.'
+        description: 'You\'re in the top ~5% of teams running AI in production. The full diagnostic will still find 3+ issues — we always do — but they\'ll be subtler: tool description routing, context rot patterns, semantic layer gaps. Worth doing if you\'re scaling past $50K/month in AI spend.'
     },
     {
         min: 14, max: 19, grade: 'b', title: 'Mostly there, notable gaps',
-        description: 'You have the basics right but are exposed in 3–5 specific areas. A targeted audit will recover 5–10x its cost in the first quarter, usually through cost optimization or reducing silent failure rates. This is our most common client profile.'
+        description: 'You have the basics right but are exposed in 3–5 specific areas. A targeted diagnostic will recover 5–10x its cost in the first quarter, usually through cost optimization or reducing silent failure rates. This is our most common client profile.'
     },
     {
         min: 8, max: 13, grade: 'c', title: 'Significant risk',
-        description: 'You\'re running what most vendors would call a "working AI product," but it\'s structurally brittle. You almost certainly have active incidents you can\'t diagnose, high spend you can\'t explain, and users losing trust for reasons you can\'t pinpoint. The audit will find 10+ fixable issues.'
+        description: 'You\'re running what most vendors would call a "working AI product," but it\'s structurally brittle. You almost certainly have active incidents you can\'t diagnose, high spend you can\'t explain, and users losing trust for reasons you can\'t pinpoint. The diagnostic will find 10+ fixable issues.'
     },
     {
         min: 0, max: 7, grade: 'd', title: 'You\'re shipping a prototype',
-        description: 'Stop. Before you add features, fix the foundation. If you\'re generating revenue on this stack, you\'re running on borrowed time. The audit becomes a MANDATORY step before your next release — not a nice-to-have.'
+        description: 'Stop. Before you add features, fix the foundation. If you\'re generating revenue on this stack, you\'re running on borrowed time. The diagnostic becomes a MANDATORY step before your next release — not a nice-to-have.'
     }
 ];
 

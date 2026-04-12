@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Questions You Should Be Asking — contrarianAI</title>
+    <meta name="description" content="Sharp, specific questions about your AI implementation — segmented by role. Ask these in your next 1:1.">
+    <meta property="og:title" content="Questions You Should Be Asking — contrarianAI">
+    <meta property="og:description" content="The right questions for your role. CEO, CTO, VP Engineering, or Engineering Lead — here's what to ask about your AI stack.">
+    <style>
+        :root {
+            --bg: #0a0a0a;
+            --surface: #141414;
+            --surface-2: #1f1f1f;
+            --border: #262626;
+            --text: #e5e5e5;
+            --text-muted: #a3a3a3;
+            --accent: #f97316;
+            --accent-hover: #fb923c;
+            --danger: #ef4444;
+            --success: #22c55e;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* NAV */
+        nav {
+            border-bottom: 1px solid var(--border);
+            padding: 16px 0;
+        }
+        nav .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo {
+            font-size: 1.25rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            text-decoration: none;
+            color: var(--text);
+        }
+        .logo span { color: var(--accent); }
+        .nav-links {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+        .nav-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+        .nav-links a.cta {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        /* HERO */
+        .hero {
+            padding: 70px 0 50px;
+            text-align: center;
+        }
+        .hero h1 {
+            font-size: clamp(1.8rem, 4.5vw, 2.6rem);
+            font-weight: 800;
+            line-height: 1.15;
+            letter-spacing: -0.03em;
+            margin-bottom: 16px;
+        }
+        .hero h1 .highlight { color: var(--accent); }
+        .hero .subtitle {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* TABS — CSS-only with radio buttons */
+        .tabs {
+            padding: 60px 0 40px;
+        }
+        .tab-input { display: none; }
+        .tab-labels {
+            display: flex;
+            gap: 0;
+            border-bottom: 2px solid var(--border);
+            margin-bottom: 40px;
+            overflow-x: auto;
+        }
+        .tab-label {
+            flex: 1;
+            text-align: center;
+            padding: 14px 16px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+            transition: color 0.2s, border-color 0.2s;
+            white-space: nowrap;
+        }
+        .tab-label:hover {
+            color: var(--text);
+        }
+        .tab-content {
+            display: none;
+        }
+
+        /* Show the correct tab content when its radio is checked */
+        #tab-ceo:checked ~ .tab-labels .tab-label[for="tab-ceo"],
+        #tab-cto:checked ~ .tab-labels .tab-label[for="tab-cto"],
+        #tab-vpe:checked ~ .tab-labels .tab-label[for="tab-vpe"],
+        #tab-eng:checked ~ .tab-labels .tab-label[for="tab-eng"] {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+        }
+        #tab-ceo:checked ~ .tab-panels .tab-content-ceo,
+        #tab-cto:checked ~ .tab-panels .tab-content-cto,
+        #tab-vpe:checked ~ .tab-panels .tab-content-vpe,
+        #tab-eng:checked ~ .tab-panels .tab-content-eng {
+            display: block;
+        }
+
+        /* TAB PANELS */
+        .role-intro {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--accent);
+            margin-bottom: 8px;
+        }
+        .role-desc {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            margin-bottom: 32px;
+        }
+        .question-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-left: 3px solid var(--accent);
+            border-radius: 8px;
+            padding: 20px 24px;
+            margin-bottom: 16px;
+        }
+        .question-card .q {
+            font-size: 1.05rem;
+            font-weight: 600;
+            line-height: 1.4;
+            margin-bottom: 8px;
+        }
+        .question-card .q::before {
+            content: "\201C";
+            color: var(--accent);
+            font-size: 1.3rem;
+            margin-right: 2px;
+        }
+        .question-card .q::after {
+            content: "\201D";
+            color: var(--accent);
+            font-size: 1.3rem;
+            margin-left: 2px;
+        }
+        .question-card .why {
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
+        /* CTA BOTTOM */
+        .cta-bottom {
+            padding: 60px 0 80px;
+            border-top: 1px solid var(--border);
+            text-align: center;
+        }
+        .cta-bottom h2 {
+            font-size: 1.6rem;
+            font-weight: 800;
+            margin-bottom: 12px;
+        }
+        .cta-bottom p {
+            color: var(--text-muted);
+            font-size: 1.05rem;
+            margin-bottom: 28px;
+            max-width: 560px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .cta-buttons {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .cta-primary {
+            display: inline-block;
+            background: var(--accent);
+            color: #000;
+            font-weight: 700;
+            font-size: 1rem;
+            padding: 14px 32px;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: background 0.2s;
+        }
+        .cta-primary:hover { background: var(--accent-hover); }
+        .cta-secondary {
+            display: inline-block;
+            background: transparent;
+            color: var(--accent);
+            font-weight: 700;
+            font-size: 1rem;
+            padding: 14px 32px;
+            border-radius: 8px;
+            border: 2px solid var(--accent);
+            text-decoration: none;
+            transition: background 0.2s, color 0.2s;
+        }
+        .cta-secondary:hover {
+            background: var(--accent);
+            color: #000;
+        }
+
+        /* FOOTER */
+        footer {
+            border-top: 1px solid var(--border);
+            padding: 32px 0;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 600px) {
+            .hero { padding: 48px 0 36px; }
+            .tab-label { font-size: 0.82rem; padding: 12px 10px; }
+            .question-card { padding: 16px 18px; }
+            .cta-buttons { flex-direction: column; align-items: center; }
+        }
+    </style>
+</head>
+<body>
+
+<nav>
+    <div class="container">
+        <a href="/" class="logo">contrarian<span>AI</span></a>
+        <div class="nav-links">
+            <a href="/assessment.html">Self-Assessment</a>
+            <a href="/answers.html">Answers</a>
+            <a href="/#audit-form" class="cta">Request Diagnostic</a>
+        </div>
+    </div>
+</nav>
+
+<section class="hero">
+    <div class="container">
+        <h1>The right questions, <span class="highlight">for your role</span></h1>
+        <p class="subtitle">Most AI failures persist because nobody asks the uncomfortable questions. These are specific enough to use in your next 1:1 — pick your role and start asking.</p>
+    </div>
+</section>
+
+<section class="tabs">
+    <div class="container">
+        <!-- Radio inputs for CSS-only tabs -->
+        <input type="radio" name="role-tab" id="tab-ceo" class="tab-input" checked>
+        <input type="radio" name="role-tab" id="tab-cto" class="tab-input">
+        <input type="radio" name="role-tab" id="tab-vpe" class="tab-input">
+        <input type="radio" name="role-tab" id="tab-eng" class="tab-input">
+
+        <div class="tab-labels">
+            <label class="tab-label" for="tab-ceo">CEO</label>
+            <label class="tab-label" for="tab-cto">CTO</label>
+            <label class="tab-label" for="tab-vpe">VP Engineering</label>
+            <label class="tab-label" for="tab-eng">Engineering Lead</label>
+        </div>
+
+        <div class="tab-panels">
+
+            <!-- CEO -->
+            <div class="tab-content tab-content-ceo">
+                <p class="role-intro">Questions to ask your CTO / AI architects</p>
+                <p class="role-desc">Framed in business impact, cost, and risk. You don't need to understand the architecture to ask these.</p>
+
+                <div class="question-card">
+                    <p class="q">What percentage of our AI features actually require AI reasoning vs. deterministic logic we're overpaying for?</p>
+                    <p class="why">Why it matters: Most "AI features" are if/else workflows burning $0.03/call on reasoning that should cost $0.</p>
+                </div>
+
+                <div class="question-card">
+                    <p class="q">If our model provider went down for 4 hours today, what happens to our product?</p>
+                    <p class="why">Why it matters: No fallback means a third-party outage becomes your outage -- and your customer churn.</p>
+                </div>
+
+                <div class="question-card">
+                    <p class="q">Who evaluates whether our AI is giving correct answers -- and is it the same AI that produced them?</p>
+                    <p class="why">Why it matters: Self-evaluation is confirmation bias with a GPU. If the grader is the student, nobody is grading.</p>
+                </div>
+
+                <div class="question-card">
+                    <p class="q">What's our actual cost per AI-powered action, and how does that compare to the value it creates?</p>
+                    <p class="why">Why it matters: Without unit economics, you can't tell if AI is a profit center or a subsidized cost center.</p>
+                </div>
+
+                <div class="question-card">
+                    <p class="q">How many of our AI errors does the user see before we do?</p>
+                    <p class="why">Why it matters: If your detection method is "a customer complains," your actual error rate is whatever they tolerate before leaving.</p>
+                </div>
+
+                <div class="question-card">
+                    <p class="q">What's our token spend this month, and what percentage of that is waste -- system prompts, retries, oversized context?</p>
+                    <p class="why">Why it matters: Token waste is invisible on the P&L until someone itemizes it. Teams routinely burn 30-50% on overhead.</p>
+                </div>
+
+                <div class="question-card">
+                    <p class="q">If a competitor replicated our AI features with basic automation, what would they lose?</p>
+                    <p class="why">Why it matters: If the answer is "nothing," the AI isn't a moat -- it's a markup.</p>
+                </div>
+
+                <div class="question-card">
+                    <p class="q">When was the last time we audited what data the AI can access, and whether it should?</p>
+                    <p class="why">Why it matters: AI tools with broad access accumulate permissions like sediment. One misconfigured tool can expose data you didn't know was reachable.</p>
+                </div>
+            </div>
+
+            <!-- CTO -->
+            <div class="tab-content tab-content-cto">
+                <p class="role-intro">Questions to ask your engineering leads</p>
+                <p class="role-desc">Architecture, systems, and observability. These expose the gaps between what's documented and what's deployed.</p>
+
+                <div class="question-card">
+                    <p class="q">Show me the structured logs for AI errors from the last 7 days. How many were silent?</p>
+                    <p class="why">Why it matters: If errors aren't structured and queryable, your monitoring is decorative.</p>
+                </div>
+
+                <div class="question-card">
+                    <p class="q">Which of our agents evaluate their own output vs. having an external evaluator?</p>
+                    <p class="why">Why it matters: Self-evaluation systematically underreports failures. The model that wrote the bad code won't flag the bad code.</p>
+                </div>
+
+                <div class="question-card">
+                    <p class="q">What's our context window utilization -- how much is system prompt, tool definitions, and overhead vs. actual user data?</p>
+                    <p class="why">Why it matters: Teams routinely discover 60%+ of their context window is consumed before the user's input arrives.</p>
+                </div>
+
+                <div class="question-card">
+                    <p class="q">Walk me through the session handoff. What artifacts persist between sessions, and what's silently dropped?</p>
+                    <p class="why">Why it matters: Most "memory" implementations lose structured data (amounts, dates, IDs) during summarization.</p>
+                </div>
+
+                <div class="question-card">
+                    <p class="q">How many tools are registered per agent, and what's our tool selection accuracy when it's above 5?</p>
+                    <p class="why">Why it matters: Tool selection degrades measurably past 4-5 tools per agent. More tools, more misroutes, zero alerts.</p>
+                </div>
+
+                <div class="question-card">
+                    <p class="q">What model are we using for each pipeline stage, and what's the justification for each choice?</p>
+                    <p class="why">Why it matters: Running Opus for classification tasks that Haiku handles identically costs 40x more with zero quality gain.</p>
+                </div>
+
+                <div class="question-card">
+                    <p class="q">Pull up our tool descriptions. Would a human reading them pick the right tool on the first try?</p>
+                    <p class="why">Why it matters: Ambiguous tool descriptions are the #1 cause of silent misroutes, and they generate no errors to debug.</p>
+                </div>
+
+                <div class="question-card">
+                    <p class="q">What's our batch API usage on latency-tolerant workloads? Are we paying real-time prices for background jobs?</p>
+                    <p class="why">Why it matters: Batch API is 50% cheaper. If your nightly reports run synchronously, you're paying a premium for speed nobody needs.</p>
+                </div>
+            </div>
+
+            <!-- VP Engineering -->
+            <div class="tab-content tab-content-vpe">
+                <p class="role-intro">Questions to ask your team leads</p>
+                <p class="role-desc">Process, reliability, and failure handling. These reveal whether your AI pipeline is production-grade or a demo with uptime.</p>
+
+                <div class="question-card">
+                    <p class="q">Walk me through what happens when the AI pipeline fails mid-request. Where does the user end up?</p>
+                    <p class="why">Why it matters: If the answer involves "it depends" or "they'd see an error page," there's no graceful degradation path.</p>
+                </div>
+
+                <div class="question-card">
+                    <p class="q">What's our mean time to detect an AI failure? An hour? A day? When a user complains?</p>
+                    <p class="why">Why it matters: AI failures are often semantically wrong, not HTTP-500 wrong. Traditional monitoring misses them entirely.</p>
+                </div>
+
+                <div class="question-card">
+                    <p class="q">How are we testing the unhappy paths -- empty input, 50KB payloads, timeouts, provider outages, concurrent duplicates?</p>
+                    <p class="why">Why it matters: If your test suite only covers the happy path, it's a demo test suite, not a production test suite.</p>
+                </div>
+
+                <div class="question-card">
+                    <p class="q">What triggers human escalation from the AI -- sentiment analysis, confidence scoring, or structured logic?</p>
+                    <p class="why">Why it matters: "The AI decides when it's stuck" is not an escalation policy. It's a hope.</p>
+                </div>
+
+                <div class="question-card">
+                    <p class="q">How many of our AI pipelines have a deterministic fallback, and how many just fail?</p>
+                    <p class="why">Why it matters: A rule-based fallback that handles 80% of cases is better than an AI-only path that fails 10% of the time.</p>
+                </div>
+
+                <div class="question-card">
+                    <p class="q">What's the retry logic when a model call times out? Is there a backoff, a fallback model, or does it just retry the same call?</p>
+                    <p class="why">Why it matters: Naive retries on overloaded providers amplify the problem and double your costs.</p>
+                </div>
+
+                <div class="question-card">
+                    <p class="q">Show me the last 5 AI-related incidents. How were they detected, and what was the resolution time?</p>
+                    <p class="why">Why it matters: If you can't pull this up quickly, you don't have AI-specific incident tracking -- you have general ops hoping to catch it.</p>
+                </div>
+
+                <div class="question-card">
+                    <p class="q">Are we logging the full prompt/response for production AI calls, or just the final output?</p>
+                    <p class="why">Why it matters: Without prompt-level observability, debugging AI failures means guessing what the model saw.</p>
+                </div>
+            </div>
+
+            <!-- Engineering Lead -->
+            <div class="tab-content tab-content-eng">
+                <p class="role-intro">Questions to verify directly</p>
+                <p class="role-desc">Hands-on-keyboard checks. Run these yourself -- don't delegate, don't ask for a summary, look at the output.</p>
+
+                <div class="question-card">
+                    <p class="q">Run the app with the AI provider returning 500s for 60 seconds. What does the user see?</p>
+                    <p class="why">Why it matters: If the answer is "I haven't tried that," your resilience is theoretical.</p>
+                </div>
+
+                <div class="question-card">
+                    <p class="q">Check git history: are any API keys, model tokens, or provider credentials committed in plaintext?</p>
+                    <p class="why">Why it matters: Rotating a leaked key costs an afternoon. A leaked key that nobody noticed costs everything.</p>
+                </div>
+
+                <div class="question-card">
+                    <p class="q">Submit an empty form, a 50KB form, and the same form twice in 200ms. What happens each time?</p>
+                    <p class="why">Why it matters: Edge cases at the AI boundary are where confidence meets chaos. These are the inputs your validators need to handle before the model sees them.</p>
+                </div>
+
+                <div class="question-card">
+                    <p class="q">Grep for silent catch blocks in the AI pipeline code. How many swallow errors without logging or re-throwing?</p>
+                    <p class="why">Why it matters: Every silent catch is an error you'll never see in your dashboard. They accumulate into "the AI is just unreliable sometimes."</p>
+                </div>
+
+                <div class="question-card">
+                    <p class="q">Measure the actual token count of your system prompt + tool definitions. What percentage of the context window is gone before the user says anything?</p>
+                    <p class="why">Why it matters: If your overhead is 40K tokens on a 128K window, the user's "long conversation" is shorter than they think.</p>
+                </div>
+
+                <div class="question-card">
+                    <p class="q">Trace a single AI request end-to-end. How many model calls does it actually make, and what's the total latency and cost?</p>
+                    <p class="why">Why it matters: "One user action" often triggers 3-7 chained model calls. If nobody's counted, nobody's optimized.</p>
+                </div>
+
+                <div class="question-card">
+                    <p class="q">Find the stop_reason handling in your agent loop. Is it checking structured stop signals, or parsing natural language for "I'm done"?</p>
+                    <p class="why">Why it matters: Parsing natural language for completion is a race condition disguised as a feature. It works until it doesn't.</p>
+                </div>
+
+                <div class="question-card">
+                    <p class="q">Check your MCP server configs. Are tool descriptions unambiguous, and do error responses use structured formats the model can parse?</p>
+                    <p class="why">Why it matters: A tool that returns "Error" as a string gives the model nothing to work with. Structured error responses let it recover or escalate.</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<section class="cta-bottom">
+    <div class="container">
+        <h2>Ready for answers?</h2>
+        <p>If these questions made you uncomfortable, that's the point. Now find out where you actually stand.</p>
+        <div class="cta-buttons">
+            <a href="/assessment.html" class="cta-primary">Take the Self-Assessment</a>
+            <a href="/#audit-form" class="cta-secondary">Request the Full Diagnostic</a>
+        </div>
+    </div>
+</section>
+
+<footer>
+    <div class="container">
+        <p>&copy; 2026 contrarianAI. We find what's actually wrong with your AI before your users do.</p>
+    </div>
+</footer>
+
+</body>
+</html>

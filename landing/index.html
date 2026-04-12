@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>contrarianAI — AI Risk & Readiness Audit</title>
-    <meta name="description" content="We find what's actually wrong with your AI before your users do. Paid AI audit with a personal guarantee: 3+ production issues found, or you don't pay.">
-    <meta property="og:title" content="contrarianAI — AI Risk & Readiness Audit">
+    <title>contrarianAI — AI Production Diagnostic</title>
+    <meta name="description" content="We find what's actually wrong with your AI before your users do. Paid AI diagnostic with a personal guarantee: 3+ production issues found, or you don't pay.">
+    <meta property="og:title" content="contrarianAI — AI Production Diagnostic">
     <meta property="og:description" content="If your AI looked great in the demo but struggles in production, the model isn't the problem. We find the structural failures that demos hide.">
     <meta property="og:type" content="website">
     <meta name="twitter:card" content="summary_large_image">
@@ -394,15 +394,19 @@
 <nav>
     <div class="container">
         <div class="logo">contrarian<span>AI</span></div>
-        <a href="#audit-form">Request Audit</a>
+        <div style="display:flex;gap:20px;align-items:center;">
+            <a href="/assessment.html" style="color:var(--text-muted);text-decoration:none;font-size:0.9rem;">Self-Assessment</a>
+            <a href="/questions.html" style="color:var(--text-muted);text-decoration:none;font-size:0.9rem;">Questions</a>
+            <a href="#audit-form" style="color:var(--accent);text-decoration:none;font-weight:600;font-size:0.9rem;">Request Diagnostic</a>
+        </div>
     </div>
 </nav>
 
 <section class="hero">
     <div class="container">
         <h1>Your AI <span class="highlight">looked great in the demo.</span><br>How's it doing in production?</h1>
-        <p class="subtitle">We find the structural failures that demos hide and production reveals. Paid AI Risk & Readiness Audit with a personal guarantee.</p>
-        <a href="#audit-form" class="cta-primary">Request Your Audit</a>
+        <p class="subtitle">We find the structural failures that demos hide and production reveals. AI Production Diagnostic with a personal guarantee.</p>
+        <a href="#audit-form" class="cta-primary">Request Your Diagnostic</a>
         <br>
         <div class="guarantee-badge">3+ issues found or you don't pay</div>
         <p style="margin-top:20px;font-size:0.9rem;color:var(--text-muted);">Not ready? Take the <a href="/assessment.html" style="color:var(--accent);font-weight:600;text-decoration:none;">10-minute self-assessment</a> first.</p>
@@ -435,7 +439,7 @@
 
 <section class="findings">
     <div class="container">
-        <h2>What the audit finds</h2>
+        <h2>What the diagnostic finds</h2>
         <p class="lead">Every engagement so far has uncovered more than 3 production-impacting issues. Here's what we typically find:</p>
 
         <div class="finding-item">
@@ -485,7 +489,7 @@
         <div class="guarantee-box">
             <h2>The Personal Guarantee</h2>
             <p>If I don't find at least 3 production-impacting issues in your AI stack, you don't pay. Period.</p>
-            <p class="fine-print">Every audit I've done so far has found more than 3. The structural failures are that common.</p>
+            <p class="fine-print">Every diagnostic I've done so far has found more than 3. The structural failures are that common.</p>
         </div>
     </div>
 </section>
@@ -503,7 +507,7 @@
                 <p>Token usage analysis and context flow mapping. Where data degrades, what gets lost, and how to prevent it.</p>
             </div>
             <div class="del-card">
-                <h3>Tool & MCP Audit</h3>
+                <h3>Tool & MCP Review</h3>
                 <p>Tool description quality review, error taxonomy, config restructuring. Eliminate silent misroutes.</p>
             </div>
             <div class="del-card">
@@ -563,7 +567,7 @@
 
 <section class="cta-final" id="audit-form">
     <div class="container">
-        <h2>Request your AI Risk & Readiness Audit</h2>
+        <h2>Request your AI Production Diagnostic</h2>
         <p>Limited slots available. Personal guarantee applies to every engagement.</p>
 
         <form class="audit-form" id="audit-form-el">
@@ -591,7 +595,7 @@
                 <label for="pain">What's not working as expected?</label>
                 <textarea id="pain" name="pain" placeholder="e.g., Wrong answers, high costs, trust issues, slow performance..."></textarea>
             </div>
-            <button type="submit" class="form-submit">Request Audit</button>
+            <button type="submit" class="form-submit">Request Diagnostic</button>
             <p id="form-status" style="text-align:center;margin-top:12px;display:none;font-weight:600;"></p>
             <p class="form-note">I'll respond within 24 hours. No spam. No sales sequences.</p>
         </form>
@@ -640,7 +644,7 @@ document.getElementById('audit-form-el').addEventListener('submit', async (e) =>
         status.style.color = 'var(--danger)';
         status.style.display = 'block';
         btn.disabled = false;
-        btn.textContent = 'Request Audit';
+        btn.textContent = 'Request Diagnostic';
     }
 });
 </script>

@@ -28,13 +28,13 @@ Here's what I keep finding:
 
 These aren't edge cases. They're the default outcome when you build AI without structural engineering discipline.
 
-I now offer a paid AI Risk & Readiness Audit with a personal guarantee: if I don't find at least 3 production-impacting issues in your AI stack, you don't pay.
+I now offer a paid AI Production Diagnostic with a personal guarantee: if I don't find at least 3 production-impacting issues in your AI stack, you don't pay.
 
 Every audit I've done so far has found more than 3.
 
 Request your audit here: https://contrarianai-landing.onrender.com/
 
-DM me "AUDIT" or comment below if you want details.
+DM me "DIAGNOSTIC" or comment below if you want details.
 
 #AI #AIEngineering #ProductionAI #AIFailure #MachineLearning #TechLeadership
 
@@ -60,11 +60,11 @@ Your AI is giving wrong answers because:
 
 A better model just gives you wrong answers faster and with more confidence.
 
-I audit AI systems and find exactly these problems. Paid engagement, personal guarantee: if I don't find at least 3 issues that are costing you money right now, the audit is free.
+I audit AI systems and find exactly these problems. Paid engagement, personal guarantee: if I don't find at least 3 issues that are costing you money right now, the diagnostic is free.
 
 Request your audit: https://contrarianai-landing.onrender.com/
 
-DM "AUDIT" to learn more.
+DM "DIAGNOSTIC" to learn more.
 
 #AI #CTO #EngineeringLeadership #AIStrategy #DataEngineering
 
@@ -93,11 +93,11 @@ Result: 60% cost reduction. Fewer wrong answers. Happier users.
 
 This is what I do. I find the structural problems that demos hide and production reveals.
 
-Paid AI Risk & Readiness Audit. Personal guarantee: 3+ production issues found, or you don't pay.
+Paid AI Production Diagnostic. Personal guarantee: 3+ production issues found, or you don't pay.
 
 Request your audit: https://contrarianai-landing.onrender.com/
 
-Interested? DM "AUDIT" or drop a comment.
+Interested? DM "DIAGNOSTIC" or drop a comment.
 
 #AI #Startup #AIAgent #ProductionEngineering #CostOptimization
 
@@ -125,11 +125,11 @@ And that's just the basics. The advanced checks most teams miss:
 11. ❌ Checklists don't survive context compression (your AI forgets its own plan)
 12. ❌ Escalation triggered by sentiment, not structured logic
 
-I've turned this into a formal audit — the AI Risk & Readiness Audit.
+I've turned this into a formal audit — the AI Production Diagnostic.
 
 Personal guarantee: if I can't find at least 3 production-impacting issues, you pay nothing.
 
-So far, no one has gotten a free audit.
+So far, no one has gotten a free diagnostic.
 
 Request your audit: https://contrarianai-landing.onrender.com/
 
@@ -141,7 +141,7 @@ Comment "SCORE" and I'll send you the self-assessment version.
 
 ## Post 5: The Direct Ask (Day 5 — Wednesday)
 
-**I'm taking on 5 AI Risk & Readiness Audit clients this month.**
+**I'm taking on 5 AI Production Diagnostic clients this month.**
 
 Here's exactly what you get:
 
@@ -157,7 +157,7 @@ Here's exactly what you get:
 
 **Deliverable:** Written report with prioritized, actionable fixes. Not a slide deck. Not a strategy document. A fix list.
 
-**My guarantee:** If I don't find at least 3 issues that are actively costing you money or trust, the audit is free. I've never had to honor that guarantee — every engagement has found more than 3.
+**My guarantee:** If I don't find at least 3 issues that are actively costing you money or trust, the diagnostic is free. I've never had to honor that guarantee — every engagement has found more than 3.
 
 **Who this is for:**
 → Engineering teams shipping AI products
@@ -166,6 +166,47 @@ Here's exactly what you get:
 
 5 slots. This month. Request yours: https://contrarianai-landing.onrender.com/
 
-DM "AUDIT" to claim one.
+DM "DIAGNOSTIC" to claim one.
 
-#AI #AIAudit #EngineeringLeadership #CTO #ProductionAI #AIStrategy
+#AI #AIDiagnostic #EngineeringLeadership #CTO #ProductionAI #AIStrategy
+
+---
+
+## Post 6: The Interactive Self-Assessment (Day 6)
+
+**Score yourself: Is your AI production-grade or a demo in disguise?**
+
+12 questions. Each one is 0, 1, or 2. Be honest — the point is to find gaps.
+
+THE BASICS:
+1. Observability — structured logs + active alerts? (0/1/2)
+2. Environment separation — staging mirrors prod with its own credentials? (0/1/2)
+3. Secrets management — API keys in a secret manager, not git? (0/1/2)
+4. Rate limiting — all AI endpoints enforce per-user limits? (0/1/2)
+5. Unhappy path testing — empty input, double-clicks, timeouts, provider failures? (0/1/2)
+6. Config separation — distinct configs and credentials per environment? (0/1/2)
+7. Error surfacing — no silent catch blocks, all errors logged + alerted? (0/1/2)
+8. Cost controls — spend tracking + limits that fire before you blow budget? (0/1/2)
+
+WHAT MOST TEAMS MISS:
+9. External evaluation — builder and judge are never the same session? (0/1/2)
+10. Session continuity — structured handoff artifacts, not raw transcripts? (0/1/2)
+11. Compaction resilience — plans survive context summarization? (0/1/2)
+12. Escalation logic — triggered by structured events, not sentiment? (0/1/2)
+
+Add it up. Out of 24:
+
+20-24 → Production-grade (top 5% of teams)
+14-19 → Mostly there, notable gaps
+8-13 → Significant risk
+0-7 → You're shipping a prototype
+
+Drop your score in the comments. I'll tell you which question to look at first.
+
+Take the full interactive version with personalized results:
+https://contrarianai-landing.onrender.com/assessment.html
+
+Not sure what questions to ask your team? We built a role-by-role guide:
+https://contrarianai-landing.onrender.com/questions.html
+
+#AI #AIEngineering #ProductionAI #SelfAssessment #AIStrategy #CTO

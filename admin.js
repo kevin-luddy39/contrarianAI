@@ -73,7 +73,7 @@ function renderAdminPage({ requests, totals, stripeEnabled }) {
 <body>
 
 <h1>contrarian<span>AI</span> Admin</h1>
-<p class="subtitle">Audit requests &amp; payment management</p>
+<p class="subtitle">Diagnostic requests &amp; payment management</p>
 
 <div class="stats">
   <div class="stat-card">

@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Context Inspector — Simulation Dashboard</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<style>
+  :root { --bg:#0a0a0a; --surface:#141414; --s2:#1f1f1f; --border:#262626; --text:#e5e5e5; --muted:#a3a3a3; --accent:#f97316; --blue:#3b82f6; --green:#22c55e; --red:#ef4444; --purple:#a855f7; }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,monospace;background:var(--bg);color:var(--text);font-size:14px}
+  header{background:var(--surface);border-bottom:1px solid var(--border);padding:12px 20px;display:flex;justify-content:space-between;align-items:center}
+  header h1{font-size:1.1rem} header h1 span{color:var(--accent)}
+  .actions{display:flex;gap:8px}
+  .btn{padding:6px 14px;border:none;border-radius:4px;font-weight:700;font-size:12px;cursor:pointer;font-family:inherit}
+  .btn-primary{background:var(--accent);color:#000} .btn-primary:hover{background:#fb923c}
+  .btn-secondary{background:var(--s2);color:var(--text);border:1px solid var(--border)} .btn-secondary:hover{background:var(--border)}
+  select{background:var(--bg);color:var(--text);border:1px solid var(--border);border-radius:4px;padding:4px 8px;font-size:12px;font-family:inherit}
+
+  .tabs{display:flex;border-bottom:1px solid var(--border);background:var(--surface)}
+  .tabs button{flex:none;padding:10px 20px;background:none;border:none;color:var(--muted);font-size:13px;cursor:pointer;border-bottom:2px solid transparent}
+  .tabs button.active{color:var(--accent);border-bottom-color:var(--accent)}
+  .tab-content{display:none;padding:20px} .tab-content.active{display:block}
+
+  .status-bar{background:var(--s2);padding:8px 20px;font-size:12px;color:var(--muted);border-bottom:1px solid var(--border)}
+  .status-bar .live{color:var(--green)} .status-bar .count{color:var(--accent);font-weight:700}
+
+  /* Runs table */
+  table{width:100%;border-collapse:collapse}
+  th{text-align:left;padding:8px 12px;background:var(--s2);font-size:11px;text-transform:uppercase;color:var(--muted);letter-spacing:.05em;border-bottom:1px solid var(--border)}
+  td{padding:8px 12px;border-bottom:1px solid var(--border);font-size:13px}
+  tr:hover td{background:var(--surface)}
+  .badge{display:inline-block;padding:2px 8px;border-radius:3px;font-size:10px;font-weight:700;text-transform:uppercase}
+  .badge.rag{background:#f9731630;color:var(--accent)} .badge.multi{background:#3b82f630;color:var(--blue)} .badge.support{background:#a855f730;color:var(--purple)}
+  .badge.completed{background:#22c55e30;color:var(--green)} .badge.running{background:#f59e0b30;color:#f59e0b}
+  .clickable{cursor:pointer;color:var(--accent);text-decoration:underline}
+  input[type=checkbox]{accent-color:var(--accent)}
+
+  /* Charts */
+  .chart-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+  .chart-box{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:16px}
+  .chart-box h3{font-size:12px;color:var(--muted);text-transform:uppercase;margin-bottom:8px;letter-spacing:.05em}
+  .chart-box canvas{width:100%!important;height:250px!important}
+  .full-width{grid-column:1/-1}
+
+  .stats-row{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+  .mini-stat{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:10px 16px;text-align:center}
+  .mini-stat .label{font-size:10px;color:var(--muted);text-transform:uppercase} .mini-stat .val{font-size:18px;font-weight:800;margin-top:2px}
+
+  .turn-slider{width:100%;accent-color:var(--accent);margin:12px 0}
+  .empty-state{text-align:center;padding:60px;color:var(--muted)}
+  @media(max-width:800px){.chart-row{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Context <span>Inspector</span> — Simulations</h1>
+  <div class="actions">
+    <select id="scenarioSelect">
+      <option value="">All scenarios</option>
+      <option value="rag-pipeline">RAG Pipeline</option>
+      <option value="multi-agent">Multi-Agent</option>
+      <option value="support-bot">Support Bot</option>
+    </select>
+    <button class="btn btn-secondary" onclick="runSingle()">Run Single</button>
+    <button class="btn btn-primary" onclick="runBatch()">Run Batch (50)</button>
+  </div>
+</header>
+
+<div id="statusBar" class="status-bar">Ready. <span id="wsStatus">WS: connecting...</span></div>
+
+<div class="tabs">
+  <button class="active" onclick="showTab('runs',this)">Runs</button>
+  <button onclick="showTab('live',this)">Live</button>
+  <button onclick="showTab('compare',this)">Compare</button>
+  <button onclick="showTab('aggregate',this)">Aggregate</button>
+  <button onclick="showTab('stories',this)">Stories</button>
+  <button onclick="showTab('rot',this)">Context Rot</button>
+</div>
+
+<!-- RUNS TAB -->
+<div id="tab-runs" class="tab-content active">
+  <div id="runsTable"></div>
+</div>
+
+<!-- LIVE TAB -->
+<div id="tab-live" class="tab-content">
+  <div id="liveStats" class="stats-row"></div>
+  <div class="chart-row">
+    <div class="chart-box"><h3>Domain alignment over time</h3><canvas id="liveDomainChart"></canvas></div>
+    <div class="chart-box"><h3>User alignment over time</h3><canvas id="liveUserChart"></canvas></div>
+    <div class="chart-box full-width"><h3>Bell curve snapshot (turn <span id="liveTurnNum">0</span>)</h3><canvas id="liveBellChart"></canvas></div>
+  </div>
+</div>
+
+<!-- COMPARE TAB -->
+<div id="tab-compare" class="tab-content">
+  <p style="margin-bottom:12px;color:var(--muted);">Select runs from the Runs tab, then switch here to compare.</p>
+  <div class="chart-row">
+    <div class="chart-box full-width"><h3>Domain mean comparison</h3><canvas id="compareDomainChart"></canvas></div>
+    <div class="chart-box full-width"><h3>Domain σ comparison</h3><canvas id="compareStdChart"></canvas></div>
+  </div>
+</div>
+
+<!-- AGGREGATE TAB -->
+<div id="tab-aggregate" class="tab-content">
+  <div id="aggControls" style="margin-bottom:16px;">
+    <select id="aggScenario" onchange="loadAggregate()">
+      <option value="rag-pipeline">RAG Pipeline</option>
+      <option value="multi-agent">Multi-Agent</option>
+      <option value="support-bot">Support Bot</option>
+    </select>
+  </div>
+  <div class="chart-row">
+    <div class="chart-box full-width"><h3>Mean domain alignment across runs (with ±1σ band)</h3><canvas id="aggChart"></canvas></div>
+    <div class="chart-box full-width"><h3>Mean σ (spread) across runs</h3><canvas id="aggStdChart"></canvas></div>
+  </div>
+</div>
+
+<!-- CONTEXT ROT TAB -->
+<div id="tab-rot" class="tab-content">
+  <div style="margin-bottom:16px;">
+    <button class="btn btn-secondary" onclick="loadRotRuns()">Refresh</button>
+    <span style="margin-left:12px;color:var(--muted);font-size:12px;">Context limit: 1,700 tokens. Auto-summarization compresses when exceeded. Red markers = summarization events.</span>
+  </div>
+  <div id="rotRunsTable"></div>
+  <div id="rotDetail" style="display:none;margin-top:20px;border-top:2px solid var(--accent);padding-top:20px;">
+    <div class="stats-row" id="rotStats"></div>
+    <div class="chart-row">
+      <div class="chart-box">
+        <h3>Lessons Alignment Score (context rot effect)</h3>
+        <canvas id="rotScoreChart"></canvas>
+      </div>
+      <div class="chart-box">
+        <h3>Domain σ (bell curve spread)</h3>
+        <canvas id="rotStdChart"></canvas>
+      </div>
+    </div>
+    <div class="chart-row">
+      <div class="chart-box">
+        <h3>Context size (tokens) — drops at each summarization</h3>
+        <canvas id="rotTokenChart"></canvas>
+      </div>
+      <div class="chart-box">
+        <h3>Bell curve — Step <span id="rotStepNum">1</span>
+          <input type="range" id="rotStepSlider" min="1" max="40" value="1" class="turn-slider" style="width:250px;vertical-align:middle;margin-left:12px;">
+        </h3>
+        <canvas id="rotBellChart"></canvas>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px;">
+      <div class="chart-box" style="border:2px solid var(--accent);">
+        <h3 style="color:var(--accent);font-size:14px;">System-Derived Lessons (Step <span id="rotLessonStep">1</span>) <span id="rotRotBadge" style="display:none;background:var(--red);color:#fff;padding:2px 8px;border-radius:3px;font-size:10px;font-weight:700;">AFTER SUMMARIZATION</span></h3>
+        <pre id="rotSystemLessons" style="color:var(--text);font-size:13px;white-space:pre-wrap;max-height:500px;overflow-y:auto;padding:8px;background:var(--bg);border-radius:4px;margin-top:8px;"></pre>
+      </div>
+      <div class="chart-box" style="border:2px solid var(--blue);">
+        <h3 style="color:var(--blue);font-size:14px;">Full Context Text at Step <span id="rotCtxStep">1</span> <span id="rotSumCount" style="color:var(--red);font-size:11px;"></span></h3>
+        <pre id="rotContextText" style="color:var(--text);font-size:12px;white-space:pre-wrap;max-height:500px;overflow-y:auto;padding:8px;background:var(--bg);border-radius:4px;margin-top:8px;"></pre>
+      </div>
+    </div>
+    <div class="chart-box" style="margin-top:16px;border:2px solid var(--green);">
+      <h3 style="color:var(--green);font-size:14px;">Ground Truth Lessons (reference)</h3>
+      <pre id="rotGroundTruth" style="color:var(--text);font-size:13px;white-space:pre-wrap;padding:8px;background:var(--bg);border-radius:4px;margin-top:8px;"></pre>
+    </div>
+  </div>
+</div>
+
+<!-- STORIES TAB -->
+<div id="tab-stories" class="tab-content">
+  <div style="display:flex;gap:12px;margin-bottom:16px;align-items:center;">
+    <select id="storyFilter">
+      <option value="">All stories</option>
+      <option value="three_little_pigs">Three Little Pigs</option>
+      <option value="little_red_riding_hood">Little Red Riding Hood</option>
+      <option value="humpty_dumpty">Humpty Dumpty</option>
+    </select>
+    <button class="btn btn-secondary" onclick="loadStoryRuns()">Refresh</button>
+  </div>
+  <div id="storyRunsTable"></div>
+  <div id="storyDetail" style="display:none;margin-top:20px;">
+    <div class="stats-row" id="storyStats"></div>
+    <div class="chart-row">
+      <div class="chart-box"><h3>Domain σ (alignment spread) over steps</h3><canvas id="storyDomainStdChart"></canvas></div>
+      <div class="chart-box"><h3>Lessons alignment score over steps</h3><canvas id="storyScoreChart"></canvas></div>
+    </div>
+    <div class="chart-row">
+      <div class="chart-box full-width">
+        <h3>Bell curve snapshot — Step <span id="storyStepNum">1</span>
+          <input type="range" id="storyStepSlider" min="1" max="40" value="1" class="turn-slider" style="width:300px;vertical-align:middle;margin-left:12px;">
+        </h3>
+        <canvas id="storyBellChart"></canvas>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px;">
+      <div class="chart-box">
+        <h3>System Lessons (Step <span id="storyLessonStep">1</span>)</h3>
+        <pre id="storySystemLessons" style="color:var(--muted);font-size:12px;white-space:pre-wrap;max-height:300px;overflow-y:auto;"></pre>
+      </div>
+      <div class="chart-box">
+        <h3>Ground Truth Lessons</h3>
+        <pre id="storyGroundTruth" style="color:var(--green);font-size:12px;white-space:pre-wrap;max-height:300px;overflow-y:auto;"></pre>
+      </div>
+    </div>
+    <div class="chart-box" style="margin-top:16px;">
+      <h3>Context text at step <span id="storyCtxStep">1</span> <span style="font-size:10px;color:var(--muted);">(phase labels shown)</span></h3>
+      <div id="storyContextPieces" style="max-height:400px;overflow-y:auto;font-size:11px;color:var(--muted);"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const COLORS = { rag: '#f97316', multi: '#3b82f6', support: '#a855f7' };
+let selectedRuns = new Set();
+let liveSteps = [];
+let charts = {};
+
+// ── WebSocket ──────────────────────────────────────────
+let ws;
+function connectWs() {
+  try {
+    ws = new WebSocket(`ws://${location.host}/ws`);
+    ws.onopen = () => { document.getElementById('wsStatus').innerHTML = '<span class="live">WS: connected</span>'; };
+    ws.onclose = () => { document.getElementById('wsStatus').textContent = 'WS: reconnecting...'; setTimeout(connectWs, 5000); };
+    ws.onerror = () => { document.getElementById('wsStatus').textContent = 'WS: offline (data still loads)'; };
+    ws.onmessage = (e) => {
+      const msg = JSON.parse(e.data);
+      if (msg.type === 'step') handleLiveStep(msg);
+      else if (msg.type === 'run_complete') { setStatus(`Run ${msg.runId.slice(0,8)} complete`); loadRuns(); }
+      else if (msg.type === 'batch_progress') setStatus(`${msg.scenario}: ${msg.completed}/${msg.total}`);
+      else if (msg.type === 'batch_complete') { setStatus('Batch complete'); loadRuns(); }
+    };
+  } catch(e) {
+    document.getElementById('wsStatus').textContent = 'WS: unavailable';
+  }
+}
+setTimeout(connectWs, 500);
+
+function setStatus(text) { document.getElementById('statusBar').innerHTML = text + ` <span id="wsStatus"><span class="live">WS: connected</span></span>`; }
+
+// ── Tab switching ──────────────────────────────────────
+function showTab(id, btn) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tabs button').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  if (btn) btn.classList.add('active');
+  if (id === 'compare') loadComparison();
+  if (id === 'aggregate') loadAggregate();
+  if (id === 'stories') loadStoryRuns();
+  if (id === 'rot') loadRotRuns();
+}
+
+// ── Runs ───────────────────────────────────────────────
+async function loadRuns() {
+  const scenario = document.getElementById('scenarioSelect').value;
+  const url = scenario ? `/api/runs?scenario=${scenario}` : '/api/runs';
+  const runs = await (await fetch(url)).json();
+  const badge = s => {
+    const cls = s.includes('rag') ? 'rag' : s.includes('multi') ? 'multi' : 'support';
+    return `<span class="badge ${cls}">${s}</span>`;
+  };
+  document.getElementById('runsTable').innerHTML = runs.length === 0
+    ? '<div class="empty-state">No runs yet. Click "Run Batch" to generate 50 simulations.</div>'
+    : `<table>
+        <thead><tr><th></th><th>Scenario</th><th>Seed</th><th>Turns</th><th>Domain μ</th><th>Domain σ</th><th>User μ</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody>${runs.map(r => `
+          <tr>
+            <td><input type="checkbox" value="${r.id}" onchange="toggleSelect(this)" ${selectedRuns.has(r.id)?'checked':''}></td>
+            <td>${badge(r.scenario)}</td>
+            <td>${r.seed}</td>
+            <td>${r.total_turns||'-'}</td>
+            <td>${r.final_domain_mean?.toFixed(3)||'-'}</td>
+            <td>${r.final_domain_std?.toFixed(3)||'-'}</td>
+            <td>${r.final_user_mean?.toFixed(3)||'-'}</td>
+            <td><span class="badge ${r.status}">${r.status}</span></td>
+            <td><span class="clickable" onclick="viewRun('${r.id}')">View</span></td>
+          </tr>
+        `).join('')}</tbody>
+      </table>`;
+}
+
+function toggleSelect(el) {
+  if (el.checked) selectedRuns.add(el.value); else selectedRuns.delete(el.value);
+}
+
+async function viewRun(id) {
+  const steps = await (await fetch(`/api/runs/${id}/steps`)).json();
+  liveSteps = steps;
+  showTab('live', document.querySelectorAll('.tabs button')[1]);
+  renderLiveCharts();
+}
+
+// ── Live view ──────────────────────────────────────────
+function handleLiveStep(step) {
+  liveSteps.push(step);
+  if (document.getElementById('tab-live').classList.contains('active')) renderLiveCharts();
+}
+
+function renderLiveCharts() {
+  if (liveSteps.length === 0) return;
+  const turns = liveSteps.map(s => s.turn);
+  const dMeans = liveSteps.map(s => s.domain?.mean ?? s.domain_mean);
+  const dStds = liveSteps.map(s => s.domain?.stdDev ?? s.domain_std);
+  const uMeans = liveSteps.map(s => s.user?.mean ?? s.user_mean);
+
+  // Stats
+  const last = liveSteps[liveSteps.length - 1];
+  const dm = dMeans[dMeans.length-1], ds = dStds[dStds.length-1], um = uMeans[uMeans.length-1];
+  document.getElementById('liveStats').innerHTML = `
+    <div class="mini-stat"><div class="label">Turn</div><div class="val" style="color:var(--accent)">${last.turn}</div></div>
+    <div class="mini-stat"><div class="label">Domain μ</div><div class="val" style="color:var(--accent)">${dm?.toFixed(3)}</div></div>
+    <div class="mini-stat"><div class="label">Domain σ</div><div class="val" style="color:var(--blue)">${ds?.toFixed(3)}</div></div>
+    <div class="mini-stat"><div class="label">User μ</div><div class="val" style="color:var(--purple)">${um?.toFixed(3)}</div></div>
+    <div class="mini-stat"><div class="label">Tokens</div><div class="val">${(last.tokenCount||last.token_count||0).toLocaleString()}</div></div>
+    <div class="mini-stat"><div class="label">Event</div><div class="val" style="font-size:12px;color:var(--muted)">${last.eventLabel||last.event_label||'-'}</div></div>
+  `;
+  document.getElementById('liveTurnNum').textContent = last.turn;
+
+  // Time series charts
+  renderTimeSeries('liveDomainChart', 'domain', turns, dMeans, dStds, '#f97316');
+  renderTimeSeries('liveUserChart', 'user', turns, uMeans, null, '#a855f7');
+
+  // Bell curve snapshot from last step
+  const hist = last.domain?.histogram || (last.domain_histogram ? JSON.parse(last.domain_histogram) : []);
+  const gauss = last.domain?.gaussianFit || (last.domain_gaussian ? JSON.parse(last.domain_gaussian) : []);
+  const liveMean = last.domain?.mean ?? last.domain_mean ?? 0;
+  const liveStd = last.domain?.stdDev ?? last.domain_std ?? 0;
+  renderBell('liveBellChart', hist, gauss, { mean: liveMean, std: liveStd });
+}
+
+function renderTimeSeries(canvasId, label, turns, means, stds, color) {
+  if (charts[canvasId]) charts[canvasId].destroy();
+  const datasets = [{ label: label+' mean', data: means, borderColor: color, borderWidth: 2, pointRadius: 0, fill: false, tension: 0.3 }];
+  if (stds) datasets.push({ label: label+' σ', data: stds, borderColor: color+'88', borderWidth: 1, borderDash: [4,4], pointRadius: 0, fill: false, tension: 0.3 });
+  charts[canvasId] = new Chart(document.getElementById(canvasId), {
+    type: 'line', data: { labels: turns, datasets },
+    options: { responsive: true, maintainAspectRatio: false, scales: {
+      x: { grid:{color:'#262626'}, ticks:{color:'#a3a3a3'}, title:{display:true,text:'Turn',color:'#a3a3a3'} },
+      y: { grid:{color:'#262626'}, ticks:{color:'#a3a3a3'}, min: 0, max: 1 }
+    }, plugins: { legend:{labels:{color:'#a3a3a3',font:{size:11}}} } }
+  });
+}
+
+/**
+ * Render bell curve with real measurements.
+ * Shows: histogram bars, Gaussian fit, individual data points (rug),
+ * mean line, ±1σ and ±2σ bands.
+ *
+ * @param {string} canvasId
+ * @param {number[]} histogram - binned density values
+ * @param {number[]} gaussian - fitted Gaussian PDF values
+ * @param {object} opts - { mean, std, rawScores }
+ */
+function renderBell(canvasId, histogram, gaussian, opts = {}) {
+  if (charts[canvasId]) charts[canvasId].destroy();
+  const binCount = histogram.length || 20;
+  const labels = histogram.map((_, i) => (i / binCount).toFixed(2));
+  const mean = opts.mean ?? 0;
+  const std = opts.std ?? 0;
+  const rawScores = opts.rawScores || [];
+  const maxDensity = Math.max(...histogram, ...gaussian, 1);
+
+  const datasets = [];
+
+  // ±2σ band (lighter)
+  if (std > 0) {
+    const band2 = labels.map((l, i) => {
+      const x = parseFloat(l) + 0.5 / binCount;
+      return (x >= mean - 2 * std && x <= mean + 2 * std) ? maxDensity * 1.05 : 0;
+    });
+    datasets.push({
+      label: '±2σ', data: band2, type: 'bar',
+      backgroundColor: '#3b82f610', borderColor: 'transparent',
+      barPercentage: 1, categoryPercentage: 1, order: 4,
+    });
+  }
+
+  // ±1σ band
+  if (std > 0) {
+    const band1 = labels.map((l, i) => {
+      const x = parseFloat(l) + 0.5 / binCount;
+      return (x >= mean - std && x <= mean + std) ? maxDensity * 1.05 : 0;
+    });
+    datasets.push({
+      label: '±1σ', data: band1, type: 'bar',
+      backgroundColor: '#3b82f625', borderColor: 'transparent',
+      barPercentage: 1, categoryPercentage: 1, order: 3,
+    });
+  }
+
+  // Histogram bars (the real distribution)
+  datasets.push({
+    label: 'Observed distribution', data: histogram,
+    backgroundColor: '#f9731666', borderColor: '#f97316', borderWidth: 1,
+    barPercentage: 1, categoryPercentage: 1, order: 2,
+  });
+
+  // Gaussian fit curve
+  datasets.push({
+    label: `Gaussian fit (μ=${mean.toFixed(2)}, σ=${std.toFixed(2)})`,
+    data: gaussian, type: 'line',
+    borderColor: '#22c55e', borderWidth: 2, pointRadius: 0,
+    fill: false, tension: 0.4, order: 1,
+  });
+
+  // Mean line (vertical)
+  const meanBin = Math.min(binCount - 1, Math.floor(mean * binCount));
+  const meanLine = labels.map((_, i) => i === meanBin ? maxDensity * 1.1 : null);
+  datasets.push({
+    label: `Mean (${mean.toFixed(3)})`, data: meanLine, type: 'bar',
+    backgroundColor: '#ef4444cc', borderColor: '#ef4444',
+    barPercentage: 0.3, categoryPercentage: 1, order: 0,
+  });
+
+  // Rug plot: individual chunk scores as dots along the bottom
+  if (rawScores.length > 0) {
+    const rugData = rawScores.map(s => ({
+      x: (s * binCount).toFixed(1),
+      y: -maxDensity * 0.04 + (Math.random() * maxDensity * 0.03), // jitter
+    }));
+    datasets.push({
+      label: `Chunk scores (n=${rawScores.length})`, data: rugData,
+      type: 'scatter', borderColor: '#e5e5e5', backgroundColor: '#e5e5e588',
+      pointRadius: 3, pointStyle: 'circle', order: 0,
+      // Map scatter x to bar indices
+    });
+  }
+
+  charts[canvasId] = new Chart(document.getElementById(canvasId), {
+    type: 'bar',
+    data: { labels, datasets },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      scales: {
+        x: {
+          grid: { color: '#262626' },
+          ticks: { color: '#a3a3a3', maxTicksLimit: 10 },
+          title: { display: true, text: 'Domain alignment score (per chunk, vs. original story)', color: '#a3a3a3', font: { size: 11 } },
+        },
+        y: {
+          grid: { color: '#262626' },
+          ticks: { color: '#a3a3a3' },
+          beginAtZero: true,
+          title: { display: true, text: 'Density', color: '#a3a3a3', font: { size: 11 } },
+        },
+      },
+      plugins: {
+        legend: {
+          labels: { color: '#a3a3a3', font: { size: 10 }, usePointStyle: true },
+        },
+        tooltip: { mode: 'index', intersect: false },
+      },
+    },
+  });
+}
+
+// ── Comparison ─────────────────────────────────────────
+async function loadComparison() {
+  const ids = [...selectedRuns];
+  if (ids.length < 2) return;
+  const data = await (await fetch(`/api/compare?ids=${ids.join(',')}`)).json();
+  const colors = ['#f97316','#3b82f6','#a855f7','#22c55e','#ef4444','#f59e0b'];
+
+  const datasets = data.map((d, i) => ({
+    label: `${d.run.scenario} #${d.run.seed}`,
+    data: d.steps.map(s => ({ x: s.turn, y: s.domain_mean })),
+    borderColor: colors[i % colors.length], borderWidth: 2, pointRadius: 0, fill: false, tension: 0.3
+  }));
+  if (charts.compareDomainChart) charts.compareDomainChart.destroy();
+  charts.compareDomainChart = new Chart(document.getElementById('compareDomainChart'), {
+    type: 'line', data: { datasets },
+    options: { responsive: true, maintainAspectRatio: false, scales: {
+      x: { type:'linear', grid:{color:'#262626'}, ticks:{color:'#a3a3a3'}, title:{display:true,text:'Turn',color:'#a3a3a3'} },
+      y: { grid:{color:'#262626'}, ticks:{color:'#a3a3a3'}, min:0, max:1 }
+    }, plugins:{legend:{labels:{color:'#a3a3a3',font:{size:11}}}} }
+  });
+
+  const stdDatasets = data.map((d, i) => ({
+    label: `${d.run.scenario} #${d.run.seed}`,
+    data: d.steps.map(s => ({ x: s.turn, y: s.domain_std })),
+    borderColor: colors[i % colors.length], borderWidth: 2, pointRadius: 0, fill: false, tension: 0.3
+  }));
+  if (charts.compareStdChart) charts.compareStdChart.destroy();
+  charts.compareStdChart = new Chart(document.getElementById('compareStdChart'), {
+    type: 'line', data: { datasets: stdDatasets },
+    options: { responsive: true, maintainAspectRatio: false, scales: {
+      x: { type:'linear', grid:{color:'#262626'}, ticks:{color:'#a3a3a3'}, title:{display:true,text:'Turn',color:'#a3a3a3'} },
+      y: { grid:{color:'#262626'}, ticks:{color:'#a3a3a3'}, min:0, max:0.5 }
+    }, plugins:{legend:{labels:{color:'#a3a3a3',font:{size:11}}}} }
+  });
+}
+
+// ── Aggregate ──────────────────────────────────────────
+async function loadAggregate() {
+  const scenario = document.getElementById('aggScenario').value;
+  const data = await (await fetch(`/api/aggregate/${scenario}`)).json();
+  if (data.length === 0) return;
+
+  const turns = data.map(d => d.turn);
+  const means = data.map(d => d.avg_domain_mean);
+  const stds = data.map(d => d.avg_domain_std);
+  const upper = means.map((m, i) => m + (stds[i] || 0));
+  const lower = means.map((m, i) => Math.max(0, m - (stds[i] || 0)));
+
+  if (charts.aggChart) charts.aggChart.destroy();
+  charts.aggChart = new Chart(document.getElementById('aggChart'), {
+    type: 'line', data: { labels: turns, datasets: [
+      { label: 'Mean', data: means, borderColor: '#f97316', borderWidth: 2, pointRadius: 0, fill: false, tension: 0.3 },
+      { label: '+1σ', data: upper, borderColor: '#f9731644', borderWidth: 1, pointRadius: 0, fill: '+1', backgroundColor: '#f9731618', tension: 0.3 },
+      { label: '-1σ', data: lower, borderColor: '#f9731644', borderWidth: 1, pointRadius: 0, fill: false, tension: 0.3 },
+    ]},
+    options: { responsive: true, maintainAspectRatio: false, scales: {
+      x: { grid:{color:'#262626'}, ticks:{color:'#a3a3a3'}, title:{display:true,text:'Turn',color:'#a3a3a3'} },
+      y: { grid:{color:'#262626'}, ticks:{color:'#a3a3a3'}, min:0, max:1 }
+    }, plugins:{legend:{labels:{color:'#a3a3a3',font:{size:11}}}} }
+  });
+
+  const avgStds = data.map(d => d.avg_domain_std);
+  if (charts.aggStdChart) charts.aggStdChart.destroy();
+  charts.aggStdChart = new Chart(document.getElementById('aggStdChart'), {
+    type: 'line', data: { labels: turns, datasets: [
+      { label: 'Avg σ', data: avgStds, borderColor: '#3b82f6', borderWidth: 2, pointRadius: 0, fill: false, tension: 0.3 }
+    ]},
+    options: { responsive: true, maintainAspectRatio: false, scales: {
+      x: { grid:{color:'#262626'}, ticks:{color:'#a3a3a3'}, title:{display:true,text:'Turn',color:'#a3a3a3'} },
+      y: { grid:{color:'#262626'}, ticks:{color:'#a3a3a3'}, min:0, max:0.5 }
+    }, plugins:{legend:{labels:{color:'#a3a3a3',font:{size:11}}}} }
+  });
+}
+
+// ── Actions ────────────────────────────────────────────
+async function runSingle() {
+  const scenario = document.getElementById('scenarioSelect').value || 'rag-pipeline';
+  liveSteps = [];
+  showTab('live', document.querySelectorAll('.tabs button')[1]);
+  await fetch('/api/simulate/single', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({scenario, seed: Date.now()}) });
+  setStatus(`Running single ${scenario}...`);
+}
+
+async function runBatch() {
+  const scenario = document.getElementById('scenarioSelect').value || null;
+  await fetch('/api/simulate/batch', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({scenario, count:50, seedBase: 1000}) });
+  setStatus(`Running batch${scenario ? ' (' + scenario + ')' : ' (all scenarios)'}...`);
+}
+
+document.getElementById('scenarioSelect').addEventListener('change', loadRuns);
+loadRuns();
+
+// ── Stories Tab ────────────────────────────────────────
+let storyStepsData = [];
+const PHASE_COLORS = { base:'#22c55e', cinderella:'#f97316', columbus:'#3b82f6', alamo:'#a855f7' };
+
+async function loadStoryRuns() {
+  const filter = document.getElementById('storyFilter').value;
+  const url = filter ? `/api/story-runs?story=${filter}` : '/api/story-runs';
+  const runs = await (await fetch(url)).json();
+  document.getElementById('storyRunsTable').innerHTML = runs.length === 0
+    ? '<div class="empty-state">No story runs yet. Run: <code>node sim/story-runner.js</code></div>'
+    : `<table><thead><tr><th>Story</th><th>Temp</th><th>Steps</th><th>Final Score</th><th>Final σ</th><th>Status</th><th></th></tr></thead>
+      <tbody>${runs.map(r => `<tr>
+        <td><span class="badge rag">${r.story_name || r.base_story}</span></td>
+        <td>${r.temperature}</td>
+        <td>${r.total_steps || '-'}</td>
+        <td style="color:var(--green)">${r.final_composite_score?.toFixed(3) || '-'}</td>
+        <td style="color:var(--blue)">${r.final_domain_std?.toFixed(3) || '-'}</td>
+        <td><span class="badge ${r.status}">${r.status}</span></td>
+        <td><span class="clickable" onclick="viewStoryRun('${r.id}')">View</span></td>
+      </tr>`).join('')}</tbody></table>`;
+}
+
+async function viewStoryRun(runId) {
+  const steps = await (await fetch(`/api/story-runs/${runId}/steps`)).json();
+  if (steps.length === 0) return;
+  storyStepsData = steps;
+  document.getElementById('storyDetail').style.display = 'block';
+  document.getElementById('storyStepSlider').max = steps.length;
+  document.getElementById('storyStepSlider').value = steps.length;
+
+  // Ground truth
+  document.getElementById('storyGroundTruth').textContent = steps[0].ground_truth_lessons || '';
+
+  // Domain σ over steps
+  const stepNums = steps.map(s => s.step);
+  const domStds = steps.map(s => s.domain_std);
+  const scores = steps.map(s => s.composite_score);
+  const judgeScores = steps.map(s => s.llm_judge_score);
+
+  // Background bands for phases
+  const phaseBands = [];
+  let curPhase = steps[0].phase;
+  let start = 0;
+  steps.forEach((s, i) => {
+    if (s.phase !== curPhase || i === steps.length - 1) {
+      phaseBands.push({ phase: curPhase, start, end: i });
+      curPhase = s.phase;
+      start = i;
+    }
+  });
+
+  if (charts.storyDomainStdChart) charts.storyDomainStdChart.destroy();
+  charts.storyDomainStdChart = new Chart(document.getElementById('storyDomainStdChart'), {
+    type:'line', data: { labels: stepNums, datasets: [
+      { label:'Domain σ', data: domStds, borderColor:'#3b82f6', borderWidth:2, pointRadius:1, fill:false, tension:0.3 }
+    ]},
+    options: { responsive:true, maintainAspectRatio:false, scales: {
+      x:{grid:{color:'#262626'},ticks:{color:'#a3a3a3'},title:{display:true,text:'Step',color:'#a3a3a3'}},
+      y:{grid:{color:'#262626'},ticks:{color:'#a3a3a3'},min:0,max:0.5}
+    }, plugins:{legend:{labels:{color:'#a3a3a3',font:{size:11}}}}}
+  });
+
+  if (charts.storyScoreChart) charts.storyScoreChart.destroy();
+  charts.storyScoreChart = new Chart(document.getElementById('storyScoreChart'), {
+    type:'line', data: { labels: stepNums, datasets: [
+      { label:'Vector composite', data: scores, borderColor:'#f97316', borderWidth:2, pointRadius:1, fill:false, tension:0.3 },
+      { label:'LLM judge', data: judgeScores, borderColor:'#22c55e', borderWidth:2, pointRadius:1, fill:false, tension:0.3 }
+    ]},
+    options: { responsive:true, maintainAspectRatio:false, scales: {
+      x:{grid:{color:'#262626'},ticks:{color:'#a3a3a3'},title:{display:true,text:'Step',color:'#a3a3a3'}},
+      y:{grid:{color:'#262626'},ticks:{color:'#a3a3a3'},min:0,max:1}
+    }, plugins:{legend:{labels:{color:'#a3a3a3',font:{size:11}}}}}
+  });
+
+  renderStoryStep(steps.length - 1);
+}
+
+function renderStoryStep(idx) {
+  const step = storyStepsData[idx];
+  if (!step) return;
+  document.getElementById('storyStepNum').textContent = step.step;
+  document.getElementById('storyLessonStep').textContent = step.step;
+  document.getElementById('storyCtxStep').textContent = step.step;
+
+  // Stats
+  document.getElementById('storyStats').innerHTML = `
+    <div class="mini-stat"><div class="label">Step</div><div class="val" style="color:var(--accent)">${step.step}/40</div></div>
+    <div class="mini-stat"><div class="label">Phase</div><div class="val" style="font-size:12px;color:${PHASE_COLORS[step.phase]||'var(--muted)'}">${step.phase_name}</div></div>
+    <div class="mini-stat"><div class="label">Domain σ</div><div class="val" style="color:var(--blue)">${step.domain_std?.toFixed(3)}</div></div>
+    <div class="mini-stat"><div class="label">Vector Score</div><div class="val" style="color:var(--accent)">${step.composite_score?.toFixed(3)}</div></div>
+    <div class="mini-stat"><div class="label">LLM Judge</div><div class="val" style="color:var(--green)">${step.llm_judge_score?.toFixed(2)}</div></div>
+    <div class="mini-stat"><div class="label">Tokens</div><div class="val">${step.token_estimate?.toLocaleString()}</div></div>
+  `;
+
+  // Bell curve
+  const hist = step.domain_histogram ? JSON.parse(step.domain_histogram) : [];
+  const gauss = step.domain_gaussian ? JSON.parse(step.domain_gaussian) : [];
+  renderBell('storyBellChart', hist, gauss, { mean: step.domain_mean || 0, std: step.domain_std || 0 });
+
+  // Lessons
+  document.getElementById('storySystemLessons').textContent = step.system_lessons || '';
+
+  // Context pieces (show each step's label as color-coded header)
+  const pieces = storyStepsData.slice(0, idx + 1).map(s => {
+    const color = PHASE_COLORS[s.phase] || '#a3a3a3';
+    return `<div style="border-left:3px solid ${color};padding:4px 8px;margin-bottom:6px;"><strong style="color:${color}">[Step ${s.step}: ${s.label}]</strong></div>`;
+  }).join('');
+  document.getElementById('storyContextPieces').innerHTML = pieces;
+}
+
+document.getElementById('storyStepSlider').addEventListener('input', (e) => {
+  renderStoryStep(parseInt(e.target.value) - 1);
+});
+
+document.getElementById('storyFilter').addEventListener('change', loadStoryRuns);
+
+// ── Context Rot Tab ────────────────────────────────────
+let rotStepsData = [];
+
+async function loadRotRuns() {
+  const runs = await (await fetch('/api/rot-runs')).json();
+  document.getElementById('rotRunsTable').innerHTML = runs.length === 0
+    ? '<div class="empty-state">No context rot runs yet. Run: <code>node sim/rot-runner.js</code></div>'
+    : `<table><thead><tr><th>Story</th><th>Limit</th><th>Steps</th><th>Summarizations</th><th>Final Score</th><th>Final Judge</th><th>Final σ</th><th></th></tr></thead>
+      <tbody>${runs.map(r => `<tr>
+        <td><span class="badge rag">${r.story_name}</span></td>
+        <td>${r.context_limit} tok</td>
+        <td>${r.total_steps || '-'}</td>
+        <td style="color:var(--red);font-weight:700">${r.total_summarizations || '-'}</td>
+        <td style="color:var(--accent)">${r.final_composite_score?.toFixed(3) || '-'}</td>
+        <td style="color:var(--green)">${r.final_judge_score?.toFixed(2) || '-'}</td>
+        <td style="color:var(--blue)">${r.final_domain_std?.toFixed(3) || '-'}</td>
+        <td><span class="clickable" onclick="viewRotRun('${r.id}')">View</span></td>
+      </tr>`).join('')}</tbody></table>`;
+}
+
+async function viewRotRun(runId) {
+  const steps = await (await fetch(`/api/rot-runs/${runId}/steps`)).json();
+  if (steps.length === 0) return;
+  rotStepsData = steps;
+  const detail = document.getElementById('rotDetail');
+  detail.style.display = 'block';
+  document.getElementById('rotStepSlider').max = steps.length;
+  document.getElementById('rotStepSlider').value = steps.length;
+  setTimeout(() => detail.scrollIntoView({ behavior: 'smooth' }), 100);
+
+  const stepNums = steps.map(s => s.step);
+  const scores = steps.map(s => s.composite_score);
+  const judgeScores = steps.map(s => s.llm_judge_score);
+  const domStds = steps.map(s => s.domain_std);
+  const tokens = steps.map(s => s.token_estimate);
+  const rotSteps = steps.filter(s => s.rot_event).map(s => s.step);
+
+  // Annotation lines for summarization events
+  const rotAnnotations = rotSteps.map(s => ({
+    type: 'line', xMin: s, xMax: s, borderColor: '#ef444488', borderWidth: 1, borderDash: [4,4],
+    label: { display: true, content: 'ROT', color: '#ef4444', font: { size: 9 }, position: 'start' }
+  }));
+
+  // Score chart
+  if (charts.rotScoreChart) charts.rotScoreChart.destroy();
+  charts.rotScoreChart = new Chart(document.getElementById('rotScoreChart'), {
+    type:'line', data: { labels: stepNums, datasets: [
+      { label:'Vector score', data: scores, borderColor:'#f97316', borderWidth:2, pointRadius: steps.map(s => s.rot_event ? 5 : 1), pointBackgroundColor: steps.map(s => s.rot_event ? '#ef4444' : '#f97316'), fill:false, tension:0.3 },
+      { label:'LLM judge', data: judgeScores, borderColor:'#22c55e', borderWidth:2, pointRadius: steps.map(s => s.rot_event ? 5 : 1), pointBackgroundColor: steps.map(s => s.rot_event ? '#ef4444' : '#22c55e'), fill:false, tension:0.3 }
+    ]},
+    options: { responsive:true, maintainAspectRatio:false, scales: {
+      x:{grid:{color:'#262626'},ticks:{color:'#a3a3a3'},title:{display:true,text:'Step (red dots = summarization)',color:'#a3a3a3'}},
+      y:{grid:{color:'#262626'},ticks:{color:'#a3a3a3'},min:0,max:1}
+    }, plugins:{legend:{labels:{color:'#a3a3a3',font:{size:11}}}}}
+  });
+
+  // Domain std chart
+  if (charts.rotStdChart) charts.rotStdChart.destroy();
+  charts.rotStdChart = new Chart(document.getElementById('rotStdChart'), {
+    type:'line', data: { labels: stepNums, datasets: [
+      { label:'Domain σ', data: domStds, borderColor:'#3b82f6', borderWidth:2, pointRadius: steps.map(s => s.rot_event ? 5 : 1), pointBackgroundColor: steps.map(s => s.rot_event ? '#ef4444' : '#3b82f6'), fill:false, tension:0.3 }
+    ]},
+    options: { responsive:true, maintainAspectRatio:false, scales: {
+      x:{grid:{color:'#262626'},ticks:{color:'#a3a3a3'}},
+      y:{grid:{color:'#262626'},ticks:{color:'#a3a3a3'},min:0,max:0.5}
+    }, plugins:{legend:{labels:{color:'#a3a3a3',font:{size:11}}}}}
+  });
+
+  // Token chart
+  if (charts.rotTokenChart) charts.rotTokenChart.destroy();
+  charts.rotTokenChart = new Chart(document.getElementById('rotTokenChart'), {
+    type:'line', data: { labels: stepNums, datasets: [
+      { label:'Tokens', data: tokens, borderColor:'#a855f7', borderWidth:2, pointRadius: steps.map(s => s.rot_event ? 5 : 1), pointBackgroundColor: steps.map(s => s.rot_event ? '#ef4444' : '#a855f7'), fill: true, backgroundColor:'#a855f718', tension:0.3 },
+      { label:'Limit (1700)', data: stepNums.map(() => 1700), borderColor:'#ef444466', borderWidth:1, borderDash:[6,4], pointRadius:0, fill:false }
+    ]},
+    options: { responsive:true, maintainAspectRatio:false, scales: {
+      x:{grid:{color:'#262626'},ticks:{color:'#a3a3a3'}},
+      y:{grid:{color:'#262626'},ticks:{color:'#a3a3a3'},min:0}
+    }, plugins:{legend:{labels:{color:'#a3a3a3',font:{size:11}}}}}
+  });
+
+  renderRotStep(steps.length - 1);
+}
+
+function renderRotStep(idx) {
+  const step = rotStepsData[idx];
+  if (!step) return;
+  document.getElementById('rotStepNum').textContent = step.step;
+  document.getElementById('rotLessonStep').textContent = step.step;
+  document.getElementById('rotCtxStep').textContent = step.step;
+
+  const rotBadge = document.getElementById('rotRotBadge');
+  rotBadge.style.display = step.rot_event ? 'inline' : 'none';
+
+  document.getElementById('rotSumCount').textContent = step.summarization_count > 0 ? `(${step.summarization_count} summarizations applied)` : '';
+
+  document.getElementById('rotStats').innerHTML = `
+    <div class="mini-stat"><div class="label">Step</div><div class="val" style="color:var(--accent)">${step.step}/40</div></div>
+    <div class="mini-stat"><div class="label">Phase</div><div class="val" style="font-size:12px;color:${PHASE_COLORS[step.phase]||'var(--muted)'}">${step.phase_name}</div></div>
+    <div class="mini-stat"><div class="label">Tokens</div><div class="val">${step.token_estimate}</div></div>
+    <div class="mini-stat"><div class="label">Summaries</div><div class="val" style="color:var(--red)">${step.summarization_count}</div></div>
+    <div class="mini-stat"><div class="label">Vector Score</div><div class="val" style="color:var(--accent)">${step.composite_score?.toFixed(3)}</div></div>
+    <div class="mini-stat"><div class="label">LLM Judge</div><div class="val" style="color:var(--green)">${step.llm_judge_score?.toFixed(2)}</div></div>
+    <div class="mini-stat"><div class="label">Domain σ</div><div class="val" style="color:var(--blue)">${step.domain_std?.toFixed(3)}</div></div>
+  `;
+
+  const hist = step.domain_histogram ? JSON.parse(step.domain_histogram) : [];
+  const gauss = step.domain_gaussian ? JSON.parse(step.domain_gaussian) : [];
+  const rawScores = step.chunk_domain_scores ? JSON.parse(step.chunk_domain_scores) : [];
+  renderBell('rotBellChart', hist, gauss, { mean: step.domain_mean || 0, std: step.domain_std || 0, rawScores });
+
+  document.getElementById('rotSystemLessons').textContent = step.system_lessons || '';
+  document.getElementById('rotContextText').textContent = step.context_snapshot || '(not stored)';
+  document.getElementById('rotGroundTruth').textContent = step.ground_truth_lessons || '';
+}
+
+document.getElementById('rotStepSlider').addEventListener('input', (e) => {
+  renderRotStep(parseInt(e.target.value) - 1);
+});
+</script>
+
+</body>
+</html>

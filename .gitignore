@@ -4,3 +4,5 @@ node_modules/
 data/
 .DS_Store
 Thumbs.db
+tools/context-inspector/node_modules/
+tools/context-inspector/sim/sim.db

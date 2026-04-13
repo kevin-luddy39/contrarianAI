@@ -1,0 +1,27 @@
+{
+  "name": "context-inspector",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Context window inspection tool with alignment analysis, bell curve visualization, MCP server, and simulation framework",
+  "bin": {
+    "context-inspector": "./cli.js"
+  },
+  "scripts": {
+    "start": "node web-server.js",
+    "cli": "node cli.js",
+    "mcp": "node mcp-server.js",
+    "sim": "node sim/index.js",
+    "sim:batch": "node sim/runner.js",
+    "sim:stories": "node sim/story-runner.js"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.39.0",
+    "@modelcontextprotocol/sdk": "^1.12.0",
+    "compromise": "^14.14.0",
+    "express": "^4.21.0",
+    "gpt-tokenizer": "^2.8.0",
+    "lda": "^0.2.0",
+    "sql.js": "^1.11.0",
+    "ws": "^8.18.0"
+  }
+}

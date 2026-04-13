@@ -144,7 +144,35 @@ Built a full context window analysis tool with 4 interfaces:
 - **Temperature comparison scrapped**: domain σ is identical across temperatures (same text), only the LLM output varies. Single temp (0.3) sufficient for demonstrating context rot.
 
 ### Next steps
-- Push landing page redesign (pending approval — currently local only)
 - Post LinkedIn Context Inspector article with screenshots
 - Consider publishing Context Inspector as standalone npm package
 - Explore deploying the simulation dashboard as a public demo
+
+---
+
+## 2026-04-13: Day 5 — White Paper, README, Landing Page
+
+### What happened
+- Pushed landing page redesign (Stark 9-section, 3-tier pricing, case study, FAQ)
+- Wrote white paper: "Context Rot: Statistical Early Warning for AI System Degradation" — documents the nursery rhyme experiment, the 3-step leading indicator finding, and the monitoring prescription
+- Created GitHub README for Context Inspector with hero, MCP drop-in example, CLI usage, architecture diagram, feature comparison vs Anthropic MCP Inspector, dependency table
+- Created Context Inspector landing page (`docs/index.html`) with demo section, data table showing step 10→15 decay timeline, "From White Paper to Tool" section, install methods
+- Replaced Humpty Dumpty source text (was Lewis Carroll's Through the Looking Glass chapter, now the actual fairy tale retelling) — judge scores went from 0.00 to 0.95 at baseline
+- Iterated on context rot strategy: summarize-only → FIFO eviction → drop-oldest + resummarize (most destructive, most realistic)
+- Re-ran all 3 rot simulations with drop+resummarize — all three reach judge=0.00 by step 15-16, never recover
+- Fixed bell curve to show real measurements: mean line (red), ±1σ/±2σ bands (blue), Gaussian fit (green), rug plot (white dots), per-chunk scores stored in DB
+- Fixed dashboard JS syntax error (duplicate `const dm` declaration breaking entire script block — caused "showTab is not defined" error)
+- Built self-contained HTML dashboard (`context_rot_dashboard.html`) as fallback for WSL networking issues
+- Wrote LinkedIn post focused on the leading indicator narrative: "Your AI is failing 3 steps before you notice" with 5 screenshot specifications
+
+### Key decisions
+- **Drop-oldest + resummarize** vs summarize-only: far more destructive (all stories reach 0.00 vs 0.75-0.95 with summarize-only). Compounds eviction loss with compression loss. More realistic model of how real systems handle context overflow.
+- **White paper as product**: the research IS the marketing. The experiment validates the tool, and the tool implements the research. Circular reinforcement.
+- **README comparison table**: positioned Context Inspector as complementary to (not competing with) Anthropic's MCP Inspector. Different purpose: manual debugging vs proactive monitoring.
+
+### Next steps
+- Record 30-60s screen recording of dashboard step slider for demo section and LinkedIn post
+- Capture screenshots for LinkedIn post (steps 10, 11, 14, 15, full trajectory)
+- Host landing page via GitHub Pages
+- Consider publishing as standalone npm package
+- Post LinkedIn article with screenshots

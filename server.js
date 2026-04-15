@@ -463,6 +463,77 @@ app.get('/admin', requireAdmin, async (req, res) => {
   }
 });
 
+// ============================================================
+// Admin JSON API (for remote dashboard)
+// ============================================================
+app.get('/api/admin/audit-requests', requireAdmin, async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT r.*, p.id as payment_id, p.amount_cents, p.status as payment_status,
+             p.stripe_session_url, p.created_at as payment_created_at, p.paid_at
+      FROM audit_requests r
+      LEFT JOIN LATERAL (SELECT * FROM payments WHERE audit_request_id = r.id ORDER BY created_at DESC LIMIT 1) p ON true
+      ORDER BY r.created_at DESC
+    `);
+    res.json(result.rows);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.get('/api/admin/assessments', requireAdmin, async (req, res) => {
+  try {
+    const result = await pool.query('SELECT * FROM assessments ORDER BY created_at DESC');
+    res.json(result.rows);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.get('/api/admin/visits', requireAdmin, async (req, res) => {
+  try {
+    const summary = await pool.query(`
+      SELECT COUNT(*)::int as total, COUNT(DISTINCT ip)::int as unique_ips,
+             MIN(created_at) as first_visit, MAX(created_at) as last_visit
+      FROM visits
+    `);
+    const referrers = await pool.query(`
+      SELECT COALESCE(NULLIF(referrer,''),'(direct)') as referrer, COUNT(*)::int as count
+      FROM visits GROUP BY referrer ORDER BY count DESC LIMIT 10
+    `);
+    const browsers = await pool.query(`
+      SELECT COALESCE(browser,'(unknown)') as browser, COUNT(*)::int as count
+      FROM visits GROUP BY browser ORDER BY count DESC LIMIT 10
+    `);
+    const devices = await pool.query(`
+      SELECT COALESCE(device,'desktop') as device, COUNT(*)::int as count
+      FROM visits GROUP BY device ORDER BY count DESC
+    `);
+    const daily = await pool.query(`
+      SELECT date_trunc('day', created_at)::date as day, COUNT(*)::int as count
+      FROM visits GROUP BY day ORDER BY day DESC LIMIT 30
+    `);
+    res.json({
+      summary: summary.rows[0],
+      referrers: referrers.rows,
+      browsers: browsers.rows,
+      devices: devices.rows,
+      daily: daily.rows,
+    });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.get('/api/admin/stats', requireAdmin, async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT
+        (SELECT COUNT(*)::int FROM audit_requests) as total_leads,
+        (SELECT COUNT(*)::int FROM audit_requests WHERE status = 'new') as new_leads,
+        (SELECT COUNT(*)::int FROM audit_requests WHERE status = 'paid') as paid_leads,
+        (SELECT COALESCE(SUM(amount_cents),0)::int FROM payments WHERE status = 'paid') as total_revenue_cents,
+        (SELECT COUNT(*)::int FROM visits) as total_visits,
+        (SELECT COUNT(DISTINCT ip)::int FROM visits) as unique_visitors
+    `);
+    res.json(result.rows[0]);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
 app.post('/admin/payment', requireAdmin, async (req, res) => {
   if (!stripe) return res.status(503).send('Stripe not configured');
 

@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>contrarianAI — Find the 6 failure patterns killing your AI agents</title>
-    <meta name="description" content="AI Production Diagnostic: we find the structural failures that demos hide. 3+ production issues found or you don't pay. Fixed scope, fixed price, 2-week turnaround.">
-    <meta property="og:title" content="contrarianAI — AI Production Diagnostic">
-    <meta property="og:description" content="Your AI looked great in the demo. We find what's actually breaking in production. Fixed price. Written report. Personal guarantee.">
+    <title>contrarianAI — Bell Tuning™ for production AI systems</title>
+    <meta name="description" content="Bell Tuning is the practice of reading the statistical bell curve of your AI's context window — and tuning the workflow against the shape, not the output. Free open-source instrument + paid diagnostic engagements with a personal guarantee.">
+    <meta property="og:title" content="contrarianAI — Bell Tuning™ for AI workflows">
+    <meta property="og:description" content="Stop tuning your AI by listening to its output. Tune it by watching the bell. Free instrument + diagnostic services with a 3+ issues found or you don't pay guarantee.">
     <meta property="og:type" content="website">
     <meta name="twitter:card" content="summary_large_image">
     <style>
@@ -162,6 +162,7 @@
     <div class="container">
         <div class="logo">contrarian<span>AI</span></div>
         <div class="nav-links">
+            <a href="#bell-tuning">Bell Tuning</a>
             <a href="/assessment.html">Self-Assessment</a>
             <a href="/questions.html">Questions</a>
             <a href="#talk" class="primary">Talk to Kevin</a>
@@ -169,16 +170,65 @@
     </div>
 </nav>
 
-<!-- 1. HERO — Pain + Promise -->
+<!-- 1. HERO — Bell Tuning + Promise -->
 <section class="hero">
     <div class="container">
-        <h1>Find the <em>6 failure patterns</em> killing your AI agents in production</h1>
-        <p class="subtitle">Your AI looked great in the demo. In production, it's giving wrong answers, burning tokens, and eroding trust. We find exactly why — and hand you the fix list.</p>
+        <div style="display:inline-block;background:var(--surface);border:1px solid var(--accent);border-radius:20px;padding:4px 14px;font-size:0.75rem;color:var(--accent);font-weight:600;margin-bottom:16px;">NEW METHODOLOGY · BELL TUNING&trade;</div>
+        <h1>Stop tuning your AI by listening to its <em>output</em>.<br>Tune it by watching the <em>bell</em>.</h1>
+        <p class="subtitle">Bell Tuning is the practice of reading the statistical bell curve of your AI's context window and tuning the workflow against the shape — not the noise from the answer. We do it for production AI systems. We also built the open-source instrument that does it.</p>
         <div class="cta-row">
             <a href="#talk" class="btn btn-primary">Talk to Kevin</a>
-            <a href="/assessment.html" class="btn btn-secondary">Free Self-Assessment</a>
+            <a href="#bell-tuning" class="btn btn-secondary">What is Bell Tuning?</a>
         </div>
         <div class="guarantee-inline">3+ production issues found or you don't pay</div>
+        <p style="margin-top:20px;font-size:0.85rem;color:var(--muted);">
+            Try the free instrument first → <code style="background:var(--surface);padding:4px 10px;border-radius:4px;color:var(--accent);">npx contrarianai-context-inspector --install-mcp</code>
+        </p>
+    </div>
+</section>
+
+<!-- 1b. BELL TUNING EXPLAINER -->
+<section class="dream" id="bell-tuning">
+    <div class="container">
+        <h2>What is Bell Tuning?</h2>
+        <p style="color:var(--muted);font-size:0.95rem;margin-bottom:20px;max-width:700px;">Most teams evaluate AI like a microphone — record the answer, judge if it sounds right. That's a <em>lagging</em> indicator. By the time the answer is wrong, the context window has been rotting for several turns and the system can't recover.</p>
+        <p style="color:var(--text);font-size:1rem;margin-bottom:24px;max-width:700px;"><strong>Bell Tuning</strong> reads the context itself. Score every chunk of the AI's context window for domain alignment, plot the distribution, watch the shape:</p>
+        <table style="width:100%;border-collapse:collapse;max-width:700px;">
+            <thead><tr>
+                <th style="text-align:left;padding:8px 12px;background:var(--surface);font-size:0.7rem;text-transform:uppercase;color:var(--muted);letter-spacing:.06em;border-bottom:1px solid var(--border);">Bell shape</th>
+                <th style="text-align:left;padding:8px 12px;background:var(--surface);font-size:0.7rem;text-transform:uppercase;color:var(--muted);letter-spacing:.06em;border-bottom:1px solid var(--border);">What it means</th>
+                <th style="text-align:left;padding:8px 12px;background:var(--surface);font-size:0.7rem;text-transform:uppercase;color:var(--muted);letter-spacing:.06em;border-bottom:1px solid var(--border);">Action</th>
+            </tr></thead>
+            <tbody>
+                <tr>
+                    <td style="padding:12px;border-bottom:1px solid var(--border);"><span style="color:var(--success);font-weight:700;">Tight, right-shifted</span></td>
+                    <td style="padding:12px;border-bottom:1px solid var(--border);color:var(--muted);font-size:0.9rem;">Context is on-domain. Healthy.</td>
+                    <td style="padding:12px;border-bottom:1px solid var(--border);color:var(--muted);font-size:0.9rem;">Keep going.</td>
+                </tr>
+                <tr>
+                    <td style="padding:12px;border-bottom:1px solid var(--border);"><span style="color:var(--accent);font-weight:700;">Wider, drifting left</span></td>
+                    <td style="padding:12px;border-bottom:1px solid var(--border);color:var(--muted);font-size:0.9rem;">Contamination, summary loss, or topic drift entering.</td>
+                    <td style="padding:12px;border-bottom:1px solid var(--border);color:var(--muted);font-size:0.9rem;">Tune now &mdash; refresh, evict, re-ground.</td>
+                </tr>
+                <tr>
+                    <td style="padding:12px;"><span style="color:var(--danger);font-weight:700;">Flat near zero</span></td>
+                    <td style="padding:12px;color:var(--muted);font-size:0.9rem;">Original content is gone. System is still answering &mdash; on noise.</td>
+                    <td style="padding:12px;color:var(--muted);font-size:0.9rem;">Reset. Output cannot be trusted.</td>
+                </tr>
+            </tbody>
+        </table>
+        <div style="background:var(--surface);border:1px solid var(--accent);border-radius:8px;padding:20px;margin-top:24px;max-width:700px;">
+            <p style="font-size:1rem;margin-bottom:6px;"><strong>The proof:</strong> 40-step contamination experiment (white paper in repo).</p>
+            <p style="color:var(--muted);font-size:0.9rem;margin-bottom:6px;">→ Step 11: bell &sigma; jumps 56%. Output still scores 0.85. <strong>The graph saw it. Output didn't.</strong></p>
+            <p style="color:var(--muted);font-size:0.9rem;margin-bottom:6px;">→ Steps 12&ndash;14: bell flattening. Output still passing. Three steps of warning.</p>
+            <p style="color:var(--muted);font-size:0.9rem;">→ Step 15: bell collapses. Output hits 0.00. Never recovers.</p>
+        </div>
+        <div style="margin-top:24px;text-align:center;">
+            <p style="color:var(--text);font-size:1.05rem;font-weight:600;margin-bottom:12px;">Try Bell Tuning yourself &mdash; the instrument is free and open source.</p>
+            <a href="https://github.com/kevin-luddy39/context-inspector" target="_blank" rel="noopener" class="btn btn-secondary">View on GitHub</a>
+            <a href="https://smithery.ai/server/kevinluddy39/contrarianai-context-inspector" target="_blank" rel="noopener" class="btn btn-secondary">Smithery</a>
+            <a href="https://github.com/kevin-luddy39/context-inspector/blob/main/docs/whitepaper.md" target="_blank" rel="noopener" class="btn btn-secondary">White Paper</a>
+        </div>
     </div>
 </section>
 
@@ -207,14 +257,15 @@
     </div>
 </section>
 
-<!-- 3. DREAM — Before/After -->
+<!-- 3. DREAM — Before/After (Bell Tuning framing) -->
 <section class="dream">
     <div class="container">
-        <h2>After the diagnostic</h2>
+        <h2>Before & after Bell Tuning</h2>
         <div class="dream-grid">
             <div class="dream-col before">
-                <h3>Before</h3>
+                <h3>Before (output-only)</h3>
                 <ul>
+                    <li>Tuning by listening to the answer — a lagging indicator</li>
                     <li>Wrong answers you can't diagnose</li>
                     <li>$47K/month in token spend, unclear ROI</li>
                     <li>4 "agents" that should be workflows</li>
@@ -223,8 +274,9 @@
                 </ul>
             </div>
             <div class="dream-col after">
-                <h3>After</h3>
+                <h3>After (Bell Tuning)</h3>
                 <ul>
+                    <li>Continuous &sigma; monitoring &mdash; the leading indicator</li>
                     <li>Prioritized fix list, ordered by impact</li>
                     <li>60% cost reduction from model right-sizing</li>
                     <li>Agent-vs-workflow map for every automation</li>
@@ -239,8 +291,8 @@
 <!-- 4. PRICING — Fix + First CTA -->
 <section class="pricing" id="pricing">
     <div class="container">
-        <h2>Fixed scope. Fixed price. Written report.</h2>
-        <p class="lead">Not hourly consulting. A defined engagement with a concrete deliverable and a personal guarantee.</p>
+        <h2>Bell Tuning, done for you.</h2>
+        <p class="lead">The free instrument tells you the bell is wrong. These engagements tell you why &mdash; and fix it. Fixed scope, fixed price, personal guarantee.</p>
         <div class="price-grid">
             <div class="price-card">
                 <h3>Quick Scan</h3>
@@ -370,6 +422,16 @@
         <h2>Questions I get asked</h2>
 
         <details class="faq-item">
+            <summary>What's Bell Tuning, exactly?</summary>
+            <p>Bell Tuning is the practice of treating an AI's context window as a measurable distribution &mdash; and tuning your workflow against the shape of that distribution rather than against the output it produces. Tighter bell, right-shifted = healthy. Wider bell, drifting left = contamination. Flat bell near zero = original content gone. The free instrument (<a href="https://github.com/kevin-luddy39/context-inspector" target="_blank">Context Inspector</a>) reports the shape continuously. This service interprets it and fixes the underlying causes.</p>
+        </details>
+
+        <details class="faq-item">
+            <summary>Do I need the free instrument before I hire you?</summary>
+            <p>No, but it helps. If you've already installed <code>npx contrarianai-context-inspector --install-mcp</code> and seen your bell flatten, you already know what's wrong &mdash; you just need help fixing it. If you haven't, I'll bring the instrument with me and we'll Bell Tune your stack together as the first step of the engagement.</p>
+        </details>
+
+        <details class="faq-item">
             <summary>How is this different from hiring a consultant?</summary>
             <p>Consultants bill hours. This is a fixed-scope engagement: defined deliverable, defined price, defined timeline. You get a written report with a prioritized fix list — not a slide deck, not an ongoing retainer you can't exit. If I don't find 3+ issues, you pay nothing.</p>
         </details>
@@ -405,6 +467,10 @@
 <section class="positions">
     <div class="container">
         <h2>What we believe (that most vendors won't say)</h2>
+        <div class="position-item">
+            <blockquote>"You don't tune an AI by listening to its output. You tune it by watching the bell."</blockquote>
+            <p>Output evaluation is a lagging indicator. Bell Tuning is the leading one.</p>
+        </div>
         <div class="position-item">
             <blockquote>"A smarter model doesn't fix agent failures. A smarter environment does."</blockquote>
             <p>Model upgrades are the most expensive way to avoid fixing your architecture.</p>

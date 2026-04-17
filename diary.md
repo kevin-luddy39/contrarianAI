@@ -176,3 +176,24 @@ Built a full context window analysis tool with 4 interfaces:
 - Host landing page via GitHub Pages
 - Consider publishing as standalone npm package
 - Post LinkedIn article with screenshots
+
+---
+
+## 2026-04-17: Day 9 — Landing page Bell Tuning copy alignment
+
+### What happened
+- Rewrote the "What is Bell Tuning?" section on `landing/index.html` to match the LinkedIn long-form copy verbatim in tone and structure
+- Kept the exact signature phrases: "observing the bell," "a more effective signal lies within the context itself," "This practice, which I call Bell Tuning," and "You decide"
+- Added the "With Claude's assistance, I developed an instrument..." paragraph with the `npx contrarianai-context-inspector --install-mcp` one-liner pulled into its own code block
+- Added the open-source / MIT / white-paper line and the closing RAG / multi-agent / long-context call-out ("you should be Bell Tuning")
+- Left the bell-shape table and the 40-step proof box unchanged — they already encode the experiment payoff
+
+### Key decisions
+- **Align to the LinkedIn post, not paraphrase it**: the post is the canonical phrasing Kevin is using in market. The landing page shouldn't introduce competing wording for the same concept. Reduces cognitive load for anyone who clicks through from LinkedIn.
+- **Keep the install command inline in the explainer** (not only in the hero): the story "I built an instrument, here's the one-liner" is the concrete handoff from narrative to action. Burying it only in the hero loses the rhetorical moment.
+- **No change to pricing / case study / FAQ**: the ask today was framing, not offer. Resist the urge to refactor surrounding sections.
+
+### Next steps
+- Watch LinkedIn engagement on the Bell Tuning post and A/B the landing hero against it
+- Consider a short (under-60s) video of the bell curve animating from tight→drifting→flat as a visual anchor in the explainer
+- Decide whether to trademark "Bell Tuning" formally or keep the ™ as positioning only

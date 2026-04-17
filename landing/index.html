@@ -191,8 +191,17 @@
 <section class="dream" id="bell-tuning">
     <div class="container">
         <h2>What is Bell Tuning?</h2>
-        <p style="color:var(--muted);font-size:0.95rem;margin-bottom:20px;max-width:700px;">Most teams evaluate AI like a microphone — record the answer, judge if it sounds right. That's a <em>lagging</em> indicator. By the time the answer is wrong, the context window has been rotting for several turns and the system can't recover.</p>
-        <p style="color:var(--text);font-size:1rem;margin-bottom:24px;max-width:700px;"><strong>Bell Tuning</strong> reads the context itself. Score every chunk of the AI's context window for domain alignment, plot the distribution, watch the shape:</p>
+        <p style="color:var(--text);font-size:1.05rem;margin-bottom:16px;max-width:700px;">Tuning an AI isn't about merely listening to its output; it's about observing the bell. The <em>bell curve</em>, that is.</p>
+        <p style="color:var(--muted);font-size:0.95rem;margin-bottom:16px;max-width:700px;">Many teams assess AI by recording responses and judging if they sound correct. This approach relies on <em>lagging</em> indicators. By the time an answer is deemed incorrect, the context window may have already deteriorated over several turns, making recovery difficult if not impossible.</p>
+        <p style="color:var(--text);font-size:1rem;margin-bottom:16px;max-width:700px;">A more effective signal lies within the context itself.</p>
+        <p style="color:var(--muted);font-size:0.95rem;margin-bottom:16px;max-width:700px;">By scoring each segment of an AI's context window for domain alignment and plotting the distribution, you create a bell curve. The shape of this bell provides insight into the system's health <strong>before</strong> the output reveals any issues.</p>
+        <p style="color:var(--muted);font-size:0.95rem;margin-bottom:16px;max-width:700px;">The ideal bell curve shape is unique to each application and may change over time. It indicates alignment with the ideal context content for your app.</p>
+        <p style="color:var(--text);font-size:1rem;margin-bottom:16px;max-width:700px;">This practice, which I call <strong>Bell Tuning</strong>, focuses on adjusting your AI workflow based on the bell's shape rather than the output noise. What's the ideal shape of the curve? <em>You decide.</em></p>
+        <p style="color:var(--muted);font-size:0.95rem;margin-bottom:16px;max-width:700px;">With Claude's assistance, I developed an instrument that provides real-time information to allow for continuous adjustment for adherence to the ideal bell curve. The tool is available as an MCP server &mdash; it can be integrated into Claude Desktop, Cursor, Windsurf, Cline, or Claude Code with a single command:</p>
+        <p style="margin-bottom:16px;max-width:700px;"><code style="background:var(--surface);padding:6px 12px;border-radius:4px;color:var(--accent);font-size:0.9rem;">npx contrarianai-context-inspector --install-mcp</code></p>
+        <p style="color:var(--muted);font-size:0.95rem;margin-bottom:16px;max-width:700px;">The tool is open source, MIT licensed, and research-backed &mdash; with a white paper available in the repository.</p>
+        <p style="color:var(--text);font-size:1rem;margin-bottom:24px;max-width:700px;">If you're running RAG, multi-agent systems, long-context chatbots, or any workflow where context accumulates across turns &mdash; you should be Bell Tuning.</p>
+        <p style="color:var(--text);font-size:1rem;margin-bottom:24px;max-width:700px;">Watch the shape:</p>
         <table style="width:100%;border-collapse:collapse;max-width:700px;">
             <thead><tr>
                 <th style="text-align:left;padding:8px 12px;background:var(--surface);font-size:0.7rem;text-transform:uppercase;color:var(--muted);letter-spacing:.06em;border-bottom:1px solid var(--border);">Bell shape</th>

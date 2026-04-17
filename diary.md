@@ -197,3 +197,15 @@ Built a full context window analysis tool with 4 interfaces:
 - Watch LinkedIn engagement on the Bell Tuning post and A/B the landing hero against it
 - Consider a short (under-60s) video of the bell curve animating from tight→drifting→flat as a visual anchor in the explainer
 - Decide whether to trademark "Bell Tuning" formally or keep the ™ as positioning only
+
+### Later that day — dashboard.html: always-fresh
+- Pulled the live admin API snapshot for the first time since the Bell Tuning push: 3 leads (all test submissions), 109 visits / 61 unique visitors, Apr 13 peak of 21, sustained 15–17/day on Apr 15–16. Funnel loads but hasn't converted an organic lead yet.
+- Hardened `landing/dashboard.html` so each visit pulls fresh data:
+  - fetch calls now use `cache: 'no-store'` + a `?_=<timestamp>` cache-buster + `Cache-Control: no-cache` headers
+  - added `Cache-Control: no-store` and `Pragma: no-cache` meta tags on the HTML shell so the page itself isn't cached
+  - added a visible "Last updated HH:MM:SS" indicator and a manual `↻ Refresh` button
+  - added `visibilitychange` + `pageshow` listeners so returning to the tab (or a bfcache restore on back/forward) triggers a re-fetch
+
+### Key decisions
+- **No polling interval**: the user asked for "refresh on each visit," not continuous auto-refresh. A timer would drain Render free-tier API calls and burn battery for no gain on a dashboard that's checked sporadically. Tab-focus refresh covers the realistic usage pattern.
+- **Cache-bust query param on top of `cache: 'no-store'`**: belt-and-suspenders. Some intermediate proxies ignore fetch cache semantics but respect a unique URL. Cheap insurance.

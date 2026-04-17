@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <title>contrarianAI — Production Dashboard</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
 <style>
@@ -48,8 +51,13 @@ details{margin-top:4px}
 </head>
 <body>
 
-<h1>contrarian<span>AI</span> Dashboard</h1>
-<p class="sub">Production data from contrarianai-landing.onrender.com</p>
+<div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;margin-bottom:20px">
+  <div>
+    <h1>contrarian<span>AI</span> Dashboard</h1>
+    <p class="sub" style="margin-bottom:0">Production data from contrarianai-landing.onrender.com · <span id="lastUpdated" style="color:var(--muted)">loading…</span></p>
+  </div>
+  <button id="refreshBtn" onclick="load()" style="background:var(--surface);border:1px solid var(--border);color:var(--accent);padding:8px 16px;border-radius:6px;font-size:0.8rem;font-weight:600;cursor:pointer;font-family:inherit">↻ Refresh</button>
+</div>
 <div class="error" id="error"></div>
 
 <div class="stats" id="statsGrid"></div>
@@ -86,7 +94,11 @@ function showTab(id, btn) {
 }
 
 async function api(path) {
-  const r = await fetch(BASE + path, { headers: { 'Authorization': AUTH } });
+  const bust = (path.includes('?') ? '&' : '?') + '_=' + Date.now();
+  const r = await fetch(BASE + path + bust, {
+    headers: { 'Authorization': AUTH, 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' },
+    cache: 'no-store'
+  });
   if (!r.ok) throw new Error(r.status + ' ' + r.statusText);
   return r.json();
 }
@@ -102,6 +114,12 @@ function fmtMoney(cents) { return cents ? '$' + (cents/100).toFixed(2) : ''; }
 
 // ── Load all data ──────────────────────────────────
 async function load() {
+  const btn = document.getElementById('refreshBtn');
+  const lu = document.getElementById('lastUpdated');
+  const err = document.getElementById('error');
+  if (btn) { btn.disabled = true; btn.textContent = '↻ Loading…'; }
+  if (err) err.style.display = 'none';
+  if (lu) lu.textContent = 'loading…';
   try {
     // Stats
     const stats = await api('/api/admin/stats');
@@ -190,10 +208,18 @@ async function load() {
       `<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:0.8rem"><span style="color:var(--muted)">${esc(r.browser)}</span><span style="font-weight:700;color:var(--blue)">${r.count}</span></div>`
     ).join('');
 
+    if (lu) lu.textContent = 'Last updated ' + new Date().toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit', second:'2-digit' });
   } catch (err) {
     showError('Failed to load: ' + err.message + '. Is the production server running?');
+    if (lu) lu.textContent = 'load failed';
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = '↻ Refresh'; }
   }
 }
+
+// Re-fetch when the user returns to the tab (covers bfcache restores too)
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') load(); });
+window.addEventListener('pageshow', (e) => { if (e.persisted) load(); });
 
 function esc(s) { return s == null ? '' : String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 

@@ -1,6 +1,6 @@
 {
   "name": "contrarianai-tool-call-grader",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Bell Tuning instrument for multi-agent / MCP workflows. Grades tool-call quality per call and per session, detects silent failures, fixation, response bloat, schema drift, and cascading errors.",
   "bin": {
     "contrarianai-tool-call-grader": "./cli.js",
@@ -35,6 +35,7 @@
     "silent-failures"
   ],
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.12.0"
+    "@modelcontextprotocol/sdk": "^1.12.0",
+    "contrarianai-context-inspector": "^0.2.15"
   }
 }

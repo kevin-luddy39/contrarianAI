@@ -10,8 +10,7 @@
  * cosine similarity over tokenised TF vectors.
  */
 
-const path = require('path');
-const ciCore = require(path.resolve(__dirname, '..', '..', 'context-inspector', 'core.js'));
+const ciCore = require('contrarianai-context-inspector');
 
 /**
  * Returns { diversity, redundancyRatio, similarityMatrix }.

@@ -11,8 +11,7 @@
  * cosine primitive are borrowed from context-inspector for consistency.
  */
 
-const path = require('path');
-const ciCore = require(path.resolve(__dirname, '..', '..', 'context-inspector', 'core.js'));
+const ciCore = require('contrarianai-context-inspector');
 
 /**
  * Score one chunk against a query via cosine similarity on tokenised

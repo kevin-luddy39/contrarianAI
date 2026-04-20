@@ -1,4 +1,5 @@
 .env
+.npmrc
 *.log
 node_modules/
 data/

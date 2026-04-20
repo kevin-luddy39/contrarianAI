@@ -51,7 +51,7 @@ function computeEmpiricalBaseline(domainTerms, contextBuilder) {
   for (let i = 0; i < BASELINE_CALIBRATION_TURNS; i++) {
     if (turns[i].drift !== 0) continue;  // use only on-topic turns
     const context = contextBuilder(i);
-    const analysis = ciCore.analyzeContext(context, { fixedDomainTerms: domainTerms });
+    const analysis = ciCore.analyze(context, { fixedDomainTerms: domainTerms });
     const stats = analysis.domain?.stats || analysis.stats;
     calibStats.push(stats);
   }
@@ -79,7 +79,7 @@ function runStrategy(strategyName, contextBuilder) {
   for (let i = 0; i < turns.length; i++) {
     const turnIdx = i + 1;
     const context = contextBuilder(i);
-    const analysis = ciCore.analyzeContext(context, { fixedDomainTerms: domainTerms });
+    const analysis = ciCore.analyze(context, { fixedDomainTerms: domainTerms });
     const stats = analysis.domain?.stats || analysis.stats;
 
     const detectorOutputs = {};

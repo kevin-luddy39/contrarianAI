@@ -16,8 +16,7 @@
  * of per-query audits as a trajectory and apply its forecasting machinery.
  */
 
-const path = require('path');
-const ciCore = require(path.resolve(__dirname, '..', '..', 'context-inspector', 'core.js'));
+const ciCore = require('contrarianai-context-inspector');
 
 const { scoreChunks, scoreCalibration, rankQualityCorrelation } = require('./scoring');
 const { diversityMetrics } = require('./diversity');

@@ -14,8 +14,7 @@
  * across an array of per-call signals.
  */
 
-const path = require('path');
-const ciCore = require(path.resolve(__dirname, '..', '..', 'context-inspector', 'core.js'));
+const ciCore = require('contrarianai-context-inspector');
 
 function stringify(v) {
   if (v == null) return '';

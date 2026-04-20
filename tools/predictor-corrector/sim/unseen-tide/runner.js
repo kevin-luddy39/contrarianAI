@@ -84,7 +84,7 @@ function main() {
     const piece = plan[i];
     context += piece.text + '\n\n';
 
-    const analysis = ciCore.analyzeContext(context, { fixedDomainTerms: domainTerms });
+    const analysis = ciCore.analyze(context, { fixedDomainTerms: domainTerms });
     const domainStats = analysis.domain?.stats || analysis.stats;
 
     const detectorOutputs = {};

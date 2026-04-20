@@ -48,7 +48,7 @@ const server = new McpServer({
 
 function loadCiCore() {
   try {
-    return require(path.resolve(__dirname, '..', 'context-inspector', 'core.js'));
+    return require('contrarianai-context-inspector');
   } catch {
     return null;
   }

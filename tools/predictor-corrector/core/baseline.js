@@ -24,13 +24,13 @@
 const { fromStats, STATE_DIM } = require('./state');
 
 function analyticalBaseline(referenceText, ciCore, options = {}) {
-  if (!ciCore || typeof ciCore.analyzeContext !== 'function') {
-    throw new Error('analyticalBaseline needs context-inspector core.js (ciCore.analyzeContext)');
+  if (!ciCore || typeof ciCore.analyze !== 'function') {
+    throw new Error('analyticalBaseline needs context-inspector core.js (ciCore.analyze)');
   }
   const domainTerms = typeof ciCore.extractDomainTerms === 'function'
     ? ciCore.extractDomainTerms(referenceText, options)
     : undefined;
-  const analysis = ciCore.analyzeContext(referenceText, {
+  const analysis = ciCore.analyze(referenceText, {
     ...options,
     fixedDomainTerms: domainTerms,
   });

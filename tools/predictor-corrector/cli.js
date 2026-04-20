@@ -65,7 +65,7 @@ function loadInput(args) {
 
 function loadCiCore() {
   try {
-    return require(path.resolve(__dirname, '..', 'context-inspector', 'core.js'));
+    return require('contrarianai-context-inspector');
   } catch (e) {
     return null;
   }

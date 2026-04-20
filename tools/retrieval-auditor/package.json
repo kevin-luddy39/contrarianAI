@@ -1,6 +1,6 @@
 {
   "name": "contrarianai-retrieval-auditor",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "RAG-specific Bell Tuning instrument. Audits retrieval quality per query by measuring the bell curve of chunk-to-query alignment plus rank quality, diversity, score calibration, and pathology flags.",
   "bin": {
     "contrarianai-retrieval-auditor": "./cli.js",
@@ -35,6 +35,7 @@
     "audit"
   ],
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.12.0"
+    "@modelcontextprotocol/sdk": "^1.12.0",
+    "contrarianai-context-inspector": "^0.2.15"
   }
 }

@@ -9,8 +9,7 @@
  * stream of session audits as a bell-curve trajectory.
  */
 
-const path = require('path');
-const ciCore = require(path.resolve(__dirname, '..', '..', 'context-inspector', 'core.js'));
+const ciCore = require('contrarianai-context-inspector');
 
 const { extractCall } = require('./signals');
 const { detectPathologies } = require('./pathologies');

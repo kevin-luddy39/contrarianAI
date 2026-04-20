@@ -1,6 +1,6 @@
 {
   "name": "contrarianai-predictor-corrector",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Forecasts the ideal bell curve of context-window alignment using predictor-corrector numerical methods. Companion to context-inspector.",
   "bin": {
     "contrarianai-predictor-corrector": "./cli.js",
@@ -35,6 +35,7 @@
     "forecasting"
   ],
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.12.0"
+    "@modelcontextprotocol/sdk": "^1.12.0",
+    "contrarianai-context-inspector": "^0.2.15"
   }
 }

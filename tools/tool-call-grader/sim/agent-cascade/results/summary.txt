@@ -1,0 +1,26 @@
+Agent Cascade — experiment summary
+==================================
+
+scenario              calls  success  relev  struct  divers  health  regime          result  fired vs expected
+-----------------     -----  -------  -----  ------  ------  ------  --------------  ------  -------------------------------------------
+healthy              12        1.000  0.594   1.000   0.750   1.000 healthy         PASS   expected=(none)  fired=(none)
+silent-failures      12        0.667  0.697   0.667   0.750   0.826 healthy         PASS   expected=SILENT_FAILURE  fired=SILENT_FAILURE,CASCADING_FAILURES
+tool-fixation        12        1.000  0.652   1.000   0.000   0.850 healthy         PASS   expected=TOOL_FIXATION  fired=TOOL_FIXATION
+response-bloat       12        1.000  0.535   1.000   0.750   1.000 healthy         PASS   expected=RESPONSE_BLOAT  fired=RESPONSE_BLOAT
+schema-drift         12        1.000  0.341   0.500   0.750   0.953 healthy         PASS   expected=SCHEMA_DRIFT  fired=SCHEMA_DRIFT
+irrelevant           12        1.000  0.000   1.000   0.750   0.850 healthy         PASS   expected=IRRELEVANT_RESPONSES  fired=IRRELEVANT_RESPONSES
+cascading            16        0.688  0.567   0.688   0.750   0.857 healthy         PASS   expected=CASCADING_FAILURES,SILENT_FAILURE  fired=SILENT_FAILURE,SCHEMA_DRIFT,CASCADING_FAILURES
+
+Pathology detection grid (rows = scenario, columns = pathology fired):
+                         SILENT_F TOOL_FIX RESPONSE SCHEMA_D IRRELEVA CASCADIN 
+healthy                    ·        ·        ·        ·        ·        ·     
+silent-failures           ✓         ·        ·        ·        ·       ✦      
+tool-fixation              ·       ✓         ·        ·        ·        ·     
+response-bloat             ·        ·       ✓         ·        ·        ·     
+schema-drift               ·        ·        ·       ✓         ·        ·     
+irrelevant                 ·        ·        ·        ·       ✓         ·     
+cascading                 ✓         ·        ·       ✦         ·       ✓      
+
+  ✓ = expected and fired   ✦ = fired but not expected   · = did not fire
+
+Pass rate: 7/7

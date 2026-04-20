@@ -1,0 +1,19 @@
+{
+  "name": "retrieval-auditor",
+  "version": "0.1.0",
+  "private": true,
+  "description": "RAG-specific Bell Tuning instrument. Audits retrieval quality per query by measuring the bell curve of chunk-to-query alignment plus rank quality, diversity, score calibration, and pathology flags.",
+  "bin": {
+    "retrieval-auditor": "./cli.js"
+  },
+  "main": "core/index.js",
+  "scripts": {
+    "cli": "node cli.js",
+    "mcp": "node mcp-server.js",
+    "test": "node test/run.js",
+    "experiment": "node sim/rag-needle/runner.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.0"
+  }
+}

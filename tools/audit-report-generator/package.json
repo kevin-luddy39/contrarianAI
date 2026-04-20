@@ -1,0 +1,16 @@
+{
+  "name": "audit-report-generator",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Consumes outputs from context-inspector, retrieval-auditor, tool-call-grader, and predictor-corrector, emits a unified audit report in markdown / HTML / JSON. The technical foundation of the Audit-in-a-Box SKU.",
+  "bin": {
+    "audit-report-generator": "./cli.js"
+  },
+  "main": "core/index.js",
+  "scripts": {
+    "cli": "node cli.js",
+    "test": "node test/run.js",
+    "example": "node sim/example-audit/generate.js"
+  },
+  "dependencies": {}
+}

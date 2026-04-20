@@ -83,7 +83,17 @@ details{margin-top:4px}
 
 <script>
 const BASE = 'https://contrarianai-landing.onrender.com';
-const AUTH = 'Basic ' + btoa('kevin:contrarianAI2026!');
+function getAuth() {
+  let creds = sessionStorage.getItem('dash_creds');
+  if (!creds) {
+    const user = prompt('Admin user:');
+    const pass = prompt('Admin password:');
+    if (!user || !pass) throw new Error('Credentials required');
+    creds = btoa(user + ':' + pass);
+    sessionStorage.setItem('dash_creds', creds);
+  }
+  return 'Basic ' + creds;
+}
 const charts = {};
 
 function showTab(id, btn) {
@@ -96,9 +106,13 @@ function showTab(id, btn) {
 async function api(path) {
   const bust = (path.includes('?') ? '&' : '?') + '_=' + Date.now();
   const r = await fetch(BASE + path + bust, {
-    headers: { 'Authorization': AUTH, 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' },
+    headers: { 'Authorization': getAuth(), 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' },
     cache: 'no-store'
   });
+  if (r.status === 401 || r.status === 403) {
+    sessionStorage.removeItem('dash_creds');
+    throw new Error('Authentication failed — reload to re-enter credentials');
+  }
   if (!r.ok) throw new Error(r.status + ' ' + r.statusText);
   return r.json();
 }

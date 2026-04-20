@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bell Tuning™ — A framework for production AI context monitoring | contrarianAI</title>
+  <meta name="description" content="Bell Tuning is the discipline of treating an AI's context window as a measurable distribution and tuning the workflow against the shape of that distribution. Five OSS tools, four whitepapers, one cloud platform.">
+  <meta name="keywords" content="Bell Tuning, AI observability, AI context monitoring, RAG quality, multi-agent observability, context inspector, predictor corrector">
+  <link rel="canonical" href="https://contrarianai-landing.onrender.com/bell-tuning/">
+
+  <meta property="og:title" content="Bell Tuning™ — A framework for production AI context monitoring">
+  <meta property="og:description" content="The model was never the problem. The context was. Bell Tuning is the discipline of measuring AI context-window health continuously, in production, before output failures appear.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://contrarianai-landing.onrender.com/bell-tuning/">
+  <meta property="og:site_name" content="contrarianAI">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Bell Tuning™ — production AI context monitoring">
+  <meta name="twitter:description" content="The model was never the problem. The context was. Five OSS tools and a managed platform for continuous AI context-window health monitoring.">
+
+  <style>
+    :root {
+      --bg: #0a0a0a;
+      --surface: #141414;
+      --surface-2: #1f1f1f;
+      --border: #262626;
+      --border-strong: #3a3a3a;
+      --text: #e5e5e5;
+      --text-muted: #a3a3a3;
+      --text-prose: #d4d4d4;
+      --accent: #f97316;
+      --accent-hover: #fb923c;
+      --accent-soft: rgba(249, 115, 22, 0.10);
+      --danger: #ef4444;
+      --success: #22c55e;
+      --info: #3b82f6;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { color: var(--accent-hover); text-decoration: underline; }
+
+    /* NAV */
+    nav { border-bottom: 1px solid var(--border); padding: 16px 0; }
+    nav .container { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+    .logo { font-size: 1.25rem; font-weight: 700; letter-spacing: -0.02em; color: var(--text); }
+    .logo a { color: var(--text); text-decoration: none; }
+    .logo span { color: var(--accent); }
+    .nav-links { display: flex; gap: 20px; align-items: center; }
+    .nav-links a { font-size: 0.9rem; color: var(--text-muted); text-decoration: none; }
+    .nav-links a:hover { color: var(--text); }
+    .nav-links a.primary { color: var(--accent); font-weight: 600; }
+
+    .container { max-width: 760px; margin: 0 auto; padding: 0 24px; }
+    .container.narrow { max-width: 720px; }
+
+    /* HERO */
+    .hero { padding: 80px 0 64px; text-align: center; border-bottom: 1px solid var(--border); }
+    .hero .eyebrow {
+      display: inline-block;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      color: var(--accent);
+      background: var(--accent-soft);
+      padding: 6px 14px;
+      border-radius: 999px;
+      margin-bottom: 24px;
+      font-weight: 600;
+    }
+    .hero h1 {
+      font-size: clamp(2.2rem, 5vw, 3.2rem);
+      font-weight: 800;
+      line-height: 1.12;
+      letter-spacing: -0.03em;
+      margin-bottom: 20px;
+    }
+    .hero h1 em { color: var(--accent); font-style: normal; }
+    .hero .subtitle {
+      font-size: 1.2rem;
+      color: var(--text-muted);
+      max-width: 620px;
+      margin: 0 auto 40px;
+      line-height: 1.55;
+    }
+    .hero .cta-row { display: flex; justify-content: center; gap: 16px; flex-wrap: wrap; }
+    .btn {
+      display: inline-block;
+      font-weight: 700;
+      font-size: 1.0rem;
+      padding: 14px 28px;
+      border-radius: 8px;
+      text-decoration: none;
+      transition: all 0.2s;
+      cursor: pointer;
+      border: none;
+      letter-spacing: -0.01em;
+    }
+    .btn-primary { background: var(--accent); color: #000; }
+    .btn-primary:hover { background: var(--accent-hover); text-decoration: none; }
+    .btn-secondary { background: transparent; color: var(--accent); border: 2px solid var(--accent); padding: 12px 26px; }
+    .btn-secondary:hover { background: var(--accent); color: #000; text-decoration: none; }
+
+    /* MANIFESTO */
+    .manifesto { padding: 64px 0 32px; }
+    .manifesto .toc {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--accent);
+      border-radius: 6px;
+      padding: 18px 24px;
+      margin-bottom: 56px;
+      font-size: 0.92rem;
+    }
+    .manifesto .toc strong {
+      display: block;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+      font-weight: 600;
+    }
+    .manifesto .toc ol {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4px 18px;
+    }
+    .manifesto .toc li { padding: 3px 0; color: var(--text-muted); }
+    .manifesto .toc li::before { content: ""; }
+    .manifesto .toc a { color: var(--text-muted); text-decoration: none; font-weight: 500; }
+    .manifesto .toc a:hover { color: var(--accent); text-decoration: none; }
+
+    .manifesto section { margin-bottom: 48px; scroll-margin-top: 24px; }
+    .manifesto h2 {
+      font-size: 1.55rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 22px;
+      line-height: 1.25;
+      color: var(--text);
+    }
+    .manifesto h2 .num {
+      color: var(--accent);
+      font-weight: 800;
+      font-size: 0.85em;
+      margin-right: 12px;
+      letter-spacing: 0;
+    }
+    .manifesto p {
+      color: var(--text-prose);
+      font-size: 1.075rem;
+      line-height: 1.72;
+      margin-bottom: 18px;
+    }
+    .manifesto p strong { color: var(--text); font-weight: 600; }
+    .manifesto p em { color: var(--text); font-style: italic; }
+    .manifesto p code, code.inline {
+      background: var(--surface);
+      color: var(--accent);
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-size: 0.92em;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      border: 1px solid var(--border);
+    }
+    .manifesto blockquote {
+      border-left: 3px solid var(--accent);
+      padding: 4px 0 4px 22px;
+      margin: 22px 0;
+      color: var(--text);
+      font-style: italic;
+      font-size: 1.1rem;
+      line-height: 1.6;
+    }
+    .pull-quote {
+      font-size: 1.18rem;
+      color: var(--text);
+      font-weight: 500;
+      line-height: 1.55;
+      margin: 28px 0;
+      padding: 24px 28px;
+      background: var(--surface);
+      border-left: 3px solid var(--accent);
+      border-radius: 0 6px 6px 0;
+    }
+
+    /* INSTRUMENTS */
+    .instruments { padding: 64px 0; border-top: 1px solid var(--border); }
+    .instruments h2 {
+      font-size: 1.8rem;
+      font-weight: 800;
+      margin-bottom: 12px;
+      letter-spacing: -0.02em;
+    }
+    .instruments .lead { color: var(--text-muted); margin-bottom: 36px; font-size: 1.05rem; max-width: 640px; }
+
+    .tool {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 24px 28px;
+      margin-bottom: 16px;
+    }
+    .tool .tool-head {
+      display: flex;
+      align-items: baseline;
+      gap: 14px;
+      margin-bottom: 8px;
+      flex-wrap: wrap;
+    }
+    .tool h3 { font-size: 1.15rem; font-weight: 700; color: var(--text); letter-spacing: -0.01em; }
+    .tool .tool-head .role {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-muted);
+      background: var(--surface-2);
+      padding: 3px 9px;
+      border-radius: 4px;
+      font-weight: 600;
+    }
+    .tool .tool-head .status {
+      font-size: 0.7rem;
+      letter-spacing: 0.05em;
+      color: var(--success);
+      font-weight: 700;
+    }
+    .tool .tool-head .status.beta { color: var(--accent); }
+    .tool p { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 14px; }
+    .tool .install {
+      background: #050505;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 12px 16px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 0.88rem;
+      color: var(--success);
+      overflow-x: auto;
+      white-space: nowrap;
+    }
+    .tool .install::before {
+      content: "$ ";
+      color: var(--text-muted);
+      user-select: none;
+    }
+    .tool .links { margin-top: 10px; font-size: 0.85rem; }
+    .tool .links a { color: var(--text-muted); margin-right: 16px; }
+    .tool .links a:hover { color: var(--accent); }
+
+    .compose-note {
+      margin-top: 28px;
+      padding: 18px 22px;
+      background: var(--accent-soft);
+      border: 1px solid rgba(249, 115, 22, 0.3);
+      border-radius: 6px;
+      color: var(--text);
+      font-size: 0.95rem;
+    }
+    .compose-note strong { color: var(--accent); }
+
+    /* CLOUD */
+    .cloud-section { padding: 56px 0; border-top: 1px solid var(--border); text-align: center; }
+    .cloud-section h2 { font-size: 1.6rem; font-weight: 800; margin-bottom: 14px; letter-spacing: -0.02em; }
+    .cloud-section p { color: var(--text-muted); max-width: 580px; margin: 0 auto 24px; font-size: 1.0rem; }
+
+    /* WHITEPAPERS */
+    .papers { padding: 64px 0; border-top: 1px solid var(--border); }
+    .papers h2 { font-size: 1.8rem; font-weight: 800; margin-bottom: 12px; letter-spacing: -0.02em; }
+    .papers .lead { color: var(--text-muted); margin-bottom: 32px; font-size: 1.05rem; }
+    .paper {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--accent);
+      border-radius: 6px;
+      padding: 22px 26px;
+      margin-bottom: 14px;
+    }
+    .paper h3 { font-size: 1.05rem; font-weight: 700; margin-bottom: 6px; color: var(--text); }
+    .paper .finding { color: var(--text-prose); font-size: 0.95rem; margin-bottom: 10px; line-height: 1.55; }
+    .paper .finding strong { color: var(--accent); font-weight: 700; }
+    .paper .meta { font-size: 0.82rem; color: var(--text-muted); }
+    .paper .meta a { color: var(--text-muted); margin-right: 18px; }
+    .paper .meta a:hover { color: var(--accent); }
+
+    /* CALL */
+    .three-asks { padding: 64px 0 80px; border-top: 1px solid var(--border); }
+    .three-asks h2 { font-size: 1.8rem; font-weight: 800; margin-bottom: 14px; letter-spacing: -0.02em; }
+    .three-asks .lead { color: var(--text-muted); margin-bottom: 32px; font-size: 1.05rem; }
+    .ask-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .ask {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 22px;
+    }
+    .ask .num {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--accent);
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+    .ask h3 { font-size: 1.0rem; font-weight: 700; margin-bottom: 8px; color: var(--text); }
+    .ask p { color: var(--text-muted); font-size: 0.88rem; line-height: 1.55; margin-bottom: 12px; }
+    .ask code {
+      display: block;
+      background: #050505;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 8px 10px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 0.78rem;
+      color: var(--success);
+      overflow-x: auto;
+      white-space: nowrap;
+    }
+    .ask code::before { content: "$ "; color: var(--text-muted); }
+    .ask .btn-link {
+      display: inline-block;
+      margin-top: 12px;
+      font-size: 0.85rem;
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    /* FOOTER */
+    footer { border-top: 1px solid var(--border); padding: 36px 0 56px; color: var(--text-muted); font-size: 0.88rem; }
+    footer .container { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 18px; }
+    footer a { color: var(--text-muted); }
+    footer a:hover { color: var(--accent); }
+
+    /* RESPONSIVE */
+    @media (max-width: 720px) {
+      .hero { padding: 56px 0 48px; }
+      .manifesto .toc ol { grid-template-columns: 1fr; }
+      .manifesto h2 { font-size: 1.35rem; }
+      .ask-grid { grid-template-columns: 1fr; }
+      .tool .tool-head { gap: 8px; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="container">
+    <div class="logo"><a href="/"><span>contrarian</span>AI</a></div>
+    <div class="nav-links">
+      <a href="/">Home</a>
+      <a href="#manifesto">Manifesto</a>
+      <a href="#instruments">Instruments</a>
+      <a href="#papers">Whitepapers</a>
+      <a href="#asks" class="primary">Get started</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="container">
+    <div class="eyebrow">A framework for production AI · MIT-licensed · Reproducible</div>
+    <h1>The model was never the problem.<br><em>The context was.</em></h1>
+    <p class="subtitle">
+      Bell Tuning is the discipline of treating an AI's context window as a measurable
+      distribution &mdash; and tuning the workflow against the shape of that distribution
+      rather than the output it eventually produces.
+    </p>
+    <div class="cta-row">
+      <a href="#manifesto" class="btn btn-primary">Read the manifesto</a>
+      <a href="#instruments" class="btn btn-secondary">Install an instrument</a>
+    </div>
+  </div>
+</header>
+
+<main class="manifesto" id="manifesto">
+  <div class="container narrow">
+
+    <div class="toc">
+      <strong>The framework, in eight sections</strong>
+      <ol>
+        <li>I. <a href="#s1">The diagnosis was wrong</a></li>
+        <li>II. <a href="#s2">Why output debugging stalled</a></li>
+        <li>III. <a href="#s3">What Bell Tuning is</a></li>
+        <li>IV. <a href="#s4">The mathematical foundation</a></li>
+        <li>V. <a href="#s5">The instruments</a></li>
+        <li>VI. <a href="#s6">The evidence</a></li>
+        <li>VII. <a href="#s7">What it enables &mdash; and isn't</a></li>
+        <li>VIII. <a href="#s8">The call</a></li>
+      </ol>
+    </div>
+
+    <section id="s1">
+      <h2><span class="num">I.</span>The diagnosis was wrong</h2>
+      <p>Most AI teams debug outputs. Their data says they should be debugging context &mdash; three turns earlier, where the failure is mathematically predictable, not yet visible, and still cheap to fix.</p>
+      <p>This is not a frontier-model claim. It is not a rant about agents. It is a claim about <em>where to look</em>. Output-side debugging has produced six years of plateau in production AI reliability. The models keep getting better; the deployments keep failing for the same reasons. Something in the diagnosis is wrong.</p>
+      <p>The diagnosis we propose: <strong>the context window is a measurable distribution, that distribution has a shape, the shape predicts output quality, and the discipline of tuning a workflow against the shape &mdash; not the output it eventually produces &mdash; is the missing layer in production AI engineering.</strong></p>
+      <p>That discipline has a name: <strong>Bell Tuning</strong>.</p>
+      <p>This essay is the framework. It explains what Bell Tuning is, why it works, what we have built to make it operational, and what the experiments say about whether the claims hold. It is intentionally long. The rest of this page lists the tools, the install commands, the whitepapers. The essay is what you should read first. The tools are downstream of the worldview; without the worldview the tools are noise.</p>
+      <p>A short version, for the impatient: every chunk of context in your AI's window has a measurable alignment score against your domain. The distribution of those scores is a bell curve. Healthy systems have a tight, right-shifted bell. Failing systems have a flat, left-drifted one. The transition between the two is detectable several turns before output quality breaks. We have built sensors that read this signal, a forecaster that anticipates it, and a managed platform that operationalises it. All of it is open-source and reproducible.</p>
+    </section>
+
+    <section id="s2">
+      <h2><span class="num">II.</span>Why output-side debugging has run out of road</h2>
+      <p>Three observable facts.</p>
+      <p><strong>First:</strong> models keep improving on benchmarks but failing in production at the same rate. The frontier-model jumps of the last three years &mdash; Claude 3 to 4.6, GPT-4 to o3, Gemini 1 to 2.5 &mdash; have produced enormous gains on reasoning benchmarks and minimal change in the rate at which production AI systems silently fail in customer-visible ways. The bottleneck is not the model.</p>
+      <p><strong>Second:</strong> most "AI agent" failures are workflow failures. The published post-mortems converge on a small set of root causes &mdash; irrelevant retrieval, context overflow, summary loss, tool-output bloat, silent error propagation, conversation drift. None of these are model issues. They are <em>context-management</em> issues. They occur in the layer between the user and the model, not in the model itself.</p>
+      <p><strong>Third:</strong> output-side observability is fundamentally lagging. By the time an output is judged degraded, the context that produced it has been degrading for several turns. You cannot recover from output failure by examining the output. You can only recover by examining what produced the output, and you can only do that if you were watching it before the failure.</p>
+      <div class="pull-quote">The implication is uncomfortable for an industry that has organised itself around prompt engineering, eval suites, and model upgrades: none of those things address the bottleneck. They address adjacent problems. The bottleneck is contextual, statistical, and continuous.</div>
+      <p>It has been measurable all along. Almost nobody has been measuring it.</p>
+      <p>Concrete shapes of the failure are familiar to anyone running production AI: a retrieval-augmented system fetches documents that share keywords with the query but contradict the recent state of the world; a multi-agent orchestrator receives a 12,000-token tool response that silently displaces the user's original request from the working window; a long-running chat assistant's own summaries replace the original source content with a lossy paraphrase, and three turns later it confidently asserts a fact that exists only in its own summary. Every one of these failures is invisible to the output until it isn't, and visible in the context the entire time.</p>
+    </section>
+
+    <section id="s3">
+      <h2><span class="num">III.</span>What Bell Tuning is</h2>
+      <p>Bell Tuning is the practice of treating an AI context window as a measurable distribution and tuning the workflow against the <em>shape</em> of that distribution rather than the output it eventually produces.</p>
+      <p>The shape is, literally, a bell curve. Each chunk of content currently in the AI's context window can be scored for alignment against the domain the AI is supposed to operate in. The mean of those scores tells you whether the context is on-topic on average. The standard deviation tells you whether it is consistently on-topic or scattered. The skewness tells you which direction it is drifting. The kurtosis tells you whether contamination is producing two coexisting clusters. The histogram tells you the full shape.</p>
+      <p>A <strong>healthy</strong> context window has a tight, right-shifted bell curve &mdash; most chunks score high, the spread is low. A <strong>degrading</strong> context window has a wider, leftward-drifting curve &mdash; chunks score lower on average, the spread grows. A <strong>collapsed</strong> context window has a flat curve &mdash; chunks score near zero, the system is generating output from noise.</p>
+      <p>The transition from healthy to degraded is <em>continuous</em>. It is detectable in the bell curve well before it is detectable in the output. The standard deviation moves first &mdash; new content arriving from a different distribution widens the spread. Then the skewness &mdash; the tail of low-alignment chunks lengthens. Then the mean &mdash; finally enough off-topic mass accumulates that the average drops. Then, finally &mdash; by which point recovery is often impossible &mdash; the output.</p>
+      <p>Each moment of the bell curve carries a distinct diagnostic meaning. The mean tells you <em>where</em> the context is centred. The standard deviation tells you <em>how consistently</em> it is centred there. The skewness tells you <em>which direction it is leaving from</em>. The kurtosis tells you whether contamination has produced two coexisting clusters &mdash; the bimodal signature that single-number thresholds cannot see. The full histogram is the diagnostic surface; the moments are how you summarise it for alerting and for forecasting.</p>
+      <p>This is a measurement claim. It is testable. We have tested it. The whitepapers below document the tests. On one controlled benchmark the bell-curve signal led static-mean output detection by 17 turns. On another, the framework's own predictor-corrector engine was beaten by a simple static threshold &mdash; we publish that negative result alongside the positive ones because the discipline is more important than the marketing.</p>
+      <p>Bell Tuning is the <em>discipline</em> of doing this measurement continuously, in production, on every workflow, and treating the bell curve as the primary diagnostic surface for AI reliability.</p>
+    </section>
+
+    <section id="s4">
+      <h2><span class="num">IV.</span>The mathematical foundation is not new</h2>
+      <p>The statistical machinery is old. TF-IDF for term-document scoring dates to the 1970s. Cosine similarity is older. The bell curve is the foundation of inferential statistics. Predictor-corrector numerical methods for ordinary differential equations go back to Adams in the 19th century. Kalman filters are 60 years old. Jensen-Shannon divergence and 1-Wasserstein distance for shape comparison are textbook information theory.</p>
+      <p>What is new is the <em>application</em> of these classical techniques to the specific problem of AI context-window monitoring &mdash; and the realisation that this application is not just possible but is in fact <em>the missing observability layer</em> for production AI systems.</p>
+      <p>The novelty is not in the mathematics. The novelty is in the framing.</p>
+      <div class="pull-quote">The context window is a distribution. Distributions have measurable shape. Shape evolution is forecastable. Forecast errors are leading indicators of output failure.</div>
+      <p>Each of those four sentences is a published result, not a hypothesis. We have shipped the experiments that test each one. The whitepapers cite each other; the citation graph is starting to look like a discipline.</p>
+      <p>This is also why Bell Tuning generalises. The framework &mdash; score each unit, observe the distribution, monitor the shape, forecast the trajectory &mdash; applies to context windows, retrieval results, multi-agent tool-call patterns, and conversation transcripts. The same statistical discipline produces a different sensor for each domain. Five sensors so far. The list will grow.</p>
+      <p>The framework also outlasts any specific scoring choice. We use TF-IDF cosine because it has zero dependencies and runs anywhere. An embedding-based scoring backend is a v1.1 addition; multi-modal alignment scoring (text + image + audio) is a v2 addition. None of those require changing the framework. The bell curve over <em>any</em> per-unit alignment score is the same statistical object &mdash; same moments, same forecastable trajectory, same pathology fingerprints. The scoring layer can evolve underneath the framework indefinitely without invalidating the discipline that sits on top.</p>
+    </section>
+
+    <section id="s5">
+      <h2><span class="num">V.</span>The instruments</h2>
+      <p>We have built five tools, all open-source, all MIT-licensed, all composable. Each implements the framework against a different surface of the AI workflow. Detailed descriptions and one-line installs appear below this essay; this section names them and explains why each exists.</p>
+      <p><strong>context-inspector</strong> measures the bell curve of chunk alignment for the context window itself. This is the founding instrument. It is the published whitepaper's subject. It is what you install first.</p>
+      <p><strong>retrieval-auditor</strong> does the same for retrieval-augmented generation. Each retrieved document is scored against the query; the bell curve of scores tells you whether the retrieval is healthy, contaminated, redundant, or rank-inverted. Pathology flags catch failure modes that precision@K cannot express at all &mdash; including score miscalibration and rank inversion.</p>
+      <p><strong>tool-call-grader</strong> does it for multi-agent systems. Per-tool-call relevance is scored; the session-level distribution reveals silent failures, tool fixation, response bloat, schema drift, and cascading failures.</p>
+      <p><strong>predictor-corrector</strong> is the forecaster. Given the trajectory of any of the above bell curves over time, it forecasts the next state under healthy dynamics. The gap between forecast and reality is itself a leading indicator. On the Unseen Tide benchmark it leads static-mean output detection by 17 turns.</p>
+      <p><strong>audit-report-generator</strong> is the productisation tool. It consumes outputs from the four sensors and emits a unified audit report &mdash; markdown, HTML, or JSON. It is the technical foundation of the consulting engagement turned into a self-serve product.</p>
+      <p>The five tools are independent CLIs and MCP servers. They share data shapes deliberately so they compose without adapters. The managed platform &mdash; <strong>Bell Tuning Cloud</strong> &mdash; aggregates them all into one dashboard with time-series, alerting, and downloadable reports.</p>
+    </section>
+
+    <section id="s6">
+      <h2><span class="num">VI.</span>The evidence</h2>
+      <p>Four experiments, each documented in a whitepaper, each fully reproducible from the public repo. Headline findings:</p>
+      <p><strong>Unseen Tide</strong> (predictor-corrector). Forty-turn staged-perturbation protocol on a controlled corpus. Tests whether the predictor-corrector forecaster catches drift earlier than static-threshold detectors. Result: forecaster fires on turn 17, static-&sigma; on turn 28, static-mean on turn 34. <strong>17-turn lead time over static-mean detection. Zero false positives in the calibration phase.</strong></p>
+      <p><strong>Conversation Rot</strong> (predictor-corrector). Fifty-one-turn synthetic chat with three drift-recovery cycles. Tests whether the forecaster handles oscillating drift with sliding-window context. Result: <strong>static-&sigma; wins on this scenario</strong> (F1 0.76 vs 0.52). Honest negative result. The predictor-corrector's value is for monotonic slow drift, not bidirectional cycles. We publish the loss because the discipline is more important than any individual tool's marketing.</p>
+      <p><strong>RAG Needle</strong> (retrieval-auditor). Pathology fingerprint test plus progressive degradation. Tests whether the auditor's health score tracks ground-truth precision@5 without seeing labels. Result: <strong>r = 0.999 correlation on alignment-degrading phases</strong>. All six pathology flags fire correctly on their designed scenarios with zero false positives on the clean control. Unsupervised RAG monitoring is feasible.</p>
+      <p><strong>Agent Cascade</strong> (tool-call-grader). Six pathology scenarios on synthetic multi-agent traces. Tests whether session-level signals diagnose specific failure modes. Result: <strong>7/7 pass rate</strong>. Each pathology fires on its designed scenario with logically-consistent co-fires (cascading failures also trips schema drift because error responses are unstructured &mdash; correct, not a false positive).</p>
+      <p>The pattern across all four experiments: the framework works on monotonic drift, gracefully reports its own limits on oscillating drift, and produces clean signal across multiple AI workflow surfaces. Negative results are reported honestly. We will publish negative results from the community alongside our own.</p>
+    </section>
+
+    <section id="s7">
+      <h2><span class="num">VII.</span>What Bell Tuning enables &mdash; and what it isn't</h2>
+      <p><strong>What it enables.</strong> Continuous, unsupervised monitoring of AI context health in production. Drift detection without labels. Pathology classification at the chunk-level statistical layer where most failures are detectable. Forecast-based early warning. A unified diagnostic surface across context, retrieval, and multi-agent tool calls. Audit reports that look like deliverables, not telemetry dumps.</p>
+      <p><strong>What it isn't.</strong> A replacement for evals. A replacement for human review. A guarantee that detected drift means broken output. A statement about model quality. A claim that the framework catches everything.</p>
+      <p>Specific known limits we publish openly: semantically-relevant content that shares no lexical tokens with a query is invisible to TF-IDF cosine scoring &mdash; an embedding-based backend addresses this and is on the roadmap. Adversarial paraphrase &mdash; off-topic content rewritten to share the on-topic vocabulary &mdash; is the obvious adversarial weakness against any lexical scorer; mitigation requires hybrid lexical-plus-semantic scoring. Very small chunk counts (under 10) make higher-moment statistics unreliable; the tools default to weighting only the first two moments at small sample sizes. Bimodal-cluster detection requires K &ge; 15 in the histogram. The Conversation Rot experiment shows where a static-&sigma; threshold beats the predictor-corrector. None of these limits are hidden. They are documented in the corresponding whitepapers, and they are how we choose what to build next.</p>
+      <p>Bell Tuning is one layer of an AI reliability stack. It is the layer most teams are missing. It composes well with eval suites, prompt observability, output review, and human-in-the-loop. It does not replace them.</p>
+    </section>
+
+    <section id="s8">
+      <h2><span class="num">VIII.</span>The call</h2>
+      <p>If this framework is right, three actions follow for any team running production AI.</p>
+      <p><strong>First &mdash; install one instrument.</strong> The fastest path is <code>npx contrarianai-context-inspector --install-mcp</code>. It adds a Bell Tuning sensor to your existing AI workflow within ninety seconds. You do not need to change anything about your stack to start watching the bell curve.</p>
+      <p><strong>Second &mdash; read one whitepaper.</strong> The RAG Needle paper is the most actionable for teams running retrieval pipelines. The Unseen Tide paper is the most theoretically interesting. Both are short, reproducible, and free.</p>
+      <p><strong>Third &mdash; ship one experiment of your own.</strong> The same framework that produced our four whitepapers can produce yours. Reproduce one of ours against your data. Publish the result. We will cite it.</p>
+      <p>Bell Tuning is not a product roadmap. It is a worldview about where the bottleneck in production AI lives. The tools, the platform, the whitepapers, the consulting engagements &mdash; those are downstream artifacts. The worldview is the contribution. If you find it useful, the rest will follow.</p>
+    </section>
+
+  </div>
+</main>
+
+<section class="instruments" id="instruments">
+  <div class="container">
+    <h2>The five instruments</h2>
+    <p class="lead">All MIT-licensed, all composable, all CLI plus MCP server. Sensor outputs share data shapes so they pipe into the predictor-corrector and the report generator without adapters.</p>
+
+    <article class="tool">
+      <div class="tool-head">
+        <h3>context-inspector</h3>
+        <span class="role">Sensor &middot; context window</span>
+        <span class="status">live on npm</span>
+      </div>
+      <p>Reads the statistical bell curve of context-window chunk alignment. Catches contamination, summary loss, and topic drift before the output reflects them. Auto-installs into Claude Desktop, Cursor, Windsurf, Cline, or Claude Code as an MCP server.</p>
+      <div class="install">npx contrarianai-context-inspector --install-mcp</div>
+      <div class="links">
+        <a href="https://www.npmjs.com/package/contrarianai-context-inspector">npm</a>
+        <a href="https://github.com/kevin-luddy39/context-inspector">GitHub</a>
+        <a href="https://github.com/kevin-luddy39/context-inspector/blob/main/docs/whitepaper.md">Whitepaper</a>
+        <a href="https://smithery.ai/server/kevinluddy39/contrarianai-context-inspector">Smithery</a>
+      </div>
+    </article>
+
+    <article class="tool">
+      <div class="tool-head">
+        <h3>retrieval-auditor</h3>
+        <span class="role">Sensor &middot; RAG retrieval</span>
+        <span class="status beta">v0.1 publishing</span>
+      </div>
+      <p>Per-query audit of retrieval quality. Bell curve of chunk-to-query alignment plus rank quality, diversity, score calibration, and bimodal detection. Catches pathologies precision@K can't express. Tracks ground-truth precision@5 at r = 0.999 without labels.</p>
+      <div class="install">npx contrarianai-retrieval-auditor trace.json</div>
+      <div class="links">
+        <a href="https://github.com/kevin-luddy39/contrarianAI/tree/main/tools/retrieval-auditor">GitHub</a>
+        <a href="https://github.com/kevin-luddy39/contrarianAI/blob/main/tools/retrieval-auditor/docs/whitepaper-rag-needle.md">RAG Needle whitepaper</a>
+      </div>
+    </article>
+
+    <article class="tool">
+      <div class="tool-head">
+        <h3>tool-call-grader</h3>
+        <span class="role">Sensor &middot; multi-agent</span>
+        <span class="status beta">v0.1 publishing</span>
+      </div>
+      <p>Grades multi-agent / MCP workflows. Per-call signals plus session-level aggregates. Detects silent failures, tool fixation, response bloat, schema drift, irrelevant responses, and cascading failures. Six pathology classes; 7/7 on the Agent Cascade benchmark.</p>
+      <div class="install">npx contrarianai-tool-call-grader session.json</div>
+      <div class="links">
+        <a href="https://github.com/kevin-luddy39/contrarianAI/tree/main/tools/tool-call-grader">GitHub</a>
+        <a href="https://github.com/kevin-luddy39/contrarianAI/blob/main/tools/tool-call-grader/docs/whitepaper-agent-cascade.md">Agent Cascade whitepaper</a>
+      </div>
+    </article>
+
+    <article class="tool">
+      <div class="tool-head">
+        <h3>predictor-corrector</h3>
+        <span class="role">Forecaster &middot; trajectory</span>
+        <span class="status beta">v0.1 publishing</span>
+      </div>
+      <p>Forecasts the ideal next bell curve from history using Adams-Bashforth-Moulton numerical methods or a Kalman filter. The gap between forecast and observation is a leading indicator. Leads static-mean detection by 17 turns on the Unseen Tide benchmark.</p>
+      <div class="install">npx contrarianai-predictor-corrector --baseline analytical --reference ref.txt</div>
+      <div class="links">
+        <a href="https://github.com/kevin-luddy39/contrarianAI/tree/main/tools/predictor-corrector">GitHub</a>
+        <a href="https://github.com/kevin-luddy39/contrarianAI/blob/main/tools/predictor-corrector/docs/whitepaper-unseen-tide.md">Unseen Tide whitepaper</a>
+        <a href="https://github.com/kevin-luddy39/contrarianAI/blob/main/tools/predictor-corrector/docs/whitepaper-conversation-rot.md">Conversation Rot whitepaper</a>
+      </div>
+    </article>
+
+    <article class="tool">
+      <div class="tool-head">
+        <h3>audit-report-generator</h3>
+        <span class="role">Productisation</span>
+        <span class="status beta">v0.1 publishing</span>
+      </div>
+      <p>Consumes outputs from the four sensors and emits a unified Bell Tuning audit report &mdash; markdown, HTML, or JSON. Cross-sensor pathology summary, prioritised findings, recommended actions per pathology kind. The technical foundation of the Audit-in-a-Box SKU.</p>
+      <div class="install">npx contrarianai-audit-report-generator audit.json --format html</div>
+      <div class="links">
+        <a href="https://github.com/kevin-luddy39/contrarianAI/tree/main/tools/audit-report-generator">GitHub</a>
+      </div>
+    </article>
+
+    <p class="compose-note">
+      <strong>v0.1 packages publishing now.</strong> The four newer tools are in the public repository today and publish to npm under the <code>contrarianai-</code> scope this week. To use them immediately, clone <code>github.com/kevin-luddy39/contrarianAI</code> and run them from the <code>tools/</code> directory.
+    </p>
+  </div>
+</section>
+
+<section class="cloud-section">
+  <div class="container">
+    <h2>Bell Tuning Cloud</h2>
+    <p>The managed SaaS platform. Ingests outputs from all five instruments, maintains per-workspace history, serves a live dashboard, and exports audit reports on demand. Free tier &le; 5,000 events/month. Self-hosted enterprise tier available.</p>
+    <a href="https://github.com/kevin-luddy39/contrarianAI/tree/main/tools/bell-tuning-cloud" class="btn btn-secondary">View source &amp; pricing</a>
+  </div>
+</section>
+
+<section class="papers" id="papers">
+  <div class="container">
+    <h2>Whitepapers</h2>
+    <p class="lead">Four experiments. Each fully reproducible from the public repo. Each documented end-to-end including the negative results.</p>
+
+    <article class="paper">
+      <h3>Unseen Tide: Model-Based Forecasting Detects Context Drift 17 Turns Before Output Failure</h3>
+      <p class="finding"><strong>Finding:</strong> The predictor-corrector forecaster fires on turn 17 of a 40-turn staged perturbation. Static-&sigma; fires on turn 28. Static-mean on turn 34. Zero false positives in the calibration phase.</p>
+      <p class="meta">
+        <a href="https://github.com/kevin-luddy39/contrarianAI/blob/main/tools/predictor-corrector/docs/whitepaper-unseen-tide.md">Read &rarr;</a>
+        <a href="https://github.com/kevin-luddy39/contrarianAI/tree/main/tools/predictor-corrector/sim/unseen-tide">Reproduce</a>
+      </p>
+    </article>
+
+    <article class="paper">
+      <h3>Conversation Rot: Where Model-Based Forecasting Does Not Help</h3>
+      <p class="finding"><strong>Finding:</strong> On bidirectional drift-recovery cycles with a sliding-window context, a static-&sigma; threshold outperforms both predictor-corrector engines (F1 0.76 vs 0.52). Honest negative result &mdash; published because the discipline matters more than the marketing.</p>
+      <p class="meta">
+        <a href="https://github.com/kevin-luddy39/contrarianAI/blob/main/tools/predictor-corrector/docs/whitepaper-conversation-rot.md">Read &rarr;</a>
+        <a href="https://github.com/kevin-luddy39/contrarianAI/tree/main/tools/predictor-corrector/sim/conversation-rot">Reproduce</a>
+      </p>
+    </article>
+
+    <article class="paper">
+      <h3>The RAG Needle: Unsupervised Detection of Retrieval Pathologies with r = 0.999 Correlation to Ground-Truth Precision</h3>
+      <p class="finding"><strong>Finding:</strong> Auditor health tracks ground-truth precision@5 at r = 0.999 on alignment-degrading contamination &mdash; without ever seeing a label. Six pathology flags fire cleanly on their designed scenarios with zero false positives on the clean control.</p>
+      <p class="meta">
+        <a href="https://github.com/kevin-luddy39/contrarianAI/blob/main/tools/retrieval-auditor/docs/whitepaper-rag-needle.md">Read &rarr;</a>
+        <a href="https://github.com/kevin-luddy39/contrarianAI/tree/main/tools/retrieval-auditor/sim/rag-needle">Reproduce</a>
+      </p>
+    </article>
+
+    <article class="paper">
+      <h3>The Agent Cascade: Detecting Six Distinct Multi-Agent Tool-Call Pathologies</h3>
+      <p class="finding"><strong>Finding:</strong> 7/7 scenarios pass on the pathology fingerprint benchmark. A 500-line JavaScript grader detects silent failures, fixation, bloat, schema drift, irrelevance, and cascades with zero false positives on the healthy control.</p>
+      <p class="meta">
+        <a href="https://github.com/kevin-luddy39/contrarianAI/blob/main/tools/tool-call-grader/docs/whitepaper-agent-cascade.md">Read &rarr;</a>
+        <a href="https://github.com/kevin-luddy39/contrarianAI/tree/main/tools/tool-call-grader/sim/agent-cascade">Reproduce</a>
+      </p>
+    </article>
+  </div>
+</section>
+
+<section class="three-asks" id="asks">
+  <div class="container">
+    <h2>Three asks</h2>
+    <p class="lead">Pick one. None require account creation, payment, or a sales call.</p>
+    <div class="ask-grid">
+      <div class="ask">
+        <div class="num">Ask 1</div>
+        <h3>Install one instrument</h3>
+        <p>Adds a Bell Tuning sensor to your existing AI workflow in 90 seconds. Auto-detects Claude Desktop, Cursor, Windsurf, Cline, Claude Code.</p>
+        <code>npx contrarianai-context-inspector --install-mcp</code>
+      </div>
+      <div class="ask">
+        <div class="num">Ask 2</div>
+        <h3>Read one whitepaper</h3>
+        <p>Pick the one that fits your stack. RAG Needle if you do retrieval. Agent Cascade if you do multi-agent. Unseen Tide if you want the theoretical core.</p>
+        <a class="btn-link" href="#papers">Browse whitepapers &rarr;</a>
+      </div>
+      <div class="ask">
+        <div class="num">Ask 3</div>
+        <h3>Ship one experiment</h3>
+        <p>Reproduce one of ours against your real data. Publish what you find &mdash; positive or negative. We will cite the result.</p>
+        <a class="btn-link" href="https://github.com/kevin-luddy39/contrarianAI">View on GitHub &rarr;</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <div>
+      Bell Tuning&trade; is a contribution of <a href="/">contrarianAI</a>. All software MIT-licensed.
+    </div>
+    <div>
+      <a href="/">Home</a> &middot;
+      <a href="https://github.com/kevin-luddy39/contrarianAI">GitHub</a> &middot;
+      <a href="https://cal.com/kevin-luddy-0dlzuu">Talk to the author</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

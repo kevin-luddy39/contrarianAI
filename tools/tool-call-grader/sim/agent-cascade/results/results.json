@@ -1,0 +1,843 @@
+{
+  "experiment": "agent-cascade",
+  "scenarios": [
+    {
+      "scenario": "healthy",
+      "callCount": 12,
+      "expected": [],
+      "fired": [],
+      "expectedAllFired": true,
+      "pass": true,
+      "health": 1,
+      "regime": "healthy",
+      "toolCalls": {
+        "successRate": 1,
+        "errorRate": 0,
+        "structuredRate": 1,
+        "meanRelevance": 0.594375,
+        "toolDiversity": 0.75,
+        "meanSize": 112.25,
+        "meanLatency": 100.83333333333333,
+        "toolCounts": {
+          "search": 3,
+          "summarize": 3,
+          "verify": 3,
+          "publish": 3
+        }
+      },
+      "stats": {
+        "mean": 0.5944,
+        "stdDev": 0.2692,
+        "variance": 0.0725,
+        "skewness": -0.7266,
+        "kurtosis": -0.9243,
+        "min": 0.1581,
+        "max": 0.8981,
+        "median": 0.6673,
+        "count": 12,
+        "histogram": [
+          0,
+          0,
+          0,
+          5,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          5,
+          0,
+          5,
+          0,
+          0,
+          4.999999999999999,
+          0,
+          0
+        ],
+        "gaussianFit": [
+          0,
+          0.2,
+          0.32,
+          0.44,
+          0.5781,
+          0.73316,
+          0.898267,
+          1.063237,
+          1.21582976,
+          1.343177516,
+          1.4335472643,
+          1.47811620391,
+          1.472390810773,
+          1.4169534316351,
+          1.31736467887696,
+          1.183244273387367,
+          1.026740672589944,
+          0.8607263128670002,
+          0.697087591280974,
+          0.5454156344097765
+        ],
+        "binEdges": [
+          0,
+          0.05,
+          0.1,
+          0.15,
+          0.2,
+          0.25,
+          0.3,
+          0.35,
+          0.4,
+          0.45,
+          0.5,
+          0.55,
+          0.6,
+          0.65,
+          0.7,
+          0.75,
+          0.8,
+          0.85,
+          0.9,
+          0.95
+        ]
+      },
+      "pathologies": []
+    },
+    {
+      "scenario": "silent-failures",
+      "callCount": 12,
+      "expected": [
+        "SILENT_FAILURE"
+      ],
+      "fired": [
+        "SILENT_FAILURE",
+        "CASCADING_FAILURES"
+      ],
+      "expectedAllFired": true,
+      "pass": true,
+      "health": 0.8261904761904761,
+      "regime": "healthy",
+      "toolCalls": {
+        "successRate": 0.6666666666666666,
+        "errorRate": 0.33333333333333337,
+        "structuredRate": 0.6666666666666666,
+        "meanRelevance": 0.6969875000000001,
+        "toolDiversity": 0.75,
+        "meanSize": 88.41666666666667,
+        "meanLatency": 96.33333333333333,
+        "toolCounts": {
+          "search": 3,
+          "summarize": 3,
+          "verify": 3,
+          "publish": 3
+        }
+      },
+      "stats": {
+        "mean": 0.697,
+        "stdDev": 0.2246,
+        "variance": 0.0504,
+        "skewness": -1.5111,
+        "kurtosis": 1.3344,
+        "min": 0.1581,
+        "max": 0.8981,
+        "median": 0.7143,
+        "count": 8,
+        "histogram": [
+          0,
+          0,
+          0,
+          2.5,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          2.5,
+          0,
+          7.5,
+          0,
+          0,
+          7.5,
+          0,
+          0
+        ],
+        "gaussianFit": [
+          0,
+          0,
+          0.07,
+          0.119,
+          0.1951,
+          0.3039,
+          0.450494,
+          0.6355027,
+          0.85312669,
+          1.089876854,
+          1.3249792735,
+          1.53288119626,
+          1.687623893903,
+          1.7681153365629,
+          1.76284153103476,
+          1.672567727209284,
+          1.510156333924061,
+          1.2975612312047935,
+          1.0609662537690296,
+          0.8255493439300582
+        ],
+        "binEdges": [
+          0,
+          0.05,
+          0.1,
+          0.15,
+          0.2,
+          0.25,
+          0.3,
+          0.35,
+          0.4,
+          0.45,
+          0.5,
+          0.55,
+          0.6,
+          0.65,
+          0.7,
+          0.75,
+          0.8,
+          0.85,
+          0.9,
+          0.95
+        ]
+      },
+      "pathologies": [
+        {
+          "kind": "SILENT_FAILURE",
+          "severity": 0.6666666666666666,
+          "description": "tool-calls errored and the agent continued without acknowledgement",
+          "evidence": {
+            "errorCount": 4,
+            "continuedAfterError": 4
+          }
+        },
+        {
+          "kind": "CASCADING_FAILURES",
+          "severity": 0.12121212121212124,
+          "description": "error rate grows monotonically — the workflow is destabilising rather than hitting transient issues",
+          "evidence": {
+            "slope": 0.02424242424242425,
+            "firstRate": 0,
+            "finalRate": 0.3333333333333333
+          }
+        }
+      ]
+    },
+    {
+      "scenario": "tool-fixation",
+      "callCount": 12,
+      "expected": [
+        "TOOL_FIXATION"
+      ],
+      "fired": [
+        "TOOL_FIXATION"
+      ],
+      "expectedAllFired": true,
+      "pass": true,
+      "health": 0.85,
+      "regime": "healthy",
+      "toolCalls": {
+        "successRate": 1,
+        "errorRate": 0,
+        "structuredRate": 1,
+        "meanRelevance": 0.6515500000000001,
+        "toolDiversity": 0,
+        "meanSize": 148.5,
+        "meanLatency": 93.91666666666667,
+        "toolCounts": {
+          "search": 12
+        }
+      },
+      "stats": {
+        "mean": 0.6516,
+        "stdDev": 0.0281,
+        "variance": 0.0008,
+        "skewness": 1.7889,
+        "kurtosis": 1.2,
+        "min": 0.639,
+        "max": 0.7143,
+        "median": 0.639,
+        "count": 12,
+        "histogram": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          16.666666666667,
+          0,
+          3.33333333333333,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "gaussianFit": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          3.6e-8,
+          0.0005455841,
+          0.34433617837,
+          9.086838837861,
+          10.0265665109138,
+          0.46259495864277,
+          0.000892398424794,
+          7.19823362e-8,
+          2.4277e-13,
+          0,
+          0
+        ],
+        "binEdges": [
+          0,
+          0.05,
+          0.1,
+          0.15,
+          0.2,
+          0.25,
+          0.3,
+          0.35,
+          0.4,
+          0.45,
+          0.5,
+          0.55,
+          0.6,
+          0.65,
+          0.7,
+          0.75,
+          0.8,
+          0.85,
+          0.9,
+          0.95
+        ]
+      },
+      "pathologies": [
+        {
+          "kind": "TOOL_FIXATION",
+          "severity": 1,
+          "description": "one tool dominates the call distribution — agent is stuck or over-relying on a single capability",
+          "evidence": {
+            "tool": "search",
+            "ratio": 1,
+            "uniqueTools": 1
+          }
+        }
+      ]
+    },
+    {
+      "scenario": "response-bloat",
+      "callCount": 12,
+      "expected": [
+        "RESPONSE_BLOAT"
+      ],
+      "fired": [
+        "RESPONSE_BLOAT"
+      ],
+      "expectedAllFired": true,
+      "pass": true,
+      "health": 1,
+      "regime": "healthy",
+      "toolCalls": {
+        "successRate": 1,
+        "errorRate": 0,
+        "structuredRate": 1,
+        "meanRelevance": 0.5354416666666667,
+        "toolDiversity": 0.75,
+        "meanSize": 613.4166666666666,
+        "meanLatency": 96.58333333333333,
+        "toolCounts": {
+          "search": 3,
+          "summarize": 3,
+          "verify": 3,
+          "publish": 3
+        }
+      },
+      "stats": {
+        "mean": 0.5354,
+        "stdDev": 0.3107,
+        "variance": 0.0965,
+        "skewness": -0.4642,
+        "kurtosis": -1.3379,
+        "min": 0.0071,
+        "max": 0.8981,
+        "median": 0.6202,
+        "count": 12,
+        "histogram": [
+          2,
+          0,
+          0,
+          5,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          5,
+          0,
+          3.33333333333333,
+          0,
+          0,
+          4.999999999999999,
+          0,
+          0
+        ],
+        "gaussianFit": [
+          0,
+          0.4,
+          0.54,
+          0.655,
+          0.7794,
+          0.90362,
+          1.020814,
+          1.1237209,
+          1.2053795,
+          1.259918549,
+          1.2832594718,
+          1.27361986873,
+          1.231738485114,
+          1.1607816521427,
+          1.06594770057107,
+          0.953837950426323,
+          0.83169987618105,
+          0.7066624492510871,
+          0.5850739073208053,
+          0.47202259105266586
+        ],
+        "binEdges": [
+          0,
+          0.05,
+          0.1,
+          0.15,
+          0.2,
+          0.25,
+          0.3,
+          0.35,
+          0.4,
+          0.45,
+          0.5,
+          0.55,
+          0.6,
+          0.65,
+          0.7,
+          0.75,
+          0.8,
+          0.85,
+          0.9,
+          0.95
+        ]
+      },
+      "pathologies": [
+        {
+          "kind": "RESPONSE_BLOAT",
+          "severity": 0.8388385651929886,
+          "description": "a tool response is an order of magnitude larger than session median, likely dominating downstream context",
+          "evidence": {
+            "maxSize": 6189,
+            "medianSize": 130,
+            "ratio": 47.60769230769231
+          }
+        }
+      ]
+    },
+    {
+      "scenario": "schema-drift",
+      "callCount": 12,
+      "expected": [
+        "SCHEMA_DRIFT"
+      ],
+      "fired": [
+        "SCHEMA_DRIFT"
+      ],
+      "expectedAllFired": true,
+      "pass": true,
+      "health": 0.9534178571428572,
+      "regime": "healthy",
+      "toolCalls": {
+        "successRate": 1,
+        "errorRate": 0,
+        "structuredRate": 0.5,
+        "meanRelevance": 0.3413083333333333,
+        "toolDiversity": 0.75,
+        "meanSize": 81.08333333333333,
+        "meanLatency": 102.75,
+        "toolCounts": {
+          "search": 3,
+          "summarize": 3,
+          "verify": 3,
+          "publish": 3
+        }
+      },
+      "stats": {
+        "mean": 0.3413,
+        "stdDev": 0.3248,
+        "variance": 0.1055,
+        "skewness": 0.3158,
+        "kurtosis": -1.5739,
+        "min": 0,
+        "max": 0.8783,
+        "median": 0.1952,
+        "count": 12,
+        "histogram": [
+          7,
+          0,
+          0,
+          3.333,
+          1.6667,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          3.333333333333,
+          0,
+          3.33333333333333,
+          0,
+          0,
+          1.6666666666666665,
+          0,
+          0
+        ],
+        "gaussianFit": [
+          1,
+          0.9,
+          0.98,
+          1.077,
+          1.152,
+          1.20289,
+          1.226675,
+          1.2216323,
+          1.18812074,
+          1.128469031,
+          1.0467132129,
+          0.94814500536,
+          0.838746673222,
+          0.7245958683991,
+          0.61132180949921,
+          0.503677928593282,
+          0.4052704553895989,
+          0.3184534529958544,
+          0.24437454942565712,
+          0.1831365293154865
+        ],
+        "binEdges": [
+          0,
+          0.05,
+          0.1,
+          0.15,
+          0.2,
+          0.25,
+          0.3,
+          0.35,
+          0.4,
+          0.45,
+          0.5,
+          0.55,
+          0.6,
+          0.65,
+          0.7,
+          0.75,
+          0.8,
+          0.85,
+          0.9,
+          0.95
+        ]
+      },
+      "pathologies": [
+        {
+          "kind": "SCHEMA_DRIFT",
+          "severity": 1,
+          "description": "rate of structured responses falls across the session — tool returning malformed outputs",
+          "evidence": {
+            "firstHalfRate": 1,
+            "secondHalfRate": 0,
+            "slope": -1
+          }
+        }
+      ]
+    },
+    {
+      "scenario": "irrelevant",
+      "callCount": 12,
+      "expected": [
+        "IRRELEVANT_RESPONSES"
+      ],
+      "fired": [
+        "IRRELEVANT_RESPONSES"
+      ],
+      "expectedAllFired": true,
+      "pass": true,
+      "health": 0.85,
+      "regime": "healthy",
+      "toolCalls": {
+        "successRate": 1,
+        "errorRate": 0,
+        "structuredRate": 1,
+        "meanRelevance": 0,
+        "toolDiversity": 0.75,
+        "meanSize": 104,
+        "meanLatency": 102.08333333333333,
+        "toolCounts": {
+          "search": 3,
+          "summarize": 3,
+          "verify": 3,
+          "publish": 3
+        }
+      },
+      "stats": {
+        "mean": 0,
+        "stdDev": 0,
+        "variance": 0,
+        "skewness": 0,
+        "kurtosis": -3,
+        "min": 0,
+        "max": 0,
+        "median": 0,
+        "count": 12,
+        "histogram": [
+          20,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "gaussianFit": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "binEdges": [
+          0,
+          0.05,
+          0.1,
+          0.15,
+          0.2,
+          0.25,
+          0.3,
+          0.35,
+          0.4,
+          0.45,
+          0.5,
+          0.55,
+          0.6,
+          0.65,
+          0.7,
+          0.75,
+          0.8,
+          0.85,
+          0.9,
+          0.95
+        ]
+      },
+      "pathologies": [
+        {
+          "kind": "IRRELEVANT_RESPONSES",
+          "severity": 1,
+          "description": "mean arg-to-response alignment is low — tools are returning content unrelated to requests",
+          "evidence": {
+            "meanRelevance": 0
+          }
+        }
+      ]
+    },
+    {
+      "scenario": "cascading",
+      "callCount": 16,
+      "expected": [
+        "CASCADING_FAILURES",
+        "SILENT_FAILURE"
+      ],
+      "fired": [
+        "SILENT_FAILURE",
+        "SCHEMA_DRIFT",
+        "CASCADING_FAILURES"
+      ],
+      "expectedAllFired": true,
+      "pass": true,
+      "health": 0.8566964285714286,
+      "regime": "healthy",
+      "toolCalls": {
+        "successRate": 0.6875,
+        "errorRate": 0.3125,
+        "structuredRate": 0.6875,
+        "meanRelevance": 0.5667636363636364,
+        "toolDiversity": 0.75,
+        "meanSize": 75.9375,
+        "meanLatency": 98.5,
+        "toolCounts": {
+          "search": 4,
+          "summarize": 4,
+          "verify": 4,
+          "publish": 4
+        }
+      },
+      "stats": {
+        "mean": 0.5668,
+        "stdDev": 0.2644,
+        "variance": 0.0699,
+        "skewness": -0.6599,
+        "kurtosis": -1.0662,
+        "min": 0.1581,
+        "max": 0.8783,
+        "median": 0.6202,
+        "count": 11,
+        "histogram": [
+          0,
+          0,
+          0,
+          5.455,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          5.454545454545,
+          0,
+          5.45454545454545,
+          0,
+          0,
+          3.6363636363636367,
+          0,
+          0
+        ],
+        "gaussianFit": [
+          0,
+          0.3,
+          0.37,
+          0.503,
+          0.6544,
+          0.82079,
+          0.993324,
+          1.1599012,
+          1.306834,
+          1.4206564,
+          1.4901393739,
+          1.50811319566,
+          1.472686146529,
+          1.3875724702618,
+          1.26145092585988,
+          1.106507231922723,
+          0.9364991023160796,
+          0.7647679618158285,
+          0.6025890258008066,
+          0.4581228588426822
+        ],
+        "binEdges": [
+          0,
+          0.05,
+          0.1,
+          0.15,
+          0.2,
+          0.25,
+          0.3,
+          0.35,
+          0.4,
+          0.45,
+          0.5,
+          0.55,
+          0.6,
+          0.65,
+          0.7,
+          0.75,
+          0.8,
+          0.85,
+          0.9,
+          0.95
+        ]
+      },
+      "pathologies": [
+        {
+          "kind": "SILENT_FAILURE",
+          "severity": 0.5,
+          "description": "tool-calls errored and the agent continued without acknowledgement",
+          "evidence": {
+            "errorCount": 5,
+            "continuedAfterError": 4
+          }
+        },
+        {
+          "kind": "SCHEMA_DRIFT",
+          "severity": 1,
+          "description": "rate of structured responses falls across the session — tool returning malformed outputs",
+          "evidence": {
+            "firstHalfRate": 1,
+            "secondHalfRate": 0.375,
+            "slope": -0.625
+          }
+        },
+        {
+          "kind": "CASCADING_FAILURES",
+          "severity": 0.41208791208791207,
+          "description": "error rate grows monotonically — the workflow is destabilising rather than hitting transient issues",
+          "evidence": {
+            "slope": 0.08241758241758242,
+            "firstRate": 0,
+            "finalRate": 1
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "name": "bell-tuning-cloud",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Bell Tuning Cloud — managed SaaS for unified context/retrieval/tool-call monitoring. Ingests outputs from the four sensor tools, stores a rolling history per workspace, serves a web dashboard, and exports audit reports on demand.",
+  "main": "server.js",
+  "scripts": {
+    "start":  "node server.js",
+    "seed":   "node demo/seed.js",
+    "test":   "node test/run.js"
+  },
+  "dependencies": {
+    "express": "^4.21.0",
+    "sql.js": "^1.11.0"
+  }
+}

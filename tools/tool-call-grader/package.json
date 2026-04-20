@@ -1,0 +1,19 @@
+{
+  "name": "tool-call-grader",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Bell Tuning instrument for multi-agent / MCP workflows. Grades tool-call quality per call and per session, detects silent failures, fixation, response bloat, schema drift, and cascading errors.",
+  "bin": {
+    "tool-call-grader": "./cli.js"
+  },
+  "main": "core/index.js",
+  "scripts": {
+    "cli": "node cli.js",
+    "mcp": "node mcp-server.js",
+    "test": "node test/run.js",
+    "experiment": "node sim/agent-cascade/runner.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.0"
+  }
+}

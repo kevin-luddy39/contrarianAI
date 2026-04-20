@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Bell Tuning Cloud</title>
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>Bell Tuning Cloud</h1>
+    <p class="lede">
+      Managed monitoring for AI context-window health. Aggregates outputs from
+      <code>context-inspector</code>, <code>retrieval-auditor</code>,
+      <code>tool-call-grader</code>, and <code>predictor-corrector</code>.
+    </p>
+    <h2>Get started</h2>
+    <p>No workspaces yet. Create one with the admin API:</p>
+    <pre><code>curl -X POST http://localhost:4200/api/workspaces \
+  -H 'x-admin-token: dev-admin-token' \
+  -H 'content-type: application/json' \
+  -d '{"name":"acme-corp"}'</code></pre>
+    <p>Or seed the demo data:</p>
+    <pre><code>npm run seed</code></pre>
+    <p>Then refresh this page.</p>
+  </div>
+</body>
+</html>

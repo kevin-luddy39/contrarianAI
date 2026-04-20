@@ -1,0 +1,39 @@
+* { box-sizing: border-box; }
+body { font-family: -apple-system, system-ui, sans-serif; margin: 0; background: #f5f5f7; color: #222; line-height: 1.5; }
+.container { max-width: 1200px; margin: 0 auto; padding: 1em 1.5em; }
+header { background: #1a1a2e; color: #fff; padding: 0.6em 0; }
+header h1 { margin: 0; font-size: 1.3em; display: inline-block; }
+header .workspace-name { float: right; opacity: 0.75; font-size: 0.95em; }
+.dashboard { padding-top: 2em; padding-bottom: 4em; }
+
+.card { background: #fff; border: 1px solid #e0e0e5; border-radius: 8px; padding: 1.2em 1.5em; margin-bottom: 1.5em; }
+.card h3 { margin: 0 0 0.6em 0; font-size: 0.95em; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: #666; }
+
+.summary { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1em; margin-bottom: 1.5em; }
+.big-number .value { font-size: 3em; font-weight: 600; line-height: 1; }
+.big-number .regime { font-size: 1em; font-weight: 500; }
+.actions p { margin: 0.5em 0; }
+
+.sensors { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1em; margin-bottom: 1.5em; }
+.sensor-card .sensor-value { font-size: 1.8em; font-weight: 500; }
+.sensor-card .sensor-regime { font-size: 0.85em; color: #666; margin-bottom: 0.5em; }
+.sensor-card svg.sparkline { width: 100%; height: 40px; margin-top: 0.5em; }
+
+.btn { display: inline-block; padding: 0.5em 1em; background: #1a1a2e; color: #fff; text-decoration: none; border-radius: 4px; font-size: 0.9em; }
+.btn.secondary { background: #fff; color: #1a1a2e; border: 1px solid #1a1a2e; }
+.btn:hover { opacity: 0.85; }
+
+table { width: 100%; border-collapse: collapse; }
+th, td { text-align: left; padding: 0.4em 0.8em; border-bottom: 1px solid #eee; font-size: 0.9em; }
+th { background: #fafafa; }
+
+.regime-healthy       { color: #1b7e3a; }
+.regime-drift         { color: #a66; }
+.regime-contamination { color: #c8470d; }
+.regime-rot           { color: #a3040f; }
+
+.lede { font-size: 1.15em; color: #333; max-width: 700px; }
+pre { background: #263238; color: #eee; padding: 1em 1.2em; border-radius: 6px; overflow-x: auto; font-size: 0.85em; }
+code { font-family: ui-monospace, Menlo, Consolas, monospace; }
+.container pre code { background: transparent; color: inherit; padding: 0; }
+.container code { background: #f0f0f0; padding: 0.1em 0.3em; border-radius: 3px; }

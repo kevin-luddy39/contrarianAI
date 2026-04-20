@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>Bell Tuning Audit — Acme Corp Live Agent</title><style>
+    body { font-family: system-ui, sans-serif; max-width: 920px; margin: 2em auto; padding: 0 1em; color: #222; line-height: 1.55; }
+    table { border-collapse: collapse; margin: 1em 0; }
+    th, td { border: 1px solid #ccc; padding: 0.4em 0.9em; }
+    th { background: #f4f4f4; text-align: left; }
+    pre { background: #f6f6f6; padding: 0.8em; overflow-x: auto; border-left: 3px solid #888; }
+    code { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 0.9em; }
+    h1 { border-bottom: 2px solid #333; padding-bottom: 0.2em; }
+    h2 { border-bottom: 1px solid #ccc; padding-bottom: 0.2em; margin-top: 2em; }
+    hr { border: none; border-top: 1px solid #ddd; margin: 1.5em 0; }
+  </style></head>
+<body><h1>Bell Tuning Audit — Acme Corp Live Agent</h1>
+<br/>
+<p><strong>Client:</strong> Acme Corp  </p>
+<p><strong>Prepared by:</strong> contrarianAI  </p>
+<p><strong>Date:</strong> 2026-04-19</p>
+<br/>
+<hr/>
+<br/>
+<h2>Executive Summary</h2>
+<br/>
+<p><strong>Audit date:</strong> 2026-04-19</p>
+<br/>
+<p><strong>Overall health:</strong> 🟠 contamination (0.41 / 1.00)  </p>
+<br/>
+<p><strong>Regime:</strong> contamination</p>
+<br/>
+<p><strong>Pathologies found:</strong> 3</p>
+<br/>
+<br/>
+<h3>Inputs audited</h3>
+<p>• <strong>Context Window (context-inspector)</strong> — 24 chunks</p>
+<p>• <strong>Retrieval Quality (retrieval-auditor)</strong> — 5 chunks audited</p>
+<p>• <strong>Multi-Agent Tool Calls (tool-call-grader)</strong> — 16 tool calls</p>
+<p>• <strong>Trajectory Forecast (predictor-corrector)</strong> — history length 22</p>
+<br/>
+<h3>Top findings</h3>
+<p>1. <strong>SCHEMA_DRIFT</strong> (sev 1.00, source: toolCallGrader) — rate of structured responses falls across the session — tool returning malformed outputs</p>
+<p>2. <strong>SILENT_FAILURE</strong> (sev 0.50, source: toolCallGrader) — tool-calls errored and the agent continued without acknowledgement</p>
+<p>3. <strong>CASCADING_FAILURES</strong> (sev 0.41, source: toolCallGrader) — error rate grows monotonically — the workflow is destabilising rather than hitting transient issues</p>
+<br/>
+<h3>Recommended actions</h3>
+<p>1. Enforce schema validation on tool outputs; reject non-conforming responses.</p>
+<p>2. Enforce explicit error propagation from tools to the orchestrator.</p>
+<p>3. Add circuit-breaker on repeated failures; halt agent session and escalate.</p>
+<br/>
+<h2>Context Window Analysis</h2>
+<br/>
+<p>Bell-curve statistics over the current context-window chunks.</p>
+<br/>
+<table>
+<thead><tr><th>Metric</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td>mean alignment</td><td>0.6729</td></tr>
+<tr><td>stdDev</td><td>0.2331</td></tr>
+<tr><td>skewness</td><td>-0.6839</td></tr>
+<tr><td>kurtosis</td><td>0.0848</td></tr>
+<tr><td>chunk count</td><td>24</td></tr>
+</tbody></table>
+<br/>
+<p>Histogram (20 bins across [0, 1]):</p>
+<pre><code>
+0.03  #
+0.07  #
+0.13  ###
+0.17  ####
+0.23  ######
+0.28  #########
+0.33  #############
+0.38  ##################
+0.42  #######################
+0.47  ############################
+0.53  #################################
+0.57  #####################################
+0.63  #######################################
+0.68  ########################################
+0.72  #######################################
+0.78  ####################################
+0.82  ################################
+0.88  ###########################
+0.93  ######################
+0.97  #################
+</code></pre>
+<br/>
+<h2>Retrieval Quality</h2>
+<br/>
+<table>
+<thead><tr><th>Metric</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td>health</td><td>0.4100</td></tr>
+<tr><td>regime</td><td>contamination</td></tr>
+<tr><td>rank-quality R</td><td>0.8868</td></tr>
+<tr><td>diversity</td><td>0.9465</td></tr>
+<tr><td>redundancy ratio</td><td>0.4725</td></tr>
+<tr><td>score calibration R</td><td>0.5953</td></tr>
+<tr><td>bimodal signal</td><td>0.0000</td></tr>
+</tbody></table>
+<br/>
+<h2>Multi-Agent Tool-Call Analysis</h2>
+<br/>
+<table>
+<thead><tr><th>Metric</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td>health</td><td>0.8567</td></tr>
+<tr><td>regime</td><td>healthy</td></tr>
+<tr><td>call count</td><td>16</td></tr>
+<tr><td>success rate</td><td>0.6875</td></tr>
+<tr><td>structured rate</td><td>0.6875</td></tr>
+<tr><td>mean relevance</td><td>0.5668</td></tr>
+<tr><td>tool diversity</td><td>0.7500</td></tr>
+<tr><td>tool distribution</td><td>search=4, summarize=4, verify=4, publish=4</td></tr>
+</tbody></table>
+<br/>
+<h3>Tool-call pathologies</h3>
+<p>• <strong>SILENT_FAILURE</strong> (severity 0.50) — tool-calls errored and the agent continued without acknowledgement</p>
+<p>• <strong>SCHEMA_DRIFT</strong> (severity 1.00) — rate of structured responses falls across the session — tool returning malformed outputs</p>
+<p>• <strong>CASCADING_FAILURES</strong> (severity 0.41) — error rate grows monotonically — the workflow is destabilising rather than hitting transient issues</p>
+<br/>
+<h2>Trajectory Forecast</h2>
+<br/>
+<p>Forecaster state reflects the predicted evolution of the context-window bell curve under healthy dynamics.</p>
+<br/>
+<table>
+<thead><tr><th>Metric</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td>engine</td><td>abm</td></tr>
+<tr><td>health</td><td>0.4200</td></tr>
+<tr><td>regime</td><td>contamination</td></tr>
+<tr><td>history length</td><td>22</td></tr>
+<tr><td>forecast error</td><td>0.1800</td></tr>
+<tr><td>baseline distance</td><td>0.2100</td></tr>
+<tr><td>Milne error (ABM only)</td><td>0.0030</td></tr>
+</tbody></table>
+<br/>
+<h2>Appendix — Raw Input Summary</h2>
+<br/>
+<pre><code>
+{
+  "contextInspector": {
+    "health": 0.6810000000000003,
+    "regime": "drift",
+    "pathologies": []
+  },
+  "retrievalAuditor": {
+    "health": 0.41,
+    "regime": "contamination",
+    "pathologies": []
+  },
+  "toolCallGrader": {
+    "health": 0.8566964285714286,
+    "regime": "healthy",
+    "pathologies": [
+      {
+        "kind": "SILENT_FAILURE",
+        "severity": 0.5
+      },
+      {
+        "kind": "SCHEMA_DRIFT",
+        "severity": 1
+      },
+      {
+        "kind": "CASCADING_FAILURES",
+        "severity": 0.41208791208791207
+      }
+    ]
+  },
+  "predictorCorrector": {
+    "health": 0.42,
+    "regime": "contamination",
+    "pathologies": []
+  }
+}
+</code></pre>
+<br/></body></html>

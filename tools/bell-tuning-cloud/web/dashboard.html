@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Bell Tuning Cloud — Dashboard</title>
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <header>
+    <div class="container">
+      <h1>Bell Tuning Cloud</h1>
+      <div class="workspace-name" id="workspace-name">—</div>
+    </div>
+  </header>
+
+  <div class="container dashboard">
+    <section class="summary">
+      <div class="card big-number" id="card-overall">
+        <h3>Overall Health</h3>
+        <div class="value" id="overall-value">—</div>
+        <div class="regime" id="overall-regime">—</div>
+      </div>
+      <div class="card big-number" id="card-pathologies">
+        <h3>Active Pathologies</h3>
+        <div class="value" id="pathology-count">—</div>
+      </div>
+      <div class="card actions">
+        <h3>Actions</h3>
+        <p><a class="btn" id="download-md" href="#">Download Report (Markdown)</a></p>
+        <p><a class="btn" id="download-html" href="#">Download Report (HTML)</a></p>
+        <p><a class="btn secondary" id="view-events" href="#">View Raw Events</a></p>
+      </div>
+    </section>
+
+    <section class="sensors">
+      <div class="card sensor-card" id="sensor-context-inspector">
+        <h3>Context Window</h3>
+        <div class="sensor-value">—</div>
+        <div class="sensor-regime">—</div>
+        <svg class="sparkline" viewBox="0 0 200 40" preserveAspectRatio="none"></svg>
+      </div>
+      <div class="card sensor-card" id="sensor-retrieval-auditor">
+        <h3>Retrieval Quality</h3>
+        <div class="sensor-value">—</div>
+        <div class="sensor-regime">—</div>
+        <svg class="sparkline" viewBox="0 0 200 40" preserveAspectRatio="none"></svg>
+      </div>
+      <div class="card sensor-card" id="sensor-tool-call-grader">
+        <h3>Agent Tool Calls</h3>
+        <div class="sensor-value">—</div>
+        <div class="sensor-regime">—</div>
+        <svg class="sparkline" viewBox="0 0 200 40" preserveAspectRatio="none"></svg>
+      </div>
+      <div class="card sensor-card" id="sensor-predictor-corrector">
+        <h3>Forecast</h3>
+        <div class="sensor-value">—</div>
+        <div class="sensor-regime">—</div>
+        <svg class="sparkline" viewBox="0 0 200 40" preserveAspectRatio="none"></svg>
+      </div>
+    </section>
+
+    <section class="card">
+      <h3>Pathology Log (most recent)</h3>
+      <table id="pathology-table">
+        <thead><tr><th>Time</th><th>Sensor</th><th>Pathology</th><th>Severity</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </section>
+
+    <section class="card">
+      <h3>Aggregate Health Over Time</h3>
+      <svg id="aggregate-chart" viewBox="0 0 800 200" preserveAspectRatio="none"></svg>
+    </section>
+  </div>
+
+  <script src="/dashboard.js"></script>
+</body>
+</html>

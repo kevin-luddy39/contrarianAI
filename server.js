@@ -231,6 +231,13 @@ app.use((req, res, next) => {
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Clean URLs for the canonical Bell Tuning page — both /bell-tuning and
+// /bell-tuning/ serve the manifesto directly without an extra 301 hop.
+app.get(['/bell-tuning', '/bell-tuning/'], (req, res) => {
+  res.sendFile(require('path').join(__dirname, 'landing', 'bell-tuning', 'index.html'));
+});
+
 app.use(express.static('landing'));
 
 // ============================================================

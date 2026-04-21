@@ -5,6 +5,8 @@ const nodemailer = require('nodemailer');
 const UAParser = require('ua-parser-js');
 const Stripe = require('stripe');
 const { renderAdminPage } = require('./admin');
+const leadIntel = require('./tools/lead-intel/collector');
+const { suggestAction } = require('./tools/lead-intel/scoring');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -80,6 +82,130 @@ async function initDb() {
     )
   `);
   await pool.query(`INSERT INTO report_state (id) VALUES (1) ON CONFLICT DO NOTHING`);
+
+  // ============================================================
+  // Lead Intel schema
+  // ============================================================
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS contacts (
+      id SERIAL PRIMARY KEY,
+      github_handle TEXT UNIQUE,
+      email TEXT,
+      name TEXT,
+      company TEXT,
+      website TEXT,
+      twitter TEXT,
+      linkedin_url TEXT,
+      bio TEXT,
+      location TEXT,
+      avatar_url TEXT,
+      followers_count INTEGER,
+      public_repos INTEGER,
+      tier TEXT,
+      source TEXT,
+      engagement_score NUMERIC DEFAULT 0,
+      icp_fit NUMERIC DEFAULT 0,
+      next_action TEXT,
+      notes TEXT,
+      first_seen TIMESTAMPTZ DEFAULT NOW(),
+      last_seen TIMESTAMPTZ DEFAULT NOW(),
+      enriched_at TIMESTAMPTZ
+    )
+  `);
+  await pool.query(`CREATE INDEX IF NOT EXISTS contacts_tier_idx ON contacts(tier)`);
+  await pool.query(`CREATE INDEX IF NOT EXISTS contacts_score_idx ON contacts(engagement_score DESC)`);
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS intel_events (
+      id SERIAL PRIMARY KEY,
+      contact_id INTEGER REFERENCES contacts(id) ON DELETE CASCADE,
+      source TEXT NOT NULL,
+      event_type TEXT NOT NULL,
+      repo TEXT,
+      metadata JSONB,
+      ts TIMESTAMPTZ DEFAULT NOW()
+    )
+  `);
+  await pool.query(`CREATE INDEX IF NOT EXISTS intel_events_contact_idx ON intel_events(contact_id, ts DESC)`);
+  await pool.query(`CREATE INDEX IF NOT EXISTS intel_events_source_idx ON intel_events(source, event_type, ts DESC)`);
+  await pool.query(`
+    CREATE UNIQUE INDEX IF NOT EXISTS intel_events_dedup_idx
+    ON intel_events(source, event_type, COALESCE(contact_id, 0), COALESCE(repo, ''), ts)
+  `);
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS intel_snapshots (
+      id SERIAL PRIMARY KEY,
+      source TEXT NOT NULL,
+      metric TEXT NOT NULL,
+      subject TEXT NOT NULL,
+      day DATE NOT NULL,
+      value NUMERIC NOT NULL,
+      uniques NUMERIC,
+      meta JSONB,
+      collected_at TIMESTAMPTZ DEFAULT NOW()
+    )
+  `);
+  await pool.query(`
+    CREATE UNIQUE INDEX IF NOT EXISTS intel_snapshots_uniq
+    ON intel_snapshots(source, metric, subject, day)
+  `);
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS linkedin_posts (
+      id SERIAL PRIMARY KEY,
+      post_url TEXT UNIQUE NOT NULL,
+      title TEXT,
+      published_at TIMESTAMPTZ,
+      impressions INTEGER DEFAULT 0,
+      reach INTEGER DEFAULT 0,
+      reactions INTEGER DEFAULT 0,
+      comments INTEGER DEFAULT 0,
+      reposts INTEGER DEFAULT 0,
+      saves INTEGER DEFAULT 0,
+      sends INTEGER DEFAULT 0,
+      link_clicks INTEGER DEFAULT 0,
+      profile_views INTEGER DEFAULT 0,
+      followers_gained INTEGER DEFAULT 0,
+      demographics JSONB,
+      notes TEXT,
+      logged_at TIMESTAMPTZ DEFAULT NOW(),
+      updated_at TIMESTAMPTZ DEFAULT NOW()
+    )
+  `);
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS intel_state (
+      id INTEGER PRIMARY KEY,
+      last_full_refresh_at TIMESTAMPTZ,
+      last_piggyback_at TIMESTAMPTZ,
+      last_github_traffic_at TIMESTAMPTZ,
+      last_github_stars_at TIMESTAMPTZ,
+      last_npm_at TIMESTAMPTZ,
+      last_error TEXT
+    )
+  `);
+  await pool.query(`INSERT INTO intel_state (id) VALUES (1) ON CONFLICT DO NOTHING`);
+
+  // Tier-rank helper used by contacts upserts (must exist before any upsert).
+  await pool.query(`
+    CREATE OR REPLACE FUNCTION tier_rank(t TEXT) RETURNS INT AS $$
+      SELECT CASE COALESCE(t,'')
+        WHEN 'payment' THEN 100
+        WHEN 'customer' THEN 95
+        WHEN 'audit_request' THEN 90
+        WHEN 'pr_author' THEN 80
+        WHEN 'issue_author' THEN 70
+        WHEN 'fork' THEN 60
+        WHEN 'watcher' THEN 50
+        WHEN 'star' THEN 40
+        WHEN 'assessment_submit' THEN 35
+        WHEN 'assessment_start' THEN 25
+        WHEN 'visit' THEN 10
+        ELSE 0
+      END
+    $$ LANGUAGE SQL IMMUTABLE;
+  `);
 }
 
 // Email setup
@@ -182,8 +308,26 @@ app.use((req, res, next) => {
 
 // Ping endpoint for external uptime monitors (UptimeRobot, cron-job.org, etc.)
 // Hitting this keeps the service awake AND triggers the report check.
+// Also fires a lightweight lead-intel refresh (cadence-gated, background).
 app.get('/api/ping', (req, res) => {
+  leadIntel.runLightRefresh(pool).catch(err => console.warn('[intel] piggyback error:', err.message));
   res.json({ ok: true, ts: new Date().toISOString() });
+});
+
+// Token-gated cron endpoint for cron-job.org.
+// Set CRON_SECRET in env; cron-job.org hits: /api/cron/intel-refresh?token=<CRON_SECRET>&mode=full|light
+app.all('/api/cron/intel-refresh', async (req, res) => {
+  const token = req.query.token || req.body?.token;
+  if (!process.env.CRON_SECRET || token !== process.env.CRON_SECRET) {
+    return res.status(401).json({ error: 'bad token' });
+  }
+  const mode = (req.query.mode || 'full').toLowerCase();
+  try {
+    const result = mode === 'light'
+      ? await leadIntel.runLightRefresh(pool)
+      : await runIntelFull({ force: req.query.force === '1' });
+    res.json({ ok: true, mode, result });
+  } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
 // Visit tracking
@@ -225,6 +369,11 @@ app.use((req, res, next) => {
         req.path,
       ]
     ).catch(err => console.error('Visit log error:', err));
+
+    // Attempt to attribute GitHub-referred visits to a contact (fire-and-forget).
+    leadIntel.linkVisitToContact(pool, {
+      referrer, path: req.path, user_agent: ua,
+    }).catch(() => {});
   }
   next();
 });
@@ -539,6 +688,255 @@ app.get('/api/admin/stats', requireAdmin, async (req, res) => {
     `);
     res.json(result.rows[0]);
   } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// ============================================================
+// Lead Intel — cross-site pipeline (GitHub, npm, LinkedIn, landing)
+// ============================================================
+let intelRefreshInFlight = false;
+async function runIntelFull(opts = {}) {
+  if (intelRefreshInFlight) return { skipped: 'in_flight' };
+  intelRefreshInFlight = true;
+  try {
+    return await leadIntel.runFullRefresh(pool, opts);
+  } finally {
+    intelRefreshInFlight = false;
+  }
+}
+
+app.post('/api/admin/intel-refresh', requireAdmin, async (req, res) => {
+  try {
+    const force = req.query.force === '1' || req.body?.force === true;
+    const result = await runIntelFull({ force });
+    res.json(result);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.get('/api/admin/intel-overview', requireAdmin, async (req, res) => {
+  try {
+    const [state, counts, traffic, npm, funnel, topRefs, topPaths] = await Promise.all([
+      pool.query(`SELECT * FROM intel_state WHERE id = 1`),
+      pool.query(`
+        SELECT
+          (SELECT COUNT(*)::int FROM contacts) as contacts,
+          (SELECT COUNT(*)::int FROM contacts WHERE tier = 'star') as stars,
+          (SELECT COUNT(*)::int FROM contacts WHERE tier = 'watcher') as watchers,
+          (SELECT COUNT(*)::int FROM contacts WHERE tier = 'fork') as forks,
+          (SELECT COUNT(*)::int FROM contacts WHERE tier IN ('issue_author','pr_author')) as issue_authors,
+          (SELECT COUNT(*)::int FROM contacts WHERE email IS NOT NULL) as with_email,
+          (SELECT COUNT(*)::int FROM intel_events WHERE ts > NOW() - INTERVAL '7 days') as events_7d,
+          (SELECT COUNT(*)::int FROM intel_events WHERE ts > NOW() - INTERVAL '1 day') as events_1d
+      `),
+      pool.query(`
+        SELECT subject as repo,
+               SUM(CASE WHEN metric='clones' THEN value ELSE 0 END)::int as clones_total,
+               SUM(CASE WHEN metric='clones' THEN uniques ELSE 0 END)::int as clones_uniques,
+               SUM(CASE WHEN metric='views' THEN value ELSE 0 END)::int as views_total,
+               SUM(CASE WHEN metric='views' THEN uniques ELSE 0 END)::int as views_uniques,
+               MAX(day) as last_day
+        FROM intel_snapshots
+        WHERE source='github' AND metric IN ('clones','views') AND day > CURRENT_DATE - INTERVAL '30 days'
+        GROUP BY subject
+        ORDER BY clones_total DESC
+      `),
+      pool.query(`
+        SELECT subject as pkg,
+               SUM(value)::int as downloads_30d,
+               MAX(day) as last_day
+        FROM intel_snapshots
+        WHERE source='npm' AND metric='downloads' AND day > CURRENT_DATE - INTERVAL '30 days'
+        GROUP BY subject ORDER BY downloads_30d DESC
+      `),
+      pool.query(`
+        SELECT
+          (SELECT COUNT(*)::int FROM visits WHERE created_at > NOW() - INTERVAL '30 days') as visits_30d,
+          (SELECT COUNT(DISTINCT ip)::int FROM visits WHERE created_at > NOW() - INTERVAL '30 days') as unique_30d,
+          (SELECT COUNT(*)::int FROM assessments WHERE created_at > NOW() - INTERVAL '30 days') as assessments_30d,
+          (SELECT COUNT(*)::int FROM audit_requests WHERE created_at > NOW() - INTERVAL '30 days') as leads_30d,
+          (SELECT COUNT(*)::int FROM payments WHERE status='paid' AND paid_at > NOW() - INTERVAL '30 days') as paid_30d
+      `),
+      pool.query(`
+        SELECT meta->>'referrer' as referrer, SUM(value)::int as count, subject as repo
+        FROM intel_snapshots
+        WHERE source='github' AND metric='referrer' AND day > CURRENT_DATE - INTERVAL '14 days'
+        GROUP BY meta->>'referrer', subject
+        ORDER BY count DESC LIMIT 20
+      `),
+      pool.query(`
+        SELECT meta->>'path' as path, meta->>'title' as title, SUM(value)::int as count, subject as repo
+        FROM intel_snapshots
+        WHERE source='github' AND metric='path' AND day > CURRENT_DATE - INTERVAL '14 days'
+        GROUP BY meta->>'path', meta->>'title', subject
+        ORDER BY count DESC LIMIT 20
+      `),
+    ]);
+    res.json({
+      state: state.rows[0] || null,
+      counts: counts.rows[0],
+      traffic: traffic.rows,
+      npm: npm.rows,
+      funnel: funnel.rows[0],
+      top_referrers: topRefs.rows,
+      top_paths: topPaths.rows,
+      refresh_in_flight: intelRefreshInFlight,
+    });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.get('/api/admin/intel-contacts', requireAdmin, async (req, res) => {
+  try {
+    const tier = req.query.tier || null;
+    const limit = Math.min(parseInt(req.query.limit || '500'), 2000);
+    const order = req.query.order === 'recent' ? 'last_seen DESC' : 'engagement_score DESC, icp_fit DESC, last_seen DESC';
+    const params = [];
+    const where = [];
+    if (tier) { params.push(tier); where.push(`tier = $${params.length}`); }
+    if (req.query.has_email === '1') where.push(`email IS NOT NULL`);
+    if (req.query.q) {
+      params.push(`%${req.query.q}%`);
+      const p = params.length;
+      where.push(`(github_handle ILIKE $${p} OR name ILIKE $${p} OR company ILIKE $${p} OR bio ILIKE $${p})`);
+    }
+    params.push(limit);
+    const limitParam = `$${params.length}`;
+    const whereClause = where.length ? `WHERE ${where.join(' AND ')}` : '';
+    const result = await pool.query(
+      `SELECT c.*,
+              (SELECT jsonb_agg(jsonb_build_object('event_type', e.event_type, 'repo', e.repo, 'ts', e.ts) ORDER BY e.ts DESC)
+               FROM intel_events e WHERE e.contact_id = c.id LIMIT 10) as recent_events
+       FROM contacts c ${whereClause}
+       ORDER BY ${order}
+       LIMIT ${limitParam}`,
+      params
+    );
+    const rows = result.rows.map(r => ({ ...r, suggested_action: suggestAction(r) }));
+    res.json(rows);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.get('/api/admin/intel-contact/:id', requireAdmin, async (req, res) => {
+  try {
+    const c = await pool.query(`SELECT * FROM contacts WHERE id = $1`, [req.params.id]);
+    if (!c.rows[0]) return res.status(404).json({ error: 'not found' });
+    const e = await pool.query(
+      `SELECT * FROM intel_events WHERE contact_id = $1 ORDER BY ts DESC LIMIT 200`,
+      [req.params.id]
+    );
+    res.json({ contact: { ...c.rows[0], suggested_action: suggestAction(c.rows[0]) }, events: e.rows });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.patch('/api/admin/intel-contact/:id', requireAdmin, async (req, res) => {
+  try {
+    const { notes, next_action } = req.body || {};
+    const sets = [];
+    const params = [];
+    if (notes !== undefined) { params.push(notes); sets.push(`notes = $${params.length}`); }
+    if (next_action !== undefined) { params.push(next_action); sets.push(`next_action = $${params.length}`); }
+    if (sets.length === 0) return res.json({ ok: true });
+    params.push(req.params.id);
+    await pool.query(`UPDATE contacts SET ${sets.join(', ')} WHERE id = $${params.length}`, params);
+    res.json({ ok: true });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.get('/api/admin/intel-snapshots', requireAdmin, async (req, res) => {
+  try {
+    const source = req.query.source || null;
+    const metric = req.query.metric || null;
+    const subject = req.query.subject || null;
+    const days = Math.min(parseInt(req.query.days || '30'), 365);
+    const params = [];
+    const where = [`day > CURRENT_DATE - ($${params.push(days + ' days')}::interval)`];
+    if (source) { params.push(source); where.push(`source = $${params.length}`); }
+    if (metric) { params.push(metric); where.push(`metric = $${params.length}`); }
+    if (subject) { params.push(subject); where.push(`subject = $${params.length}`); }
+    const result = await pool.query(
+      `SELECT source, metric, subject, day, value, uniques, meta
+       FROM intel_snapshots
+       WHERE ${where.join(' AND ')}
+       ORDER BY day DESC, source, metric, subject`,
+      params
+    );
+    res.json(result.rows);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.get('/api/admin/intel-linkedin', requireAdmin, async (req, res) => {
+  try {
+    const result = await pool.query(`SELECT * FROM linkedin_posts ORDER BY published_at DESC NULLS LAST`);
+    res.json(result.rows);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.post('/api/admin/intel-linkedin', requireAdmin, async (req, res) => {
+  try {
+    const p = req.body || {};
+    if (!p.post_url) return res.status(400).json({ error: 'post_url required' });
+    const result = await pool.query(
+      `INSERT INTO linkedin_posts
+        (post_url, title, published_at, impressions, reach, reactions, comments, reposts, saves, sends, link_clicks, profile_views, followers_gained, demographics, notes)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15)
+       ON CONFLICT (post_url) DO UPDATE SET
+         title = COALESCE(EXCLUDED.title, linkedin_posts.title),
+         published_at = COALESCE(EXCLUDED.published_at, linkedin_posts.published_at),
+         impressions = GREATEST(EXCLUDED.impressions, linkedin_posts.impressions),
+         reach = GREATEST(EXCLUDED.reach, linkedin_posts.reach),
+         reactions = GREATEST(EXCLUDED.reactions, linkedin_posts.reactions),
+         comments = GREATEST(EXCLUDED.comments, linkedin_posts.comments),
+         reposts = GREATEST(EXCLUDED.reposts, linkedin_posts.reposts),
+         saves = GREATEST(EXCLUDED.saves, linkedin_posts.saves),
+         sends = GREATEST(EXCLUDED.sends, linkedin_posts.sends),
+         link_clicks = GREATEST(EXCLUDED.link_clicks, linkedin_posts.link_clicks),
+         profile_views = GREATEST(EXCLUDED.profile_views, linkedin_posts.profile_views),
+         followers_gained = GREATEST(EXCLUDED.followers_gained, linkedin_posts.followers_gained),
+         demographics = COALESCE(EXCLUDED.demographics, linkedin_posts.demographics),
+         notes = COALESCE(EXCLUDED.notes, linkedin_posts.notes),
+         updated_at = NOW()
+       RETURNING id`,
+      [
+        p.post_url, p.title || null, p.published_at || null,
+        p.impressions || 0, p.reach || 0, p.reactions || 0, p.comments || 0,
+        p.reposts || 0, p.saves || 0, p.sends || 0, p.link_clicks || 0,
+        p.profile_views || 0, p.followers_gained || 0,
+        p.demographics ? JSON.stringify(p.demographics) : null,
+        p.notes || null,
+      ]
+    );
+    res.json({ ok: true, id: result.rows[0].id });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.get('/api/admin/intel-action-queue', requireAdmin, async (req, res) => {
+  try {
+    // Hot: high score, no next_action recorded
+    const hot = await pool.query(`
+      SELECT * FROM contacts
+      WHERE engagement_score >= 20 AND COALESCE(next_action,'') = ''
+      ORDER BY engagement_score DESC, icp_fit DESC LIMIT 25
+    `);
+    const icp = await pool.query(`
+      SELECT * FROM contacts
+      WHERE tier = 'star' AND icp_fit >= 10 AND COALESCE(next_action,'') = ''
+      ORDER BY icp_fit DESC, engagement_score DESC LIMIT 25
+    `);
+    const withEmail = await pool.query(`
+      SELECT * FROM contacts
+      WHERE email IS NOT NULL AND tier = 'star' AND COALESCE(next_action,'') = ''
+      ORDER BY engagement_score DESC LIMIT 25
+    `);
+    const fresh = await pool.query(`
+      SELECT * FROM contacts
+      WHERE first_seen > NOW() - INTERVAL '7 days'
+      ORDER BY first_seen DESC LIMIT 25
+    `);
+    const tag = rows => rows.map(r => ({ ...r, suggested_action: suggestAction(r) }));
+    res.json({ hot: tag(hot.rows), icp_stars: tag(icp.rows), with_email: tag(withEmail.rows), recently_added: tag(fresh.rows) });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.get('/lead-intel', requireAdmin, (req, res) => {
+  res.sendFile(path.join(__dirname, 'landing', 'lead-intel.html'));
 });
 
 app.post('/admin/payment', requireAdmin, async (req, res) => {

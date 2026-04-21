@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>contrarianAI — Lead Intel</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<style>
+:root{--bg:#0a0a0a;--surface:#141414;--s2:#1f1f1f;--border:#262626;--text:#e5e5e5;--muted:#a3a3a3;--accent:#f97316;--blue:#3b82f6;--green:#22c55e;--red:#ef4444;--purple:#a855f7;--yellow:#eab308}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);font-size:14px;padding:24px}
+h1{font-size:1.4rem;font-weight:800;margin-bottom:4px} h1 span{color:var(--accent)}
+.sub{color:var(--muted);font-size:0.85rem}
+.error{background:#200606;border:1px solid var(--red);color:var(--red);padding:12px;border-radius:6px;margin:8px 0;display:none;font-family:monospace;font-size:0.75rem}
+.note{background:#0c1a2a;border:1px solid #1e3a5f;color:#93c5fd;padding:10px 12px;border-radius:6px;margin:8px 0;font-size:0.75rem;display:none}
+
+/* Header */
+.hdr{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;margin-bottom:16px}
+.btns{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.btn{background:var(--surface);border:1px solid var(--border);color:var(--accent);padding:8px 14px;border-radius:6px;font-size:0.78rem;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap}
+.btn:hover{background:var(--s2)}
+.btn.primary{background:var(--accent);color:#0a0a0a}
+.btn.ghost{color:var(--muted)}
+.btn:disabled{opacity:0.5;cursor:wait}
+
+/* Stats */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-bottom:16px}
+.stat{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px 12px;text-align:center}
+.stat .label{font-size:0.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.stat .value{font-size:1.6rem;font-weight:800;margin-top:4px;color:#fff}
+.stat .value.small{font-size:1.1rem}
+.stat .sub2{font-size:0.7rem;color:var(--muted);margin-top:2px}
+.stat.hot{border-color:var(--accent)}
+
+/* Tabs */
+.tabs{display:flex;border-bottom:1px solid var(--border);margin-bottom:16px;overflow-x:auto}
+.tabs button{padding:10px 16px;background:none;border:none;color:var(--muted);font-size:0.82rem;cursor:pointer;border-bottom:2px solid transparent;font-family:inherit;white-space:nowrap}
+.tabs button.active{color:var(--accent);border-bottom-color:var(--accent)}
+.tabs button .count{display:inline-block;margin-left:6px;padding:1px 6px;background:var(--s2);border-radius:10px;font-size:0.65rem;color:var(--muted)}
+.tabs button.active .count{background:var(--accent);color:#0a0a0a}
+.panel{display:none} .panel.active{display:block}
+
+/* Tables */
+table{width:100%;border-collapse:collapse;font-size:0.82rem}
+th{text-align:left;padding:9px 10px;background:var(--s2);font-size:0.62rem;text-transform:uppercase;color:var(--muted);letter-spacing:.06em;border-bottom:1px solid var(--border);position:sticky;top:0;cursor:pointer;user-select:none}
+th.sortable:hover{color:var(--accent)}
+td{padding:9px 10px;border-bottom:1px solid var(--border);vertical-align:top}
+tr:hover td{background:var(--surface)}
+tr.expanded td{background:var(--surface)}
+
+.tbl-wrap{max-height:600px;overflow:auto;border:1px solid var(--border);border-radius:8px}
+
+/* Contact row */
+.ch{display:flex;align-items:center;gap:10px}
+.avatar{width:32px;height:32px;border-radius:50%;background:var(--s2);flex-shrink:0}
+.handle{color:#fff;font-weight:600}
+.handle a{color:inherit;text-decoration:none}
+.handle a:hover{color:var(--accent)}
+.badge{display:inline-block;padding:1px 7px;border-radius:3px;font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em}
+.badge.star{background:#eab30820;color:var(--yellow)}
+.badge.watcher{background:#3b82f620;color:var(--blue)}
+.badge.fork{background:#a855f720;color:var(--purple)}
+.badge.issue_author{background:#22c55e20;color:var(--green)}
+.badge.pr_author{background:#22c55e40;color:var(--green);border:1px solid var(--green)}
+.badge.visit{background:#64748b20;color:var(--muted)}
+.badge.audit_request{background:var(--accent);color:#0a0a0a}
+.badge.payment{background:var(--green);color:#0a0a0a}
+.badge.customer{background:var(--green);color:#0a0a0a}
+.badge.new{background:#f9731620;color:var(--accent)}
+.score{font-weight:700;color:#fff}
+.score.high{color:var(--accent)}
+.score.vhigh{color:var(--green)}
+.icp{font-weight:600;color:var(--blue)}
+.muted{color:var(--muted);font-size:0.75rem}
+.muted.tiny{font-size:0.68rem}
+a.link{color:var(--accent);text-decoration:none}
+a.link:hover{text-decoration:underline}
+
+/* Action queue cards */
+.queue-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px}
+.queue-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px}
+.queue-card h3{font-size:0.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;display:flex;justify-content:space-between}
+.queue-card h3 .cnt{color:var(--accent);font-weight:700}
+.q-row{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);font-size:0.8rem}
+.q-row:last-child{border-bottom:none}
+.q-row .grow{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.q-action{font-size:0.7rem;color:var(--muted);margin-top:2px}
+
+/* Filters */
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;align-items:center}
+.filters input, .filters select{background:var(--s2);border:1px solid var(--border);color:var(--text);padding:6px 10px;border-radius:4px;font-size:0.8rem;font-family:inherit}
+.filters input{min-width:200px}
+.filters label{color:var(--muted);font-size:0.75rem;display:flex;align-items:center;gap:4px;cursor:pointer}
+
+/* Charts */
+.chart-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.chart-box{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px}
+.chart-box h3{font-size:0.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px}
+.chart-box canvas{width:100%!important;height:200px!important}
+@media(max-width:760px){.chart-row{grid-template-columns:1fr}}
+
+/* Expanded row */
+.detail-pane{background:var(--bg);padding:14px;border-top:1px dashed var(--border)}
+.detail-pane h4{font-size:0.7rem;color:var(--muted);text-transform:uppercase;margin-bottom:6px;letter-spacing:.05em}
+.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.event-list{max-height:200px;overflow:auto;font-size:0.75rem}
+.event{padding:4px 0;border-bottom:1px solid var(--border);color:var(--muted)}
+.event b{color:var(--text)}
+textarea.notes{width:100%;background:var(--s2);border:1px solid var(--border);color:var(--text);padding:6px 8px;border-radius:4px;font-family:inherit;font-size:0.8rem;min-height:50px;margin-top:4px}
+input.action{width:100%;background:var(--s2);border:1px solid var(--border);color:var(--text);padding:6px 8px;border-radius:4px;font-family:inherit;font-size:0.8rem;margin-top:4px}
+
+/* LinkedIn form */
+.li-form{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:16px;margin-bottom:16px}
+.li-form h3{font-size:0.78rem;color:var(--text);margin-bottom:10px}
+.li-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-bottom:10px}
+.li-grid .full{grid-column:1/-1}
+.li-grid label{font-size:0.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:2px}
+.li-grid input{width:100%;background:var(--s2);border:1px solid var(--border);color:var(--text);padding:6px 8px;border-radius:4px;font-family:inherit;font-size:0.8rem}
+
+/* DM template */
+.dm-tmpl{background:var(--s2);border:1px solid var(--border);padding:8px;border-radius:4px;font-family:monospace;font-size:0.72rem;margin-top:6px;white-space:pre-wrap}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div>
+    <h1>Lead <span>Intel</span></h1>
+    <p class="sub">Cross-site signal: GitHub traffic + stars + npm downloads + landing funnel + LinkedIn · <span id="lastUpdated">loading…</span></p>
+  </div>
+  <div class="btns">
+    <button class="btn" onclick="loadAll()">↻ Reload view</button>
+    <button class="btn primary" id="refreshBtn" onclick="triggerRefresh()">🔄 Full refresh</button>
+    <button class="btn ghost" onclick="triggerRefresh(true)">Force refresh</button>
+    <a href="/admin" class="btn ghost" style="text-decoration:none">← Admin</a>
+  </div>
+</div>
+<div class="error" id="error"></div>
+<div class="note" id="note"></div>
+
+<div class="stats" id="statsGrid"></div>
+
+<div class="tabs">
+  <button class="active" onclick="showTab('overview',this)">Overview</button>
+  <button onclick="showTab('leads',this)">Named Leads <span class="count" id="cntLeads">—</span></button>
+  <button onclick="showTab('queue',this)">Action Queue <span class="count" id="cntQueue">—</span></button>
+  <button onclick="showTab('sources',this)">Sources</button>
+  <button onclick="showTab('linkedin',this)">LinkedIn</button>
+  <button onclick="showTab('raw',this)">Raw Data</button>
+</div>
+
+<!-- OVERVIEW -->
+<div class="panel active" id="panel-overview">
+  <div class="chart-row">
+    <div class="chart-box"><h3>Daily Clones (last 30 days — all repos)</h3><canvas id="clonesChart"></canvas></div>
+    <div class="chart-box"><h3>Daily npm Downloads (last 30 days)</h3><canvas id="downloadsChart"></canvas></div>
+  </div>
+  <div class="chart-row">
+    <div class="chart-box"><h3>Traffic by Repo (14 days, clones/views/uniques)</h3><div id="repoTable"></div></div>
+    <div class="chart-box"><h3>npm Packages (30 days)</h3><div id="npmTable"></div></div>
+  </div>
+  <div class="chart-row">
+    <div class="chart-box"><h3>Top Traffic Referrers (GitHub, 14d)</h3><div id="refTable"></div></div>
+    <div class="chart-box"><h3>Popular Paths (GitHub, 14d)</h3><div id="pathTable"></div></div>
+  </div>
+  <div class="chart-box">
+    <h3>Funnel (30-day)</h3>
+    <div id="funnelView" style="font-size:0.85rem"></div>
+  </div>
+</div>
+
+<!-- NAMED LEADS -->
+<div class="panel" id="panel-leads">
+  <div class="filters">
+    <input id="fltQ" placeholder="Search handle / name / company / bio…" oninput="debouncedLoadLeads()">
+    <select id="fltTier" onchange="loadLeads()">
+      <option value="">All tiers</option>
+      <option value="star">Stars</option>
+      <option value="watcher">Watchers</option>
+      <option value="fork">Forks</option>
+      <option value="issue_author">Issue authors</option>
+      <option value="pr_author">PR authors</option>
+      <option value="visit">Visits</option>
+    </select>
+    <label><input type="checkbox" id="fltEmail" onchange="loadLeads()"> Has email</label>
+    <select id="fltOrder" onchange="loadLeads()">
+      <option value="score">By score</option>
+      <option value="recent">Most recent</option>
+    </select>
+    <span class="muted" id="leadsCount"></span>
+  </div>
+  <div class="tbl-wrap"><table id="leadsTable"></table></div>
+</div>
+
+<!-- ACTION QUEUE -->
+<div class="panel" id="panel-queue">
+  <div class="queue-grid" id="queueGrid"></div>
+</div>
+
+<!-- SOURCES -->
+<div class="panel" id="panel-sources">
+  <div class="chart-row">
+    <div class="chart-box"><h3>Clones by Repo (14d daily)</h3><canvas id="clonesByRepoChart"></canvas></div>
+    <div class="chart-box"><h3>Downloads by Package (30d daily)</h3><canvas id="dlsByPkgChart"></canvas></div>
+  </div>
+  <div class="chart-row">
+    <div class="chart-box"><h3>GitHub Referrers</h3><div id="sourcesRefTable"></div></div>
+    <div class="chart-box"><h3>GitHub Paths</h3><div id="sourcesPathTable"></div></div>
+  </div>
+</div>
+
+<!-- LINKEDIN -->
+<div class="panel" id="panel-linkedin">
+  <div class="li-form">
+    <h3>Log LinkedIn post metrics</h3>
+    <div class="li-grid">
+      <div class="full"><label>Post URL *</label><input id="liUrl" placeholder="https://www.linkedin.com/posts/..." required></div>
+      <div><label>Title</label><input id="liTitle"></div>
+      <div><label>Published at</label><input id="liPub" type="datetime-local"></div>
+      <div><label>Impressions</label><input id="liImp" type="number" min="0"></div>
+      <div><label>Reach</label><input id="liReach" type="number" min="0"></div>
+      <div><label>Reactions</label><input id="liReact" type="number" min="0"></div>
+      <div><label>Comments</label><input id="liComm" type="number" min="0"></div>
+      <div><label>Reposts</label><input id="liRepost" type="number" min="0"></div>
+      <div><label>Saves</label><input id="liSave" type="number" min="0"></div>
+      <div><label>Sends</label><input id="liSend" type="number" min="0"></div>
+      <div><label>Link clicks</label><input id="liClk" type="number" min="0"></div>
+      <div><label>Profile views</label><input id="liPv" type="number" min="0"></div>
+      <div><label>Followers gained</label><input id="liFol" type="number" min="0"></div>
+    </div>
+    <button class="btn primary" onclick="submitLinkedIn()">Save metrics</button>
+    <span class="muted tiny" style="margin-left:8px">Paste from LinkedIn "View analytics"</span>
+  </div>
+  <div class="tbl-wrap"><table id="liTable"></table></div>
+</div>
+
+<!-- RAW -->
+<div class="panel" id="panel-raw">
+  <div class="chart-box"><h3>Recent Intel Events (last 200)</h3><div id="eventsList" style="max-height:600px;overflow:auto;font-size:0.75rem"></div></div>
+</div>
+
+<script>
+const fmt = n => (n == null ? '—' : Number(n).toLocaleString());
+const fmtDate = s => s ? new Date(s).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }) : '—';
+const fmtDay = s => s ? new Date(s).toISOString().slice(0, 10) : '—';
+const fmtAgo = s => {
+  if (!s) return 'never';
+  const d = (Date.now() - new Date(s).getTime()) / 1000;
+  if (d < 60) return 'just now';
+  if (d < 3600) return `${Math.round(d/60)}m ago`;
+  if (d < 86400) return `${Math.round(d/3600)}h ago`;
+  return `${Math.round(d/86400)}d ago`;
+};
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const qs = o => Object.entries(o).filter(([,v])=>v!=null&&v!=='').map(([k,v])=>`${k}=${encodeURIComponent(v)}`).join('&');
+const showError = m => { const e=document.getElementById('error'); e.textContent=m; e.style.display='block'; };
+const hideError = () => document.getElementById('error').style.display='none';
+const showNote = m => { const n=document.getElementById('note'); n.textContent=m; n.style.display='block'; setTimeout(()=>n.style.display='none',4000); };
+
+async function api(url, opts={}) {
+  const res = await fetch(url, { cache: 'no-store', credentials: 'same-origin', ...opts });
+  if (!res.ok) throw new Error(`${res.status} ${url}: ${(await res.text()).slice(0,200)}`);
+  return res.json();
+}
+
+let OVERVIEW = null;
+let LEADS = [];
+let CHARTS = {};
+function destroyChart(k) { if (CHARTS[k]) { CHARTS[k].destroy(); delete CHARTS[k]; } }
+
+function showTab(t, btn) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tabs button').forEach(b => b.classList.remove('active'));
+  document.getElementById('panel-'+t).classList.add('active');
+  btn.classList.add('active');
+  if (t === 'leads' && LEADS.length === 0) loadLeads();
+  if (t === 'queue') loadQueue();
+  if (t === 'sources') loadSources();
+  if (t === 'linkedin') loadLinkedIn();
+  if (t === 'raw') loadRaw();
+}
+
+async function loadAll() {
+  hideError();
+  document.getElementById('lastUpdated').textContent = 'loading…';
+  try {
+    OVERVIEW = await api('/api/admin/intel-overview');
+    renderOverview(OVERVIEW);
+    document.getElementById('lastUpdated').textContent = 'as of ' + new Date().toLocaleTimeString();
+  } catch (err) { showError('Overview load: ' + err.message); }
+}
+
+function renderOverview(d) {
+  const c = d.counts || {};
+  const f = d.funnel || {};
+  const state = d.state || {};
+  const stats = [
+    { label: 'Contacts', value: fmt(c.contacts) },
+    { label: 'Stars', value: fmt(c.stars) },
+    { label: 'Watchers', value: fmt(c.watchers) },
+    { label: 'Forks', value: fmt(c.forks) },
+    { label: 'Issue authors', value: fmt(c.issue_authors) },
+    { label: 'w/ email', value: fmt(c.with_email) },
+    { label: 'Events 24h', value: fmt(c.events_1d), sub2: `${fmt(c.events_7d)} / 7d` },
+    { label: 'Last refresh', value: fmtAgo(state.last_full_refresh_at), sub2: state.last_error ? 'error' : '' },
+  ];
+  document.getElementById('statsGrid').innerHTML = stats.map(s =>
+    `<div class="stat${s.hot?' hot':''}"><div class="label">${esc(s.label)}</div><div class="value ${String(s.value).length>6?'small':''}">${esc(s.value)}</div>${s.sub2?`<div class="sub2">${esc(s.sub2)}</div>`:''}</div>`
+  ).join('');
+
+  // Repo table
+  const tr = (d.traffic || []).map(r => `
+    <tr>
+      <td><a class="link" href="https://github.com/${esc(r.repo)}" target="_blank">${esc(r.repo.split('/')[1])}</a></td>
+      <td>${fmt(r.clones_total)}<div class="muted tiny">${fmt(r.clones_uniques)} uniq</div></td>
+      <td>${fmt(r.views_total)}<div class="muted tiny">${fmt(r.views_uniques)} uniq</div></td>
+      <td class="muted">${fmtDay(r.last_day)}</td>
+    </tr>`).join('');
+  document.getElementById('repoTable').innerHTML = tr
+    ? `<table><thead><tr><th>Repo</th><th>Clones 30d</th><th>Views 30d</th><th>Last day</th></tr></thead><tbody>${tr}</tbody></table>`
+    : `<div class="muted">No traffic data yet. Run full refresh (requires GH_TOKEN).</div>`;
+
+  const np = (d.npm || []).map(r => `
+    <tr>
+      <td><a class="link" href="https://www.npmjs.com/package/${esc(r.pkg)}" target="_blank">${esc(r.pkg.replace('contrarianai-', ''))}</a></td>
+      <td>${fmt(r.downloads_30d)}</td>
+      <td class="muted">${fmtDay(r.last_day)}</td>
+    </tr>`).join('');
+  document.getElementById('npmTable').innerHTML = np
+    ? `<table><thead><tr><th>Package</th><th>Downloads 30d</th><th>Last day</th></tr></thead><tbody>${np}</tbody></table>`
+    : `<div class="muted">No npm data yet.</div>`;
+
+  const rf = (d.top_referrers || []).slice(0, 10).map(r => `
+    <tr><td>${esc(r.repo.split('/')[1])}</td><td>${esc(r.referrer)}</td><td>${fmt(r.count)}</td></tr>`).join('');
+  document.getElementById('refTable').innerHTML = rf
+    ? `<table><thead><tr><th>Repo</th><th>Referrer</th><th>Count</th></tr></thead><tbody>${rf}</tbody></table>`
+    : `<div class="muted">—</div>`;
+
+  const pt = (d.top_paths || []).slice(0, 10).map(r => `
+    <tr><td>${esc(r.repo.split('/')[1])}</td><td>${esc(r.title || r.path)}</td><td>${fmt(r.count)}</td></tr>`).join('');
+  document.getElementById('pathTable').innerHTML = pt
+    ? `<table><thead><tr><th>Repo</th><th>Path / title</th><th>Views</th></tr></thead><tbody>${pt}</tbody></table>`
+    : `<div class="muted">—</div>`;
+
+  // Funnel
+  const totals = {
+    npm_dls: (d.npm || []).reduce((a, b) => a + (b.downloads_30d || 0), 0),
+    clones: (d.traffic || []).reduce((a, b) => a + (b.clones_total || 0), 0),
+    clones_uniq: (d.traffic || []).reduce((a, b) => a + (b.clones_uniques || 0), 0),
+    visits: f.visits_30d || 0,
+    unique: f.unique_30d || 0,
+    assessments: f.assessments_30d || 0,
+    leads: f.leads_30d || 0,
+    paid: f.paid_30d || 0,
+  };
+  document.getElementById('funnelView').innerHTML = `
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:8px">
+      ${[
+        ['npm ↓', totals.npm_dls, 'package downloads'],
+        ['GH clones', totals.clones, `${totals.clones_uniq} unique`],
+        ['Landing', totals.visits, `${totals.unique} unique`],
+        ['Assessments', totals.assessments, 'submitted'],
+        ['Leads', totals.leads, 'audit requests'],
+        ['Paid', totals.paid, 'payments'],
+      ].map(([l,v,s]) => `<div class="stat"><div class="label">${l}</div><div class="value small">${fmt(v)}</div><div class="sub2">${s}</div></div>`).join('')}
+    </div>`;
+
+  // Clones + downloads charts
+  drawClonesChart();
+  drawDownloadsChart();
+}
+
+async function drawClonesChart() {
+  try {
+    const snaps = await api('/api/admin/intel-snapshots?' + qs({ source: 'github', metric: 'clones', days: 30 }));
+    const byDay = {};
+    for (const s of snaps) byDay[s.day] = (byDay[s.day] || 0) + Number(s.value);
+    const days = Object.keys(byDay).sort();
+    destroyChart('clones');
+    CHARTS.clones = new Chart(document.getElementById('clonesChart'), {
+      type: 'bar',
+      data: { labels: days.map(d => d.slice(5)), datasets: [{ data: days.map(d => byDay[d]), backgroundColor: '#f97316' }] },
+      options: { plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#a3a3a3' }, grid: { color: '#262626' } }, y: { ticks: { color: '#a3a3a3' }, grid: { color: '#262626' }, beginAtZero: true } } }
+    });
+  } catch (e) {}
+}
+async function drawDownloadsChart() {
+  try {
+    const snaps = await api('/api/admin/intel-snapshots?' + qs({ source: 'npm', metric: 'downloads', days: 30 }));
+    const byDay = {};
+    for (const s of snaps) byDay[s.day] = (byDay[s.day] || 0) + Number(s.value);
+    const days = Object.keys(byDay).sort();
+    destroyChart('dls');
+    CHARTS.dls = new Chart(document.getElementById('downloadsChart'), {
+      type: 'bar',
+      data: { labels: days.map(d => d.slice(5)), datasets: [{ data: days.map(d => byDay[d]), backgroundColor: '#3b82f6' }] },
+      options: { plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#a3a3a3' }, grid: { color: '#262626' } }, y: { ticks: { color: '#a3a3a3' }, grid: { color: '#262626' }, beginAtZero: true } } }
+    });
+  } catch (e) {}
+}
+
+// ----- LEADS -----
+let leadTimer;
+function debouncedLoadLeads() { clearTimeout(leadTimer); leadTimer = setTimeout(loadLeads, 300); }
+async function loadLeads() {
+  try {
+    const params = {
+      q: document.getElementById('fltQ').value || '',
+      tier: document.getElementById('fltTier').value,
+      has_email: document.getElementById('fltEmail').checked ? '1' : '',
+      order: document.getElementById('fltOrder').value,
+      limit: 500,
+    };
+    const rows = await api('/api/admin/intel-contacts?' + qs(params));
+    LEADS = rows;
+    document.getElementById('cntLeads').textContent = rows.length;
+    document.getElementById('leadsCount').textContent = `${rows.length} contacts`;
+    renderLeads(rows);
+  } catch (err) { showError('Leads load: ' + err.message); }
+}
+
+function dmTemplate(c) {
+  const firstName = (c.name || c.github_handle || '').split(' ')[0];
+  const pathology = c.bio && /rag/i.test(c.bio) ? 'retrieval noise' :
+                    c.bio && /agent/i.test(c.bio) ? 'silent tool-call failures' :
+                    c.bio && /llm/i.test(c.bio) ? 'context rot past turn 10' :
+                    'context-window alignment';
+  return `Hey ${firstName} — saw you ${c.tier === 'star' ? 'starred contrarianai-context-inspector' : `engaged with contrarianAI (${c.tier})`}. Curious: does ${pathology} show up in your workflow? Working on a sensor framework (Bell Tuning) that flags it pre-output. Happy to run a free audit on a trace if useful.`;
+}
+
+function renderLeads(rows) {
+  const head = `<thead><tr>
+    <th>Contact</th><th>Tier</th><th>Score</th><th>ICP</th><th>Company / bio</th><th>Last seen</th><th>Suggested action</th>
+  </tr></thead>`;
+  const body = rows.map((r, i) => `
+    <tr data-id="${r.id}" onclick="toggleRow(this, ${r.id}, ${i})">
+      <td>
+        <div class="ch">
+          ${r.avatar_url ? `<img class="avatar" src="${esc(r.avatar_url)}" alt="">` : `<div class="avatar"></div>`}
+          <div>
+            <div class="handle"><a href="https://github.com/${esc(r.github_handle)}" target="_blank" onclick="event.stopPropagation()">@${esc(r.github_handle)}</a></div>
+            <div class="muted tiny">${esc(r.name || '')}${r.email ? ' · '+esc(r.email) : ''}</div>
+          </div>
+        </div>
+      </td>
+      <td><span class="badge ${esc(r.tier || '')}">${esc(r.tier || '—')}</span></td>
+      <td><span class="score ${r.engagement_score >= 50 ? 'vhigh' : r.engagement_score >= 20 ? 'high' : ''}">${Math.round(r.engagement_score || 0)}</span></td>
+      <td><span class="icp">${Math.round(r.icp_fit || 0)}</span></td>
+      <td><div>${esc(r.company || '')}</div><div class="muted tiny">${esc((r.bio || '').slice(0, 80))}</div></td>
+      <td class="muted tiny">${fmtAgo(r.last_seen)}</td>
+      <td class="muted tiny">${esc(r.suggested_action || '')}</td>
+    </tr>
+    <tr class="detail-row" id="detail-${r.id}" style="display:none"><td colspan="7" class="detail-pane">
+      <div class="detail-grid">
+        <div>
+          <h4>Profile</h4>
+          <div class="muted tiny">followers: ${fmt(r.followers_count)} · public repos: ${fmt(r.public_repos)}</div>
+          <div class="muted tiny">location: ${esc(r.location || '—')}</div>
+          ${r.website ? `<div><a class="link" href="${esc(r.website)}" target="_blank">${esc(r.website)}</a></div>` : ''}
+          ${r.twitter ? `<div><a class="link" href="https://twitter.com/${esc(r.twitter)}" target="_blank">@${esc(r.twitter)}</a></div>` : ''}
+          ${r.linkedin_url ? `<div><a class="link" href="${esc(r.linkedin_url)}" target="_blank">LinkedIn</a></div>` : ''}
+          <h4 style="margin-top:10px">Recent events</h4>
+          <div class="event-list">${(r.recent_events || []).map(e => `<div class="event"><b>${esc(e.event_type)}</b> ${esc(e.repo || '')} <span class="muted tiny">${fmtAgo(e.ts)}</span></div>`).join('') || '<div class="muted tiny">—</div>'}</div>
+        </div>
+        <div>
+          <h4>Outreach</h4>
+          <label class="muted tiny">Next action</label>
+          <input class="action" id="na-${r.id}" value="${esc(r.next_action || '')}" placeholder="e.g. DM sent 4/21, replied 4/22">
+          <label class="muted tiny" style="margin-top:8px;display:block">Notes</label>
+          <textarea class="notes" id="nt-${r.id}">${esc(r.notes || '')}</textarea>
+          <button class="btn primary" style="margin-top:6px" onclick="saveContact(${r.id})">Save</button>
+          <h4 style="margin-top:10px">DM template</h4>
+          <div class="dm-tmpl">${esc(dmTemplate(r))}</div>
+          <button class="btn" style="margin-top:6px" onclick="copyDM(${r.id})">Copy template</button>
+        </div>
+      </div>
+    </td></tr>
+  `).join('');
+  document.getElementById('leadsTable').innerHTML = head + `<tbody>${body}</tbody>`;
+}
+
+function toggleRow(tr, id, i) {
+  const d = document.getElementById('detail-' + id);
+  if (!d) return;
+  const open = d.style.display !== 'none';
+  d.style.display = open ? 'none' : '';
+  tr.classList.toggle('expanded', !open);
+}
+
+async function saveContact(id) {
+  const notes = document.getElementById('nt-' + id).value;
+  const next_action = document.getElementById('na-' + id).value;
+  try {
+    await api('/api/admin/intel-contact/' + id, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ notes, next_action }),
+    });
+    showNote('Saved contact ' + id);
+  } catch (err) { showError('Save: ' + err.message); }
+}
+
+function copyDM(id) {
+  const c = LEADS.find(r => r.id === id);
+  if (!c) return;
+  navigator.clipboard.writeText(dmTemplate(c)).then(() => showNote('Copied DM template'));
+}
+
+// ----- QUEUE -----
+async function loadQueue() {
+  try {
+    const q = await api('/api/admin/intel-action-queue');
+    const total = (q.hot?.length || 0) + (q.icp_stars?.length || 0) + (q.with_email?.length || 0) + (q.recently_added?.length || 0);
+    document.getElementById('cntQueue').textContent = total;
+    const section = (title, rows, badge) => `
+      <div class="queue-card">
+        <h3>${esc(title)} <span class="cnt">${(rows||[]).length}</span></h3>
+        ${(rows||[]).map(r => `
+          <div class="q-row">
+            ${r.avatar_url ? `<img class="avatar" style="width:24px;height:24px" src="${esc(r.avatar_url)}">` : '<div class="avatar" style="width:24px;height:24px"></div>'}
+            <div class="grow">
+              <a class="link" href="https://github.com/${esc(r.github_handle)}" target="_blank">@${esc(r.github_handle)}</a>
+              ${r.company ? ` · <span class="muted tiny">${esc(r.company.slice(0, 30))}</span>` : ''}
+              <div class="q-action">${esc(r.suggested_action || '')} · score ${Math.round(r.engagement_score||0)} · icp ${Math.round(r.icp_fit||0)}</div>
+            </div>
+          </div>`).join('') || '<div class="muted tiny">none</div>'}
+      </div>`;
+    document.getElementById('queueGrid').innerHTML = [
+      section('🔥 Hot — high engagement', q.hot, 'hot'),
+      section('🎯 ICP Stars — seniority/AI signal', q.icp_stars, 'icp'),
+      section('📧 With public email — direct reach', q.with_email, 'email'),
+      section('🆕 Recently added (7d)', q.recently_added, 'new'),
+    ].join('');
+  } catch (err) { showError('Queue: ' + err.message); }
+}
+
+// ----- SOURCES -----
+async function loadSources() {
+  try {
+    const [gh, np] = await Promise.all([
+      api('/api/admin/intel-snapshots?' + qs({ source: 'github', metric: 'clones', days: 14 })),
+      api('/api/admin/intel-snapshots?' + qs({ source: 'npm', metric: 'downloads', days: 30 })),
+    ]);
+    // Clones by repo (multi-series)
+    const repos = {}; const days = new Set();
+    for (const s of gh) {
+      repos[s.subject] = repos[s.subject] || {};
+      repos[s.subject][s.day] = Number(s.value);
+      days.add(s.day);
+    }
+    const sortedDays = [...days].sort();
+    const palette = ['#f97316','#3b82f6','#22c55e','#a855f7','#eab308','#ef4444','#06b6d4'];
+    destroyChart('clonesByRepo');
+    CHARTS.clonesByRepo = new Chart(document.getElementById('clonesByRepoChart'), {
+      type: 'line',
+      data: {
+        labels: sortedDays.map(d => d.slice(5)),
+        datasets: Object.keys(repos).map((r, i) => ({
+          label: r.split('/')[1],
+          data: sortedDays.map(d => repos[r][d] || 0),
+          borderColor: palette[i % palette.length],
+          backgroundColor: palette[i % palette.length] + '20',
+          tension: 0.3,
+        })),
+      },
+      options: { plugins: { legend: { labels: { color: '#e5e5e5', font: { size: 10 } } } }, scales: { x: { ticks: { color: '#a3a3a3' }, grid: { color: '#262626' } }, y: { ticks: { color: '#a3a3a3' }, grid: { color: '#262626' }, beginAtZero: true } } }
+    });
+    // Downloads by pkg
+    const pkgs = {}; const npDays = new Set();
+    for (const s of np) {
+      pkgs[s.subject] = pkgs[s.subject] || {};
+      pkgs[s.subject][s.day] = Number(s.value);
+      npDays.add(s.day);
+    }
+    const npSorted = [...npDays].sort();
+    destroyChart('dlsByPkg');
+    CHARTS.dlsByPkg = new Chart(document.getElementById('dlsByPkgChart'), {
+      type: 'line',
+      data: {
+        labels: npSorted.map(d => d.slice(5)),
+        datasets: Object.keys(pkgs).map((p, i) => ({
+          label: p.replace('contrarianai-', ''),
+          data: npSorted.map(d => pkgs[p][d] || 0),
+          borderColor: palette[i % palette.length],
+          backgroundColor: palette[i % palette.length] + '20',
+          tension: 0.3,
+        })),
+      },
+      options: { plugins: { legend: { labels: { color: '#e5e5e5', font: { size: 10 } } } }, scales: { x: { ticks: { color: '#a3a3a3' }, grid: { color: '#262626' } }, y: { ticks: { color: '#a3a3a3' }, grid: { color: '#262626' }, beginAtZero: true } } }
+    });
+    // Tables
+    if (OVERVIEW) {
+      const rf = (OVERVIEW.top_referrers || []).map(r => `<tr><td>${esc(r.repo.split('/')[1])}</td><td>${esc(r.referrer)}</td><td>${fmt(r.count)}</td></tr>`).join('');
+      document.getElementById('sourcesRefTable').innerHTML = rf
+        ? `<table><thead><tr><th>Repo</th><th>Referrer</th><th>Count</th></tr></thead><tbody>${rf}</tbody></table>`
+        : `<div class="muted">—</div>`;
+      const pt = (OVERVIEW.top_paths || []).map(r => `<tr><td>${esc(r.repo.split('/')[1])}</td><td>${esc(r.title || r.path)}</td><td>${fmt(r.count)}</td></tr>`).join('');
+      document.getElementById('sourcesPathTable').innerHTML = pt
+        ? `<table><thead><tr><th>Repo</th><th>Path</th><th>Views</th></tr></thead><tbody>${pt}</tbody></table>`
+        : `<div class="muted">—</div>`;
+    }
+  } catch (err) { showError('Sources: ' + err.message); }
+}
+
+// ----- LINKEDIN -----
+async function loadLinkedIn() {
+  try {
+    const rows = await api('/api/admin/intel-linkedin');
+    const head = `<thead><tr><th>Published</th><th>Post</th><th>Impr</th><th>Reach</th><th>React</th><th>Comm</th><th>Rep</th><th>Clk</th><th>Updated</th></tr></thead>`;
+    const body = rows.map(r => `<tr>
+      <td class="muted tiny">${fmtDate(r.published_at)}</td>
+      <td><a class="link" href="${esc(r.post_url)}" target="_blank">${esc((r.title || r.post_url).slice(0, 50))}</a></td>
+      <td>${fmt(r.impressions)}</td><td>${fmt(r.reach)}</td><td>${fmt(r.reactions)}</td>
+      <td>${fmt(r.comments)}</td><td>${fmt(r.reposts)}</td><td>${fmt(r.link_clicks)}</td>
+      <td class="muted tiny">${fmtAgo(r.updated_at)}</td>
+    </tr>`).join('');
+    document.getElementById('liTable').innerHTML = head + `<tbody>${body || `<tr><td colspan="9" class="muted">No posts logged yet.</td></tr>`}</tbody>`;
+  } catch (err) { showError('LinkedIn: ' + err.message); }
+}
+
+async function submitLinkedIn() {
+  const pub = document.getElementById('liPub').value;
+  const payload = {
+    post_url: document.getElementById('liUrl').value.trim(),
+    title: document.getElementById('liTitle').value.trim() || null,
+    published_at: pub ? new Date(pub).toISOString() : null,
+    impressions: +document.getElementById('liImp').value || 0,
+    reach: +document.getElementById('liReach').value || 0,
+    reactions: +document.getElementById('liReact').value || 0,
+    comments: +document.getElementById('liComm').value || 0,
+    reposts: +document.getElementById('liRepost').value || 0,
+    saves: +document.getElementById('liSave').value || 0,
+    sends: +document.getElementById('liSend').value || 0,
+    link_clicks: +document.getElementById('liClk').value || 0,
+    profile_views: +document.getElementById('liPv').value || 0,
+    followers_gained: +document.getElementById('liFol').value || 0,
+  };
+  if (!payload.post_url) return showError('post_url required');
+  try {
+    await api('/api/admin/intel-linkedin', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    showNote('Saved LinkedIn post metrics');
+    loadLinkedIn();
+  } catch (err) { showError('LI save: ' + err.message); }
+}
+
+// ----- RAW -----
+async function loadRaw() {
+  try {
+    // Raw pulls a page of intel_events via contacts endpoint as a proxy (no dedicated endpoint to keep scope small).
+    const rows = await api('/api/admin/intel-contacts?' + qs({ order: 'recent', limit: 200 }));
+    const ev = [];
+    for (const r of rows) {
+      for (const e of (r.recent_events || [])) {
+        ev.push({ ...e, handle: r.github_handle });
+      }
+    }
+    ev.sort((a, b) => new Date(b.ts) - new Date(a.ts));
+    document.getElementById('eventsList').innerHTML = ev.slice(0, 200).map(e => `
+      <div class="event"><b>${esc(e.event_type)}</b> <a class="link" href="https://github.com/${esc(e.handle)}" target="_blank">@${esc(e.handle)}</a> ${esc(e.repo || '')} <span class="muted tiny">${fmtAgo(e.ts)}</span></div>
+    `).join('') || '<div class="muted">No events yet.</div>';
+  } catch (err) { showError('Raw: ' + err.message); }
+}
+
+// ----- REFRESH -----
+async function triggerRefresh(force = false) {
+  const btn = document.getElementById('refreshBtn');
+  btn.disabled = true;
+  btn.textContent = '⏳ Refreshing…';
+  try {
+    const q = force ? '?force=1' : '';
+    const r = await api('/api/admin/intel-refresh' + q, { method: 'POST' });
+    const errs = [];
+    if (r.error) errs.push('top: ' + r.error);
+    for (const k of Object.keys(r)) {
+      if (typeof r[k] === 'object' && r[k]) {
+        for (const sub of Object.keys(r[k])) {
+          if (r[k][sub]?.error) errs.push(`${k}.${sub}: ${r[k][sub].error}`);
+        }
+      }
+    }
+    if (errs.length) showError('Refresh finished with errors: ' + errs.slice(0, 5).join(' | '));
+    else showNote('Refresh complete — reloading view');
+    await loadAll();
+  } catch (err) { showError('Refresh: ' + err.message); }
+  finally {
+    btn.disabled = false;
+    btn.textContent = '🔄 Full refresh';
+  }
+}
+
+// ----- BOOT -----
+loadAll();
+document.addEventListener('visibilitychange', () => { if (!document.hidden) loadAll(); });
+window.addEventListener('pageshow', () => loadAll());
+</script>
+
+</body>
+</html>

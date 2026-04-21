@@ -7,6 +7,10 @@ const Stripe = require('stripe');
 const { renderAdminPage } = require('./admin');
 const leadIntel = require('./tools/lead-intel/collector');
 const { suggestAction } = require('./tools/lead-intel/scoring');
+const Anthropic = require('@anthropic-ai/sdk').default || require('@anthropic-ai/sdk');
+const anthropic = process.env.ANTHROPIC_API_KEY ? new Anthropic() : null;
+if (anthropic) console.log('Anthropic SDK enabled (model: claude-haiku-4-5 for intel-parse)');
+else console.warn('ANTHROPIC_API_KEY not set — /api/admin/intel-parse will return 503');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -812,6 +816,102 @@ app.get('/api/admin/intel-contacts', requireAdmin, async (req, res) => {
     const rows = result.rows.map(r => ({ ...r, suggested_action: suggestAction(r) }));
     res.json(rows);
   } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// LLM-powered structured extraction for the manual contact form.
+// Pastes raw text (LinkedIn About, DM thread, email, etc.) → extracted fields.
+// Uses claude-haiku-4-5 with tool_use for strict JSON output.
+app.post('/api/admin/intel-parse', requireAdmin, async (req, res) => {
+  if (!anthropic) {
+    return res.status(503).json({ error: 'ANTHROPIC_API_KEY not configured on server' });
+  }
+  const raw = (req.body && typeof req.body.raw === 'string') ? req.body.raw : '';
+  if (!raw.trim()) return res.status(400).json({ error: 'raw text required' });
+  if (raw.length > 20000) return res.status(413).json({ error: 'paste too long (max 20k chars)' });
+
+  const toolSchema = {
+    name: 'save_contact',
+    description: 'Extract structured contact information from unstructured text about a person.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        name: { type: 'string', description: "Full name" },
+        email: { type: 'string', description: 'Email address' },
+        linkedin_url: { type: 'string', description: 'Full LinkedIn URL (https://www.linkedin.com/in/...)' },
+        github_handle: { type: 'string', description: 'GitHub username only, no URL' },
+        twitter: { type: 'string', description: 'Twitter/X handle, no @, no URL' },
+        website: { type: 'string', description: 'Personal site URL' },
+        company: { type: 'string', description: 'Current company or employer' },
+        role: { type: 'string', description: 'Current job title / role' },
+        location: { type: 'string', description: 'City / region / country' },
+        bio: {
+          type: 'string',
+          description: 'Concise 1-3 sentence third-person summary emphasizing signal keywords useful for ICP scoring (seniority: staff/principal/senior/lead/director; AI relevance: ai/ml/llm/rag/agent/mlops; platform/infra/devtools; founder; government; legacy modernization). Do NOT copy the source verbatim — synthesize.',
+        },
+        seniority: {
+          type: 'string',
+          enum: ['junior','mid','senior','staff','principal','lead','manager','director','vp','cxo','founder'],
+          description: 'Inferred seniority',
+        },
+        ai_relevance: {
+          type: 'string',
+          enum: ['ai_ml_core','ai_adjacent','ai_curious','non_ai'],
+          description: "Proximity to AI/LLM work. ai_ml_core=builds AI systems; ai_adjacent=platform/infra/data eng likely to adopt; ai_curious=mentions/references AI; non_ai=no AI signal.",
+        },
+        tier: {
+          type: 'string',
+          enum: ['visit','star','watcher','issue_author','fork','pr_author','audit_request','customer'],
+          description: "Engagement tier inferred from any conversational context. Default 'visit' if unclear.",
+        },
+        icp_notes: { type: 'string', description: "One line on whether this contact fits contrarianAI ICP (senior engineer/leader at a company running AI agents or RAG in production) and why." },
+        next_action_suggestion: { type: 'string', description: 'Concrete suggested next outreach step based on what was extracted.' },
+        raw_context_summary: { type: 'string', description: 'One-sentence description of what the pasted content was (e.g. "LinkedIn About + Top Skills section", "Slack DM reply thread", "email signature").' },
+      },
+    },
+  };
+
+  try {
+    const response = await anthropic.messages.create({
+      model: 'claude-haiku-4-5',
+      max_tokens: 2048,
+      tools: [toolSchema],
+      tool_choice: { type: 'tool', name: 'save_contact' },
+      messages: [{
+        role: 'user',
+        content:
+`You extract structured contact fields for a lead-intel dashboard. The user runs contrarianAI — an AI audit / "Bell Tuning" consulting practice targeting teams running LLM agents, RAG, or long-context workflows in production. ICP = senior engineers / tech leads / managers / founders at 10-500 person companies who have AI in production or are clearly about to.
+
+Favor high recall on explicit identifiers (email, URLs, handles).
+Favor high precision on inferred fields (seniority, ai_relevance, tier).
+If a field is not supported by the text, omit it — do not hallucinate.
+For 'bio', write a NEW concise 1-3 sentence third-person summary tuned for ICP keyword scoring; do not copy the source verbatim.
+
+CONTENT:
+${raw}`,
+      }],
+    });
+
+    const toolBlock = response.content.find(b => b.type === 'tool_use' && b.name === 'save_contact');
+    if (!toolBlock) return res.status(502).json({ error: 'model did not emit tool_use' });
+
+    res.json({
+      ok: true,
+      extracted: toolBlock.input,
+      usage: {
+        input_tokens: response.usage.input_tokens,
+        output_tokens: response.usage.output_tokens,
+        cache_read_input_tokens: response.usage.cache_read_input_tokens || 0,
+      },
+      model: response.model,
+    });
+  } catch (err) {
+    if (err instanceof Anthropic.APIError) {
+      console.error('[intel-parse] Anthropic error:', err.status, err.message);
+      return res.status(err.status || 500).json({ error: err.message });
+    }
+    console.error('[intel-parse] error:', err);
+    res.status(500).json({ error: err.message || 'extraction failed' });
+  }
 });
 
 // Manual contact creation for non-GitHub sources (LinkedIn DMs, email threads,

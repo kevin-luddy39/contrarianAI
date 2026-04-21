@@ -200,7 +200,8 @@ input.action{width:100%;background:var(--s2);border:1px solid var(--border);colo
       <label style="font-size:0.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:4px">Paste raw info (LinkedIn profile, message thread, email sig, etc.)</label>
       <textarea id="mPaste" class="notes" style="min-height:110px" placeholder="Paste anything — About section, contact info, conversation. Click Parse & fill to auto-extract name, email, LinkedIn URL, GitHub, Twitter, location, company, and bio. Unmatched text goes to Notes."></textarea>
       <div style="margin-top:6px;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-        <button class="btn primary" onclick="parseManualPaste()">🔍 Parse & fill</button>
+        <button class="btn primary" onclick="parseManualPasteAI()">🧠 AI parse (Haiku)</button>
+        <button class="btn" onclick="parseManualPaste()">🔍 Regex parse (local)</button>
         <button class="btn ghost" onclick="document.getElementById('mPaste').value=''">Clear</button>
         <span class="muted tiny" id="parseReport"></span>
       </div>
@@ -543,6 +544,70 @@ function extractFields(text) {
   else if (/\b(following|watching|subscribed)\b/.test(lc)) out.tier = 'watcher';
 
   return out;
+}
+
+async function parseManualPasteAI() {
+  const raw = document.getElementById('mPaste').value;
+  if (!raw.trim()) return showError('Paste something first');
+  const reportEl = document.getElementById('parseReport');
+  reportEl.textContent = '⏳ calling Haiku 4.5…';
+  try {
+    const r = await api('/api/admin/intel-parse', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ raw }),
+    });
+    const ex = r.extracted || {};
+    const setIfEmpty = (id, v) => {
+      if (!v) return false;
+      const el = document.getElementById(id);
+      if (!el) return false;
+      if (el.tagName === 'SELECT') {
+        for (const opt of el.options) if (opt.value === v) { el.value = v; return true; }
+        return false;
+      }
+      if (el.value) return false;
+      el.value = v;
+      el.style.background = '#1a2e1a';
+      setTimeout(() => el.style.background = '', 1500);
+      return true;
+    };
+    const filled = [];
+    if (setIfEmpty('mName', ex.name)) filled.push('name');
+    if (setIfEmpty('mEmail', ex.email)) filled.push('email');
+    if (setIfEmpty('mLinkedIn', ex.linkedin_url)) filled.push('LinkedIn');
+    if (setIfEmpty('mGithub', ex.github_handle)) filled.push('GitHub');
+    if (setIfEmpty('mTwitter', ex.twitter)) filled.push('Twitter');
+    if (setIfEmpty('mLocation', ex.location)) filled.push('location');
+    // Company from company+role
+    const companyRole = [ex.role, ex.company].filter(Boolean).join(' at ');
+    if (companyRole && setIfEmpty('mCompany', companyRole)) filled.push('company');
+    if (setIfEmpty('mBio', ex.bio)) filled.push('bio');
+    if (ex.tier && setIfEmpty('mTier', ex.tier)) filled.push('tier=' + ex.tier);
+    if (ex.next_action_suggestion && setIfEmpty('mNextAction', ex.next_action_suggestion)) filled.push('next_action');
+    // Notes: prepend structured insights + raw paste
+    const notesEl = document.getElementById('mNotes');
+    const insights = [];
+    if (ex.seniority) insights.push(`seniority: ${ex.seniority}`);
+    if (ex.ai_relevance) insights.push(`ai_relevance: ${ex.ai_relevance}`);
+    if (ex.icp_notes) insights.push(`ICP: ${ex.icp_notes}`);
+    if (ex.raw_context_summary) insights.push(`source: ${ex.raw_context_summary}`);
+    const insightLine = insights.length ? '[Haiku ' + new Date().toLocaleString() + '] ' + insights.join(' · ') + '\n\n' : '';
+    const sep = notesEl.value.trim() ? '\n\n--- PASTED ---\n' : '';
+    notesEl.value = (insightLine + notesEl.value + sep + raw).slice(0, 10000);
+
+    const tok = r.usage ? ` (${r.usage.input_tokens}↑ / ${r.usage.output_tokens}↓ tokens)` : '';
+    reportEl.textContent = `🧠 Filled: ${filled.join(', ') || 'nothing'}${tok}. Review + edit before saving.`;
+  } catch (err) {
+    reportEl.textContent = '';
+    const msg = err.message || '';
+    if (msg.includes('503')) {
+      showError('AI parse unavailable — ANTHROPIC_API_KEY not configured on server. Falling back to regex.');
+      parseManualPaste();
+    } else {
+      showError('AI parse failed: ' + msg + ' — try regex.');
+    }
+  }
 }
 
 function parseManualPaste() {

@@ -196,6 +196,15 @@ input.action{width:100%;background:var(--s2);border:1px solid var(--border);colo
 
   <div id="manualForm" style="display:none;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:16px;margin-bottom:12px">
     <h3 style="font-size:0.78rem;margin-bottom:10px">Add manual contact (LinkedIn, email, conversation)</h3>
+    <div style="background:var(--s2);border:1px dashed var(--border);border-radius:6px;padding:10px;margin-bottom:10px">
+      <label style="font-size:0.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:4px">Paste raw info (LinkedIn profile, message thread, email sig, etc.)</label>
+      <textarea id="mPaste" class="notes" style="min-height:110px" placeholder="Paste anything — About section, contact info, conversation. Click Parse & fill to auto-extract name, email, LinkedIn URL, GitHub, Twitter, location, company, and bio. Unmatched text goes to Notes."></textarea>
+      <div style="margin-top:6px;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+        <button class="btn primary" onclick="parseManualPaste()">🔍 Parse & fill</button>
+        <button class="btn ghost" onclick="document.getElementById('mPaste').value=''">Clear</button>
+        <span class="muted tiny" id="parseReport"></span>
+      </div>
+    </div>
     <div class="li-grid">
       <div><label>Name</label><input id="mName" placeholder="Boris Nakshun"></div>
       <div><label>Company / role</label><input id="mCompany" placeholder="Tech lead, hunting senior leadership"></div>
@@ -453,14 +462,136 @@ async function loadLeads() {
   } catch (err) { showError('Leads load: ' + err.message); }
 }
 
+// Heuristic field extractor. Best-effort — user can edit after.
+function extractFields(text) {
+  const out = { found: [] };
+  const lines = text.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+
+  const email = text.match(/[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/);
+  if (email) { out.email = email[0]; out.found.push('email'); }
+
+  const li = text.match(/(?:https?:\/\/)?(?:www\.)?linkedin\.com\/(?:in|company|pub)\/[A-Za-z0-9_\-%]+\/?/i);
+  if (li) {
+    let u = li[0];
+    if (!/^https?:/i.test(u)) u = 'https://' + u.replace(/^www\./i, '');
+    out.linkedin_url = u;
+    out.found.push('linkedin');
+  }
+
+  const gh = text.match(/github\.com\/([A-Za-z0-9][A-Za-z0-9-]{0,38})/i);
+  if (gh && !['orgs','features','pricing','login','signup','marketplace','topics'].includes(gh[1].toLowerCase())) {
+    out.github_handle = gh[1]; out.found.push('github');
+  }
+
+  const tw = text.match(/(?:twitter|x)\.com\/([A-Za-z0-9_]{1,15})/i);
+  if (tw && !['home','explore','notifications','messages','i'].includes(tw[1].toLowerCase())) {
+    out.twitter = tw[1]; out.found.push('twitter');
+  }
+
+  // Name — first line matching 2–4 capitalized word pattern (title case)
+  for (const line of lines.slice(0, 6)) {
+    if (/^[A-Z][a-zA-Z'.-]+(?:\s+[A-Z][a-zA-Z'.-]+){1,3}$/.test(line) && line.length < 50) {
+      out.name = line; out.found.push('name'); break;
+    }
+  }
+
+  // Location — "City, Region" pattern
+  for (const line of lines) {
+    if (/^[A-Z][a-zA-Z .-]+,\s+[A-Z][a-zA-Z .-]+(?:,\s+[A-Z][a-zA-Z .-]+)?$/.test(line) && line.length < 80) {
+      out.location = line; out.found.push('location'); break;
+    }
+  }
+
+  // Company — LinkedIn patterns: "Role at Company", "Company · Full-time"
+  for (const line of lines) {
+    const m1 = line.match(/\bat\s+([A-Z][A-Za-z0-9 &.'()-]{2,60}?)(?:\s*[·|,]|\s+\(|$)/);
+    if (m1) { out.company = m1[1].trim(); out.found.push('company'); break; }
+    const m2 = line.match(/^([A-Z][A-Za-z0-9 &.'()-]{2,60})\s*·\s*(?:Full-time|Part-time|Contract|Self-employed|Freelance|Internship)/i);
+    if (m2) { out.company = m2[1].trim(); out.found.push('company'); break; }
+  }
+
+  // Bio — prefer "About" section, fallback to longest prose line
+  const aboutIdx = lines.findIndex(l => /^about$/i.test(l));
+  const breaks = new Set(['top skills','skills','experience','education','activity','featured','languages','certifications','volunteer','recommendations','contact','publications','projects','awards','patents','courses','organizations','interests']);
+  if (aboutIdx >= 0) {
+    const bio = [];
+    for (let i = aboutIdx + 1; i < lines.length; i++) {
+      const ll = lines[i].toLowerCase();
+      const firstTwo = ll.split(/\s+/).slice(0, 2).join(' ');
+      if (breaks.has(ll) || breaks.has(firstTwo) || breaks.has(ll.split(/\s+/)[0])) break;
+      bio.push(lines[i]);
+      if (bio.join(' ').length > 1200) break;
+    }
+    if (bio.length) { out.bio = bio.join(' ').slice(0, 1200); out.found.push('bio'); }
+  }
+  if (!out.bio) {
+    let best = '';
+    for (const line of lines) {
+      if (line.length > 100 && line.length < 600 && line.split(' ').length >= 12 && !/https?:\/\//.test(line) && !/@/.test(line)) {
+        if (line.length > best.length) best = line;
+      }
+    }
+    if (best) { out.bio = best; out.found.push('bio'); }
+  }
+
+  // Tier guess — keywords
+  const lc = text.toLowerCase();
+  if (/\b(customer|paid|invoice)\b/.test(lc)) out.tier = 'customer';
+  else if (/\b(audit|diagnostic|demo|call booked)\b/.test(lc)) out.tier = 'audit_request';
+  else if (/\b(replied|responded|interested|asked)\b/.test(lc)) out.tier = 'issue_author';
+  else if (/\b(liked|reacted|thanks|thumbs up)\b/.test(lc)) out.tier = 'star';
+  else if (/\b(following|watching|subscribed)\b/.test(lc)) out.tier = 'watcher';
+
+  return out;
+}
+
+function parseManualPaste() {
+  const raw = document.getElementById('mPaste').value;
+  if (!raw.trim()) return showError('Paste something first');
+  const res = extractFields(raw);
+
+  const setIfEmpty = (id, v) => {
+    if (!v) return false;
+    const el = document.getElementById(id);
+    if (!el || el.value) return false;
+    el.value = v;
+    el.style.background = '#1a2e1a';
+    setTimeout(() => el.style.background = '', 1500);
+    return true;
+  };
+  const filled = [];
+  if (setIfEmpty('mName', res.name)) filled.push('name');
+  if (setIfEmpty('mEmail', res.email)) filled.push('email');
+  if (setIfEmpty('mLinkedIn', res.linkedin_url)) filled.push('LinkedIn');
+  if (setIfEmpty('mGithub', res.github_handle)) filled.push('GitHub');
+  if (setIfEmpty('mTwitter', res.twitter)) filled.push('Twitter');
+  if (setIfEmpty('mLocation', res.location)) filled.push('location');
+  if (setIfEmpty('mCompany', res.company)) filled.push('company');
+  if (setIfEmpty('mBio', res.bio)) filled.push('bio');
+  if (res.tier) {
+    const sel = document.getElementById('mTier');
+    if (sel) sel.value = res.tier;
+    filled.push('tier=' + res.tier);
+  }
+  // Append raw paste to notes
+  const notesEl = document.getElementById('mNotes');
+  const sep = notesEl.value.trim() ? '\n\n--- PASTED ' + new Date().toLocaleString() + ' ---\n' : '';
+  notesEl.value = (notesEl.value + sep + raw).slice(0, 10000);
+
+  document.getElementById('parseReport').textContent = filled.length
+    ? `Filled: ${filled.join(', ')}. Review + edit before saving.`
+    : 'Nothing auto-detected — paste visible in Notes. Fill manually.';
+}
+
 function openManualForm() {
   document.getElementById('manualForm').style.display = '';
   document.getElementById('mName').focus();
 }
 function closeManualForm() {
   document.getElementById('manualForm').style.display = 'none';
-  ['mName','mCompany','mLinkedIn','mEmail','mGithub','mTwitter','mLocation','mBio','mNextAction','mNotes']
+  ['mName','mCompany','mLinkedIn','mEmail','mGithub','mTwitter','mLocation','mBio','mNextAction','mNotes','mPaste']
     .forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+  document.getElementById('parseReport').textContent = '';
 }
 async function submitManualContact() {
   const payload = {

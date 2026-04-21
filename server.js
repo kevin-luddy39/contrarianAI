@@ -814,6 +814,39 @@ app.get('/api/admin/intel-contacts', requireAdmin, async (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
+// Manual contact creation for non-GitHub sources (LinkedIn DMs, email threads,
+// conference/conversation leads). All fields optional except needs at least one
+// identifier (name / github_handle / email / linkedin_url).
+app.post('/api/admin/intel-contact', requireAdmin, async (req, res) => {
+  try {
+    const p = req.body || {};
+    if (!p.name && !p.github_handle && !p.email && !p.linkedin_url) {
+      return res.status(400).json({ error: 'at least one of name/github_handle/email/linkedin_url required' });
+    }
+    const r = await pool.query(
+      `INSERT INTO contacts
+        (github_handle, email, name, company, linkedin_url, twitter, website, bio, location,
+         tier, source, notes, next_action)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13)
+       RETURNING id`,
+      [
+        p.github_handle || null, p.email || null, p.name || null, p.company || null,
+        p.linkedin_url || null, p.twitter || null, p.website || null,
+        p.bio || null, p.location || null,
+        p.tier || 'visit', p.source || 'manual', p.notes || null, p.next_action || null,
+      ]
+    );
+    const id = r.rows[0].id;
+    await pool.query(
+      `INSERT INTO intel_events (contact_id, source, event_type, metadata)
+       VALUES ($1, 'manual', $2, $3)`,
+      [id, p.event_type || 'manual_add',
+       JSON.stringify({ reason: p.reason || 'manual', via: p.via || null })]
+    );
+    res.json({ ok: true, id });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
 app.get('/api/admin/intel-contact/:id', requireAdmin, async (req, res) => {
   try {
     const c = await pool.query(`SELECT * FROM contacts WHERE id = $1`, [req.params.id]);

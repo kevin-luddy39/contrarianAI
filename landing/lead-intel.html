@@ -191,7 +191,38 @@ input.action{width:100%;background:var(--s2);border:1px solid var(--border);colo
       <option value="recent">Most recent</option>
     </select>
     <span class="muted" id="leadsCount"></span>
+    <button class="btn primary" style="margin-left:auto" onclick="openManualForm()">+ Add manual contact</button>
   </div>
+
+  <div id="manualForm" style="display:none;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:16px;margin-bottom:12px">
+    <h3 style="font-size:0.78rem;margin-bottom:10px">Add manual contact (LinkedIn, email, conversation)</h3>
+    <div class="li-grid">
+      <div><label>Name</label><input id="mName" placeholder="Boris Nakshun"></div>
+      <div><label>Company / role</label><input id="mCompany" placeholder="Tech lead, hunting senior leadership"></div>
+      <div><label>LinkedIn URL</label><input id="mLinkedIn" placeholder="https://www.linkedin.com/in/..."></div>
+      <div><label>Email</label><input id="mEmail"></div>
+      <div><label>GitHub handle</label><input id="mGithub" placeholder="(optional)"></div>
+      <div><label>Twitter</label><input id="mTwitter" placeholder="(optional)"></div>
+      <div><label>Location</label><input id="mLocation"></div>
+      <div><label>Tier</label>
+        <select id="mTier" style="width:100%;background:var(--s2);border:1px solid var(--border);color:var(--text);padding:6px 8px;border-radius:4px;font-family:inherit;font-size:0.8rem">
+          <option value="visit">visit (touched)</option>
+          <option value="star">star-equivalent (reacted/liked)</option>
+          <option value="watcher">watcher (following)</option>
+          <option value="issue_author">high-intent (replied / asked)</option>
+          <option value="audit_request">audit lead</option>
+          <option value="customer">customer</option>
+        </select>
+      </div>
+      <div><label>Source</label><input id="mSource" value="linkedin" placeholder="linkedin / email / conference"></div>
+      <div class="full"><label>Bio (one line — hook for ICP scoring)</label><input id="mBio" placeholder="SQL / architecture / legacy modernization / gov + commercial · job-hunting senior leadership"></div>
+      <div class="full"><label>Next action</label><input id="mNextAction" placeholder="e.g. sent reply w/ Bell Tuning link 4/21, awaiting response"></div>
+      <div class="full"><label>Notes</label><textarea id="mNotes" class="notes" placeholder="Context: 17-year connection, colleague from prior employer. Commented 'Thanks' on context-inspector post 4/17."></textarea></div>
+    </div>
+    <button class="btn primary" onclick="submitManualContact()">Save contact</button>
+    <button class="btn ghost" onclick="closeManualForm()">Cancel</button>
+  </div>
+
   <div class="tbl-wrap"><table id="leadsTable"></table></div>
 </div>
 
@@ -422,6 +453,45 @@ async function loadLeads() {
   } catch (err) { showError('Leads load: ' + err.message); }
 }
 
+function openManualForm() {
+  document.getElementById('manualForm').style.display = '';
+  document.getElementById('mName').focus();
+}
+function closeManualForm() {
+  document.getElementById('manualForm').style.display = 'none';
+  ['mName','mCompany','mLinkedIn','mEmail','mGithub','mTwitter','mLocation','mBio','mNextAction','mNotes']
+    .forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+}
+async function submitManualContact() {
+  const payload = {
+    name: document.getElementById('mName').value.trim() || null,
+    company: document.getElementById('mCompany').value.trim() || null,
+    linkedin_url: document.getElementById('mLinkedIn').value.trim() || null,
+    email: document.getElementById('mEmail').value.trim() || null,
+    github_handle: document.getElementById('mGithub').value.trim() || null,
+    twitter: document.getElementById('mTwitter').value.trim() || null,
+    location: document.getElementById('mLocation').value.trim() || null,
+    tier: document.getElementById('mTier').value,
+    source: document.getElementById('mSource').value.trim() || 'manual',
+    bio: document.getElementById('mBio').value.trim() || null,
+    next_action: document.getElementById('mNextAction').value.trim() || null,
+    notes: document.getElementById('mNotes').value.trim() || null,
+  };
+  if (!payload.name && !payload.linkedin_url && !payload.email && !payload.github_handle) {
+    return showError('Need at least name, LinkedIn URL, email, or GitHub handle');
+  }
+  try {
+    const r = await api('/api/admin/intel-contact', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    showNote('Saved contact id=' + r.id);
+    closeManualForm();
+    loadLeads();
+  } catch (err) { showError('Save: ' + err.message); }
+}
+
 function dmTemplate(c) {
   const firstName = (c.name || c.github_handle || '').split(' ')[0];
   const pathology = c.bio && /rag/i.test(c.bio) ? 'retrieval noise' :
@@ -441,8 +511,12 @@ function renderLeads(rows) {
         <div class="ch">
           ${r.avatar_url ? `<img class="avatar" src="${esc(r.avatar_url)}" alt="">` : `<div class="avatar"></div>`}
           <div>
-            <div class="handle"><a href="https://github.com/${esc(r.github_handle)}" target="_blank" onclick="event.stopPropagation()">@${esc(r.github_handle)}</a></div>
-            <div class="muted tiny">${esc(r.name || '')}${r.email ? ' · '+esc(r.email) : ''}</div>
+            <div class="handle">${r.github_handle
+              ? `<a href="https://github.com/${esc(r.github_handle)}" target="_blank" onclick="event.stopPropagation()">@${esc(r.github_handle)}</a>`
+              : (r.linkedin_url
+                ? `<a href="${esc(r.linkedin_url)}" target="_blank" onclick="event.stopPropagation()">${esc(r.name || 'LinkedIn contact')}</a>`
+                : esc(r.name || r.email || `contact #${r.id}`))}</div>
+            <div class="muted tiny">${esc(r.github_handle ? (r.name || '') : (r.source || 'manual'))}${r.email ? ' · '+esc(r.email) : ''}</div>
           </div>
         </div>
       </td>
@@ -522,7 +596,11 @@ async function loadQueue() {
           <div class="q-row">
             ${r.avatar_url ? `<img class="avatar" style="width:24px;height:24px" src="${esc(r.avatar_url)}">` : '<div class="avatar" style="width:24px;height:24px"></div>'}
             <div class="grow">
-              <a class="link" href="https://github.com/${esc(r.github_handle)}" target="_blank">@${esc(r.github_handle)}</a>
+              ${r.github_handle
+                ? `<a class="link" href="https://github.com/${esc(r.github_handle)}" target="_blank">@${esc(r.github_handle)}</a>`
+                : (r.linkedin_url
+                  ? `<a class="link" href="${esc(r.linkedin_url)}" target="_blank">${esc(r.name || 'LinkedIn')}</a>`
+                  : esc(r.name || r.email || `#${r.id}`))}
               ${r.company ? ` · <span class="muted tiny">${esc(r.company.slice(0, 30))}</span>` : ''}
               <div class="q-action">${esc(r.suggested_action || '')} · score ${Math.round(r.engagement_score||0)} · icp ${Math.round(r.icp_fit||0)}</div>
             </div>

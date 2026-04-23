@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bell Tuning Rapid Audit — $2,500 / 48-hour turnaround | contrarianAI</title>
+    <meta name="description" content="Productized Bell Tuning audit. $2,500 flat. 48-hour turnaround. Five sensors run against your retrieval / agent pipeline. PDF report with bell curves, flagged pathologies, prioritized fixes. Walkthrough call + 7 days of Q&A.">
+    <meta property="og:title" content="Bell Tuning Rapid Audit — $2,500 / 48-hour turnaround">
+    <meta property="og:description" content="5 sensors, PDF report, flagged pathologies, prioritized fixes. Limited to 3/week.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://contrarianai-landing.onrender.com/bell-tuning-rapid-audit.html">
+    <meta name="twitter:card" content="summary_large_image">
+    <link rel="canonical" href="https://contrarianai-landing.onrender.com/bell-tuning-rapid-audit.html">
+    <style>
+        :root {
+            --bg: #0a0a0a;
+            --surface: #141414;
+            --surface-2: #1f1f1f;
+            --border: #262626;
+            --text: #e5e5e5;
+            --text-muted: #a3a3a3;
+            --accent: #f97316;
+            --accent-hover: #fb923c;
+            --danger: #ef4444;
+            --success: #22c55e;
+            --info: #3b82f6;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; }
+        .container { max-width: 800px; margin: 0 auto; padding: 0 24px; }
+
+        nav { border-bottom: 1px solid var(--border); padding: 16px 0; }
+        nav .container { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+        .logo { font-size: 1.25rem; font-weight: 700; letter-spacing: -0.02em; text-decoration: none; color: var(--text); }
+        .logo span { color: var(--accent); }
+        .nav-links { display: flex; gap: 20px; align-items: center; }
+        .nav-links a { text-decoration: none; font-size: 0.9rem; color: var(--text-muted); }
+        .nav-links a.primary { color: var(--accent); font-weight: 600; }
+
+        .hero { padding: 60px 0 40px; text-align: center; }
+        .eyebrow { display: inline-block; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.15em; color: var(--accent); background: rgba(249, 115, 22, 0.1); border: 1px solid rgba(249, 115, 22, 0.3); border-radius: 999px; padding: 6px 14px; margin-bottom: 24px; }
+        .hero h1 { font-size: clamp(2rem, 5vw, 2.8rem); font-weight: 800; line-height: 1.15; letter-spacing: -0.03em; margin-bottom: 20px; }
+        .hero h1 em { color: var(--accent); font-style: normal; }
+        .hero .subtitle { font-size: 1.1rem; color: var(--text-muted); max-width: 620px; margin: 0 auto 28px; }
+        .price-badge { display: inline-flex; align-items: baseline; gap: 10px; margin-bottom: 24px; }
+        .price-badge .amount { font-size: 2.4rem; font-weight: 800; color: var(--accent); letter-spacing: -0.03em; }
+        .price-badge .unit { font-size: 1rem; color: var(--text-muted); }
+        .btn { display: inline-block; font-weight: 700; font-size: 1.05rem; padding: 16px 36px; border-radius: 8px; text-decoration: none; transition: all 0.2s; cursor: pointer; border: none; }
+        .btn-primary { background: var(--accent); color: #000; }
+        .btn-primary:hover { background: var(--accent-hover); }
+        .btn-secondary { background: transparent; color: var(--accent); border: 2px solid var(--accent); margin-left: 12px; }
+        .btn-secondary:hover { background: var(--accent); color: #000; }
+        .scarcity { display: inline-flex; align-items: center; gap: 8px; margin-top: 18px; color: var(--success); font-weight: 600; font-size: 0.9rem; }
+        .scarcity::before { content: "\2713"; display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border: 2px solid var(--success); border-radius: 50%; font-size: 0.75rem; }
+
+        section { padding: 48px 0; border-top: 1px solid var(--border); }
+        section h2 { font-size: 1.6rem; font-weight: 700; margin-bottom: 16px; letter-spacing: -0.02em; }
+        section .lead { color: var(--text-muted); margin-bottom: 24px; font-size: 1rem; }
+
+        .twocol { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .col-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 24px; }
+        .col-card h3 { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 16px; color: var(--accent); }
+        .col-card ul { list-style: none; }
+        .col-card li { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 10px; padding-left: 20px; position: relative; }
+        .col-card li::before { content: "\2022"; position: absolute; left: 6px; color: var(--accent); font-weight: 700; }
+
+        .pathology-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 8px; }
+        .path-chip { background: var(--surface-2); border: 1px solid var(--border); border-left: 4px solid var(--danger); border-radius: 6px; padding: 14px 18px; }
+        .path-chip .name { font-weight: 700; color: var(--text); font-size: 0.95rem; margin-bottom: 4px; }
+        .path-chip .desc { color: var(--text-muted); font-size: 0.85rem; }
+
+        .timeline { display: flex; gap: 0; margin-top: 24px; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+        .step { flex: 1; background: var(--surface); padding: 20px 18px; border-right: 1px solid var(--border); text-align: center; }
+        .step:last-child { border-right: none; }
+        .step .num { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 50%; background: var(--accent); color: #000; font-weight: 800; font-size: 0.85rem; margin-bottom: 10px; }
+        .step .label { font-weight: 700; color: var(--text); font-size: 0.9rem; margin-bottom: 4px; }
+        .step .time { color: var(--text-muted); font-size: 0.8rem; }
+
+        .cta-block { background: linear-gradient(135deg, rgba(249, 115, 22, 0.1), rgba(249, 115, 22, 0.02)); border: 1px solid rgba(249, 115, 22, 0.3); border-radius: 12px; padding: 36px 32px; text-align: center; margin: 16px 0; }
+        .cta-block h2 { color: var(--accent); margin-bottom: 12px; }
+        .cta-block .lead { color: var(--text); margin-bottom: 24px; }
+
+        .fine-print { font-size: 0.85rem; color: var(--text-muted); margin-top: 16px; }
+        .fine-print a { color: var(--accent); text-decoration: none; }
+        .fine-print a:hover { text-decoration: underline; }
+
+        footer { padding: 36px 0; border-top: 1px solid var(--border); color: var(--text-muted); font-size: 0.85rem; text-align: center; }
+        footer a { color: var(--accent); text-decoration: none; }
+
+        @media (max-width: 600px) {
+            .twocol { grid-template-columns: 1fr; }
+            .pathology-list { grid-template-columns: 1fr; }
+            .timeline { flex-direction: column; }
+            .step { border-right: none; border-bottom: 1px solid var(--border); }
+            .step:last-child { border-bottom: none; }
+            .btn-secondary { margin-left: 0; margin-top: 12px; }
+        }
+    </style>
+</head>
+<body>
+
+<nav>
+    <div class="container">
+        <a href="/" class="logo">contrarian<span>AI</span></a>
+        <div class="nav-links">
+            <a href="/bell-tuning/">Bell Tuning framework</a>
+            <a href="/" class="primary">Main site</a>
+        </div>
+    </div>
+</nav>
+
+<header class="hero">
+    <div class="container">
+        <div class="eyebrow">Productized audit · 48-hour turnaround · 3 slots per week</div>
+        <h1>Bell Tuning <em>Rapid Audit</em></h1>
+        <p class="subtitle">
+            Five Bell Tuning sensors run against your retrieval / agent pipeline.
+            PDF report with bell curves, flagged pathologies, and a prioritized fix list.
+            Walkthrough call. Seven days of Q&amp;A. Fixed price. No scope negotiation.
+        </p>
+        <div class="price-badge">
+            <span class="amount">$2,500</span>
+            <span class="unit">USD · flat · one-time</span>
+        </div>
+        <div>
+            <a href="#BUY" class="btn btn-primary">Book an audit</a>
+            <a href="#what-you-get" class="btn btn-secondary">What's included</a>
+        </div>
+        <div class="scarcity">Two slots open this week</div>
+    </div>
+</header>
+
+<section id="what-you-get">
+    <div class="container">
+        <h2>What you get</h2>
+        <p class="lead">Deliverables, not deliberations. Everything listed below ships within 48 hours of data handoff.</p>
+        <div class="twocol">
+            <div class="col-card">
+                <h3>You receive</h3>
+                <ul>
+                    <li>All 5 Bell Tuning sensors run against your data: context-inspector, retrieval-auditor, tool-call-grader, predictor-corrector, audit-report-generator</li>
+                    <li>8-12 page PDF report with bell curves of your per-query alignment distribution</li>
+                    <li>Flagged pathologies by kind, with severity scores and concrete examples from your data</li>
+                    <li>Prioritized fix list (3-5 items), ranked by effort and impact</li>
+                    <li>30-minute Zoom walkthrough of findings</li>
+                    <li>7 days of Slack / email Q&amp;A after delivery</li>
+                </ul>
+            </div>
+            <div class="col-card">
+                <h3>You provide</h3>
+                <ul>
+                    <li>Retriever config, or read-access to your pipeline</li>
+                    <li>10-20 sample queries representative of production traffic</li>
+                    <li>Small corpus sample (1k-10k chunks)</li>
+                    <li>30-minute kickoff call to confirm scope</li>
+                    <li>Any existing eval set or ground-truth labels (optional, useful)</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section>
+    <div class="container">
+        <h2>Pathologies the audit flags</h2>
+        <p class="lead">None of these move precision@K cleanly. All are visible in the shape of your retrieval distribution before they surface as user complaints.</p>
+        <div class="pathology-list">
+            <div class="path-chip">
+                <div class="name">Score miscalibration</div>
+                <div class="desc">Rank order stays right while score values drift as the corpus grows. Precision@K is blind to it.</div>
+            </div>
+            <div class="path-chip">
+                <div class="name">Rank inversion</div>
+                <div class="desc">Top-K contains all relevant docs but in reverse order. LLM reads top-down, hallucinates.</div>
+            </div>
+            <div class="path-chip">
+                <div class="name">Redundancy attacks</div>
+                <div class="desc">Near-duplicate sources evict distinct ones from top-K. Answer is confidently incomplete.</div>
+            </div>
+            <div class="path-chip">
+                <div class="name">Bimodal retrieval</div>
+                <div class="desc">Two content clusters both score high. Wrong cluster wins top-K. Confidently wrong answer.</div>
+            </div>
+            <div class="path-chip">
+                <div class="name">Contamination drift</div>
+                <div class="desc">Off-topic chunks slowly accumulate in top-K. Mean alignment drops until complaints arrive.</div>
+            </div>
+            <div class="path-chip">
+                <div class="name">Tool fixation / agent loops</div>
+                <div class="desc">Per-tool-call relevance distribution collapses. Loop detectable several turns before production breaks.</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section>
+    <div class="container">
+        <h2>48-hour timeline</h2>
+        <p class="lead">Clock starts at data handoff, not at purchase. Kickoff call same day.</p>
+        <div class="timeline">
+            <div class="step">
+                <div class="num">1</div>
+                <div class="label">Kickoff call</div>
+                <div class="time">Same day (30 min)</div>
+            </div>
+            <div class="step">
+                <div class="num">2</div>
+                <div class="label">Data handoff</div>
+                <div class="time">Hours 0-4</div>
+            </div>
+            <div class="step">
+                <div class="num">3</div>
+                <div class="label">Sensor analysis</div>
+                <div class="time">Hours 4-36</div>
+            </div>
+            <div class="step">
+                <div class="num">4</div>
+                <div class="label">Report delivered</div>
+                <div class="time">Hour 48</div>
+            </div>
+            <div class="step">
+                <div class="num">5</div>
+                <div class="label">Walkthrough</div>
+                <div class="time">Day 3 (30 min)</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section>
+    <div class="container">
+        <h2>Who this is for</h2>
+        <div class="twocol">
+            <div class="col-card">
+                <h3>Good fit</h3>
+                <ul>
+                    <li>Team already running RAG or multi-agent in production</li>
+                    <li>Users reporting "plausible but wrong" answers</li>
+                    <li>Eval suite still passing, but quality feels off</li>
+                    <li>Corpus or agent complexity has grown since launch</li>
+                    <li>Need a defensible, numbers-backed read before a bigger decision (re-architecture, re-embedding, rewrite)</li>
+                </ul>
+            </div>
+            <div class="col-card">
+                <h3>Not the right fit</h3>
+                <ul>
+                    <li>Still in prototype phase, no production traffic</li>
+                    <li>Looking for implementation labor (this is diagnosis, not remediation)</li>
+                    <li>Need a custom research project or bespoke framework</li>
+                    <li>Under $10k annual AI budget (this is $2,500; the remediation work that follows costs more)</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="BUY">
+    <div class="container">
+        <div class="cta-block">
+            <h2>Book an audit</h2>
+            <p class="lead">$2,500 flat. 48-hour turnaround. Two slots open this week.</p>
+            <a href="REPLACE_WITH_STRIPE_LINK?ref=landing-rapid-audit" class="btn btn-primary">Pay now</a>
+            <a href="mailto:kevin.luddy39@gmail.com?subject=Bell%20Tuning%20Rapid%20Audit%20-%20fit%20check" class="btn btn-secondary">Discuss fit first</a>
+            <p class="fine-print">
+                Not sure if your setup fits? Email first; we'll confirm fit before you pay.
+                <br>
+                Full framework: <a href="/bell-tuning/">Bell Tuning manifesto + whitepapers + open-source sensors</a>
+            </p>
+        </div>
+    </div>
+</section>
+
+<section>
+    <div class="container">
+        <h2>How this relates to the open-source sensors</h2>
+        <p style="color: var(--text-muted); margin-bottom: 14px;">
+            The five Bell Tuning sensors are MIT-licensed and installable via <code style="background: var(--surface); padding: 2px 8px; border-radius: 4px; color: var(--accent);">npx contrarianai-context-inspector --install-mcp</code>. They are free. If you want to run them yourself, you do not need this audit.
+        </p>
+        <p style="color: var(--text-muted);">
+            The audit exists for teams that want the analysis done for them in 48 hours with a defensible report attached. You're paying for the turnaround, the pathology interpretation, and the prioritized fix list - not the tools themselves.
+        </p>
+    </div>
+</section>
+
+<footer>
+    <div class="container">
+        Bell Tuning&trade; is a contribution of <a href="/">contrarianAI</a>. All sensors MIT-licensed.
+        <br>
+        <a href="/bell-tuning/">Framework</a> &nbsp;·&nbsp;
+        <a href="/">Main site</a> &nbsp;·&nbsp;
+        <a href="mailto:kevin.luddy39@gmail.com">kevin.luddy39@gmail.com</a>
+    </div>
+</footer>
+
+</body>
+</html>

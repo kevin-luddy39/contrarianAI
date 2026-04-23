@@ -149,6 +149,7 @@ input.action{width:100%;background:var(--s2);border:1px solid var(--border);colo
   <button onclick="showTab('queue',this)">Action Queue <span class="count" id="cntQueue">—</span></button>
   <button onclick="showTab('sources',this)">Sources</button>
   <button onclick="showTab('linkedin',this)">LinkedIn</button>
+  <button onclick="showTab('dms',this)">DM Composer <span class="count" id="cntDms">—</span></button>
   <button onclick="showTab('raw',this)">Raw Data</button>
 </div>
 
@@ -278,6 +279,19 @@ input.action{width:100%;background:var(--s2);border:1px solid var(--border);colo
   <div class="tbl-wrap"><table id="liTable"></table></div>
 </div>
 
+<!-- DM COMPOSER -->
+<div class="panel" id="panel-dms">
+  <div class="filters" style="margin-bottom:14px">
+    <span class="muted">$2,500 Bell Tuning Rapid Audit · warm-pool DM queue</span>
+    <button class="btn" onclick="loadDmComposer()" style="margin-left:auto">↻ Reload</button>
+    <a href="/bell-tuning-rapid-audit.html" target="_blank" class="btn ghost">View landing page</a>
+  </div>
+
+  <div id="dmComposerContent">
+    <p class="muted">Loading...</p>
+  </div>
+</div>
+
 <!-- RAW -->
 <div class="panel" id="panel-raw">
   <div class="chart-box"><h3>Recent Intel Events (last 200)</h3><div id="eventsList" style="max-height:600px;overflow:auto;font-size:0.75rem"></div></div>
@@ -321,7 +335,99 @@ function showTab(t, btn) {
   if (t === 'queue') loadQueue();
   if (t === 'sources') loadSources();
   if (t === 'linkedin') loadLinkedIn();
+  if (t === 'dms') loadDmComposer();
   if (t === 'raw') loadRaw();
+}
+
+async function loadDmComposer() {
+  const host = document.getElementById('dmComposerContent');
+  host.innerHTML = '<p class="muted">Loading warm-pool DMs…</p>';
+  try {
+    const data = await api('/api/admin/dm-composer?limit=15');
+    const p1 = data.pool1?.items || [];
+    const p2 = data.pool2?.items || [];
+    const total = p1.length + p2.length;
+    document.getElementById('cntDms').textContent = total;
+
+    const renderItem = (item, idx, poolName) => {
+      const sent = item.dm_sent;
+      const id = poolName === 'pool1' ? item.id : item.id;
+      const header = poolName === 'pool1'
+        ? `<b>${esc(item.name || '(no name)')}</b> <span class="muted">&lt;${esc(item.email || 'no email')}&gt;</span> · ${esc(item.company || '—')} · <span class="muted tiny">submitted ${fmtDay(item.created_at)}</span>`
+        : `<b>${esc(item.name || '@'+(item.github_handle||'?'))}</b> <span class="badge ${item.tier||'visit'}">${esc(item.tier||'—')}</span> · ${esc(item.company || '—')} · <span class="muted tiny">first seen ${fmtDay(item.first_seen)}</span> · score ${fmt(Math.round((item.engagement_score||0)*10)/10)}, icp ${fmt(Math.round((item.icp_fit||0)*10)/10)}`;
+      const contextLine = poolName === 'pool1'
+        ? (item.pain ? `<div class="muted tiny" style="margin:4px 0">Pain: "${esc(item.pain.slice(0,220))}${item.pain.length>220?'…':''}"</div>` : '')
+        : (item.bio ? `<div class="muted tiny" style="margin:4px 0">Bio: ${esc(item.bio.slice(0,180))}${item.bio.length>180?'…':''}</div>` : '');
+      return `
+<div style="background:var(--surface);border:1px solid var(--border);border-left:4px solid ${sent?'var(--green)':'var(--accent)'};border-radius:6px;padding:12px;margin-bottom:10px">
+  <div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;align-items:flex-start">
+    <div style="flex:1;min-width:0">${header}${contextLine}</div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap">
+      <button class="btn" onclick="copyDm(this,${idx},'${poolName}')">📋 Copy DM</button>
+      ${sent
+        ? `<span class="badge" style="background:var(--green);color:#0a0a0a;padding:5px 10px">✓ Sent</span>`
+        : `<button class="btn primary" onclick="markDmSent(this,${poolName==='pool1'?item.id:'null'},${poolName==='pool2'?item.id:'null'},'${poolName}')">Mark sent</button>`
+      }
+    </div>
+  </div>
+  <pre class="dm-tmpl" id="dm-${poolName}-${idx}" style="margin-top:8px">${esc(item.dm_text)}</pre>
+  <div class="muted tiny" style="margin-top:4px">Tracking tag: <code>?ref=${esc(item.tracking_ref)}</code></div>
+</div>`;
+    };
+
+    const html = `
+<div style="margin-bottom:20px">
+  <h3 style="font-size:0.9rem;margin-bottom:10px;color:var(--accent)">${esc(data.pool1.label)} (${p1.length})</h3>
+  ${p1.length === 0 ? '<p class="muted">No unconverted audit_requests. Nothing in this pool.</p>' : p1.map((it,i) => renderItem(it,i,'pool1')).join('')}
+</div>
+<div>
+  <h3 style="font-size:0.9rem;margin-bottom:10px;color:var(--accent)">${esc(data.pool2.label)} (${p2.length})</h3>
+  ${p2.length === 0 ? '<p class="muted">No high-tier Lead Intel contacts yet.</p>' : p2.map((it,i) => renderItem(it,i,'pool2')).join('')}
+</div>
+`;
+    // stash data globally for copy handlers
+    window.__dmData = { pool1: p1, pool2: p2 };
+    host.innerHTML = html;
+  } catch (err) {
+    host.innerHTML = `<div class="error" style="display:block">DM Composer load: ${esc(err.message)}</div>`;
+  }
+}
+
+async function copyDm(btn, idx, poolName) {
+  const item = (window.__dmData || {})[poolName]?.[idx];
+  if (!item) return;
+  try {
+    await navigator.clipboard.writeText(item.dm_text);
+    const orig = btn.textContent;
+    btn.textContent = '✓ Copied';
+    btn.disabled = true;
+    setTimeout(() => { btn.textContent = orig; btn.disabled = false; }, 1800);
+  } catch (err) { showError('Copy failed: ' + err.message); }
+}
+
+async function markDmSent(btn, auditRequestId, contactId, poolName) {
+  const channel = prompt('Channel? (email / linkedin / twitter / dm / other)', 'email');
+  if (!channel) return;
+  const notes = prompt('Notes? (optional, skip with empty)', '') || null;
+  btn.disabled = true; btn.textContent = '...';
+  try {
+    await api('/api/admin/mark-dm-sent', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        pool: poolName,
+        audit_request_id: auditRequestId,
+        contact_id: contactId,
+        channel,
+        notes,
+      }),
+    });
+    showNote('DM logged. Reloading composer.');
+    loadDmComposer();
+  } catch (err) {
+    btn.disabled = false; btn.textContent = 'Mark sent';
+    showError('Mark sent failed: ' + err.message);
+  }
 }
 
 async function loadAll() {

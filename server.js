@@ -973,6 +973,175 @@ app.patch('/api/admin/intel-contact/:id', requireAdmin, async (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
+// ============================================================
+// DM Composer — pulls warm-pool leads and renders paste-ready DMs for the
+// $2,500 Bell Tuning Rapid Audit offer. Read-only (GET) + event-log (POST).
+// ============================================================
+
+const RAPID_AUDIT_STRIPE = 'https://buy.stripe.com/00w28sfq5gjS6Dg4Ia9IQ00';
+
+function renderPool1DM(lead) {
+  const pain = (lead.pain || '').trim();
+  const painExcerpt = pain.length > 280 ? pain.slice(0, 280) + '...' : pain;
+  const paraphrase = painExcerpt
+    || (lead.ai_stack ? `your ${lead.ai_stack} setup` : 'your AI setup');
+  const submitted = new Date(lead.created_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+  const firstName = lead.name ? String(lead.name).split(/\s+/)[0] : 'there';
+  const trackingLink = `${RAPID_AUDIT_STRIPE}?ref=dm-audit-lead-${lead.id}`;
+  return [
+    `Subject: Quick offer for the audit you asked about`,
+    ``,
+    `Hi ${firstName},`,
+    ``,
+    `You filled out the contrarianAI audit form back in ${submitted} asking about:`,
+    ``,
+    `  "${paraphrase}"`,
+    ``,
+    `We never closed the loop on that - that's on me.`,
+    ``,
+    `I'm productizing the audit work into a faster, cheaper SKU: the Bell Tuning Rapid Audit. $2,500 flat, 48-hour turnaround. Five sensors run against your retrieval / agent pipeline, 8-12 page PDF with flagged pathologies and prioritized fixes, 30-min walkthrough call, 7 days of Q&A after.`,
+    ``,
+    `Limited to 3 audits per week. Two slots open this week.`,
+    ``,
+    `If your original ask is still unresolved, this is the fastest path to a defensible answer. Pay link (no negotiation):`,
+    ``,
+    trackingLink,
+    ``,
+    `Or reply with current stack details and I'll confirm fit before you pay.`,
+    ``,
+    `Kevin`,
+  ].join('\n');
+}
+
+function renderPool2DM(contact) {
+  const firstName = contact.name ? String(contact.name).split(/\s+/)[0]
+    : (contact.github_handle ? '@' + contact.github_handle : 'there');
+  const trackingTag = contact.github_handle ? contact.github_handle : ('contact-' + contact.id);
+  const trackingLink = `${RAPID_AUDIT_STRIPE}?ref=dm-${contact.tier || 'leadintel'}-${trackingTag}`;
+  const signal = contact.tier === 'pr_author' ? 'opened a PR against contrarianAI'
+    : contact.tier === 'issue_author' ? 'opened an issue on contrarianAI'
+    : contact.tier === 'fork' ? 'forked contrarianAI'
+    : contact.tier === 'watcher' ? 'watched contrarianAI'
+    : 'starred contrarianAI/context-inspector';
+  return [
+    `Hi ${firstName},`,
+    ``,
+    `Saw you ${signal}. Curious whether you ended up using it in a real pipeline, or just bookmarked.`,
+    ``,
+    `Either way - I'm doing 3 Bell Tuning Rapid Audits this week. $2,500 fixed, 48hr turnaround, 5 sensors run against your retrieval pipeline, full PDF report, walkthrough call. If you're shipping RAG or agents in production and want a defensible read on retrieval-distribution health + flagged pathologies + prioritized fixes, this is the fastest version of the audit work I do.`,
+    ``,
+    `Pay link: ${trackingLink}`,
+    `Spec: https://contrarianai-landing.onrender.com/bell-tuning-rapid-audit.html`,
+    ``,
+    `No pitch beyond this - either it's useful or it's not.`,
+    ``,
+    `Kevin`,
+  ].join('\n');
+}
+
+app.get('/api/admin/dm-composer', requireAdmin, async (req, res) => {
+  try {
+    const limit = Math.min(parseInt(req.query.limit, 10) || 10, 50);
+
+    // Pool 1 — unconverted audit_requests
+    const pool1Res = await pool.query(`
+      SELECT
+        ar.id, ar.name, ar.email, ar.company, ar.role, ar.pain, ar.ai_stack, ar.created_at,
+        COALESCE(
+          (SELECT status FROM payments p
+           WHERE p.audit_request_id = ar.id
+           ORDER BY created_at DESC LIMIT 1),
+          'no_payment_sent'
+        ) AS payment_status,
+        EXISTS(
+          SELECT 1 FROM intel_events e
+          WHERE e.source = 'dm-composer'
+            AND e.event_type = 'dm_sent_pool1'
+            AND (e.metadata->>'audit_request_id')::int = ar.id
+        ) AS dm_sent
+      FROM audit_requests ar
+      WHERE ar.created_at > NOW() - INTERVAL '12 months'
+        AND NOT EXISTS (
+          SELECT 1 FROM payments p
+          WHERE p.audit_request_id = ar.id
+            AND p.status IN ('paid', 'succeeded', 'complete')
+        )
+      ORDER BY ar.created_at DESC
+      LIMIT $1
+    `, [limit]);
+
+    // Pool 2 — tier:star+ Lead Intel contacts
+    const pool2Res = await pool.query(`
+      SELECT
+        c.id, c.github_handle, c.name, c.email, c.company, c.bio, c.tier,
+        c.engagement_score, c.icp_fit, c.twitter, c.linkedin_url, c.first_seen,
+        EXISTS(
+          SELECT 1 FROM intel_events e
+          WHERE e.contact_id = c.id
+            AND e.source = 'dm-composer'
+            AND e.event_type = 'dm_sent_pool2'
+        ) AS dm_sent
+      FROM contacts c
+      WHERE c.tier IN ('star','watcher','fork','issue_author','pr_author','audit_request')
+        AND c.first_seen > NOW() - INTERVAL '12 months'
+      ORDER BY
+        CASE c.tier
+          WHEN 'pr_author' THEN 1 WHEN 'issue_author' THEN 2
+          WHEN 'fork' THEN 3 WHEN 'watcher' THEN 4
+          WHEN 'star' THEN 5 ELSE 9
+        END,
+        c.icp_fit DESC NULLS LAST,
+        c.engagement_score DESC
+      LIMIT $1
+    `, [limit]);
+
+    const pool1 = pool1Res.rows.map(lead => ({
+      ...lead,
+      dm_text: renderPool1DM(lead),
+      tracking_ref: `dm-audit-lead-${lead.id}`,
+    }));
+
+    const pool2 = pool2Res.rows.map(c => ({
+      ...c,
+      dm_text: renderPool2DM(c),
+      tracking_ref: `dm-${c.tier || 'leadintel'}-${c.github_handle || 'contact-' + c.id}`,
+    }));
+
+    res.json({
+      stripe_link: RAPID_AUDIT_STRIPE,
+      pool1: { label: 'Pool 1 — unconverted audit_requests (warmest)', items: pool1 },
+      pool2: { label: 'Pool 2 — tier:star+ Lead Intel (code-engaged)', items: pool2 },
+    });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.post('/api/admin/mark-dm-sent', requireAdmin, async (req, res) => {
+  try {
+    const { pool: poolName, audit_request_id, contact_id, channel, notes } = req.body || {};
+    if (poolName === 'pool1' && audit_request_id) {
+      await pool.query(
+        `INSERT INTO intel_events (source, event_type, metadata)
+         VALUES ('dm-composer', 'dm_sent_pool1', $1)`,
+        [JSON.stringify({ audit_request_id, channel: channel || 'manual', notes: notes || null })]
+      );
+      return res.json({ ok: true });
+    }
+    if (poolName === 'pool2' && contact_id) {
+      await pool.query(
+        `INSERT INTO intel_events (contact_id, source, event_type, metadata)
+         VALUES ($1, 'dm-composer', 'dm_sent_pool2', $2)`,
+        [contact_id, JSON.stringify({ channel: channel || 'manual', notes: notes || null })]
+      );
+      await pool.query(
+        `UPDATE contacts SET next_action = $1 WHERE id = $2`,
+        [`Rapid Audit DM sent ${new Date().toISOString().slice(0,10)}; follow up +5 days`, contact_id]
+      );
+      return res.json({ ok: true });
+    }
+    res.status(400).json({ error: 'Missing pool + audit_request_id/contact_id' });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
 app.get('/api/admin/intel-snapshots', requireAdmin, async (req, res) => {
   try {
     const source = req.query.source || null;

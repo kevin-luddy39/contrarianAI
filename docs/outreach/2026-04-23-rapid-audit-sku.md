@@ -80,7 +80,7 @@ I'm productizing the audit work into a faster, cheaper SKU - the Bell Tuning Rap
 
 Limited to 3 audits per week. Two slots open this week.
 
-If your original ask is still unresolved, this is the fastest path to a defensible answer. Pay link, no negotiation: [STRIPE_LINK]?ref=dm-audit-lead-[id]
+If your original ask is still unresolved, this is the fastest path to a defensible answer. Pay link, no negotiation: https://buy.stripe.com/00w28sfq5gjS6Dg4Ia9IQ00?ref=dm-audit-lead-[id]
 
 Or reply with stack details and I'll confirm fit before you pay.
 
@@ -96,7 +96,7 @@ Saw you starred contrarianAI/context-inspector. Curious whether you ended up usi
 
 Either way - I'm doing 3 Bell Tuning Rapid Audits this week. $2,500 fixed, 48hr turnaround, 5 sensors run against your retrieval pipeline, full PDF report, walkthrough call. If you're shipping RAG or agents in production and want a defensible read on retrieval-distribution health + flagged pathologies + prioritized fixes, this is the fastest version of the audit work I do.
 
-Pay link: [STRIPE_LINK]?ref=dm-github-star-[handle]
+Pay link: https://buy.stripe.com/00w28sfq5gjS6Dg4Ia9IQ00?ref=dm-github-star-[handle]
 Spec: contrarianai-landing.onrender.com/bell-tuning-rapid-audit (or reply with stack details first)
 
 No pitch beyond this - either it's useful or it's not.
@@ -113,7 +113,7 @@ Hi [founder name],
 
 Following up on the connection note. Quick update: productized the Bell Tuning audit work into a fixed-price SKU - $2,500, 48-hour turnaround, 5 sensors against your retrieval / agent pipeline, full PDF report with flagged pathologies and prioritized fixes.
 
-If [their company] is at the stage where you're about to ship to production and want a defensible read on where the pipeline will break first, this is the fastest version of that read. Pay link: [STRIPE_LINK]?ref=dm-yc-[company-slug]
+If [their company] is at the stage where you're about to ship to production and want a defensible read on where the pipeline will break first, this is the fastest version of that read. Pay link: https://buy.stripe.com/00w28sfq5gjS6Dg4Ia9IQ00?ref=dm-yc-[company-slug]
 
 If the team isn't there yet, ignore. No follow-up beyond this.
 
@@ -166,7 +166,7 @@ DM if you want to discuss fit before paying.
 
 **First comment from your own account (link goes here, not in post body):**
 ```
-Pay link + full spec: [STRIPE_LINK]?ref=linkedin-rapid-audit-launch
+Pay link + full spec: https://buy.stripe.com/00w28sfq5gjS6Dg4Ia9IQ00?ref=linkedin-rapid-audit-launch
 ```
 
 ### r/LangChain "consulting gig of 2026" follow-up reply
@@ -176,7 +176,7 @@ Follow-up to my comment above for anyone currently looking at a stuck pipeline:
 
 I'm opening 3 slots this week for a productized version of the audit work I described. $2,500 fixed price, 48-hour turnaround from data handoff. Five sensors run against your retrieval / agent pipeline. 8-12 page PDF report with bell curves of your per-query alignment distribution, flagged pathologies (score miscalibration, rank inversion, redundancy, bimodal retrieval, contamination drift), prioritized fix list ranked by effort and impact. 30-minute Zoom walkthrough. 7 days of Slack / email Q&A.
 
-Pay link: [STRIPE_LINK]?ref=reddit-langchain-consulting-thread
+Pay link: https://buy.stripe.com/00w28sfq5gjS6Dg4Ia9IQ00?ref=reddit-langchain-consulting-thread
 
 Or DM first if you want to confirm fit before paying. Works best for teams already running RAG or multi-agent in production who are seeing silent quality degradation that the eval suite doesn't flag.
 
@@ -192,7 +192,7 @@ New: Bell Tuning Rapid Audit. $2,500 flat. 48-hour turnaround.
 
 3 slots/week. 2 open.
 
-[STRIPE_LINK]?ref=x-launch
+https://buy.stripe.com/00w28sfq5gjS6Dg4Ia9IQ00?ref=x-launch
 ```
 
 ---

@@ -203,7 +203,7 @@ That's the realistic same-day-to-this-week consulting-win path. The comment-and-
 | ID | Target | Status | Action date | Outcome | Notes |
 |----|--------|--------|-------------|---------|-------|
 | T0-01 | r/LangChain consulting gig | complete | 2026-04-23 | pending | Posted; awaiting thread engagement |
-| T0-02 | Arzule (YC W26) | complete | 2026-04-23 | pending | LinkedIn connect+message route (DM gated) |
+| T0-02 | Arzule (YC W26) - Jeffrey Lin, CTO | **connected** | 2026-04-23 | **accepted 2026-04-24** | Follow-up DM w/ partnership axes + 3 time slots sent 2026-04-24; awaiting reply |
 | T0-03 | Burt (YC W26) | complete | 2026-04-23 | pending | LinkedIn connect+message route |
 | T0-04 | Panta (YC W26) | complete | 2026-04-23 | pending | LinkedIn connect+message route |
 | T0-05 | Corelayer (YC W26) | complete | 2026-04-23 | pending | LinkedIn connect+message route |

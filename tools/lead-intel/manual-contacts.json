@@ -1,0 +1,65 @@
+[
+  {
+    "name": "Jeffrey Lin",
+    "company": "Arzule",
+    "linkedin_url": "",
+    "tier": "prospect",
+    "source": "linkedin",
+    "notes": "T0-02. YC W26. CTO, multi-agent coordination. Connected 2026-04-23, accepted 2026-04-24. Follow-up DM w/ partnership axes + 3 time slots sent 2026-04-24. Awaiting reply.",
+    "next_action": "Day 5 nudge 2026-04-29 if silent; Bell Tuning teardown offer"
+  },
+  {
+    "name": "Burt (founder)",
+    "company": "Burt",
+    "linkedin_url": "",
+    "tier": "prospect",
+    "source": "linkedin",
+    "notes": "T0-03. YC W26. Agent fine-tuning pitch. LinkedIn connect+message 2026-04-23. Pending acceptance. Pitch angle: feed production agent failure-pattern data into their fine-tuning pipeline.",
+    "next_action": "Day 7 unaccepted switch to X/email 2026-04-30"
+  },
+  {
+    "name": "Panta (founder)",
+    "company": "Panta",
+    "linkedin_url": "",
+    "tier": "prospect",
+    "source": "linkedin",
+    "notes": "T0-04. YC W26. Autonomous insurance brokerage. LinkedIn connect+message 2026-04-23. Pending acceptance. Pitch angle: regulated industry = audit-grade observability is non-optional.",
+    "next_action": "Day 7 unaccepted switch to X/email 2026-04-30"
+  },
+  {
+    "name": "Corelayer (founder)",
+    "company": "Corelayer",
+    "linkedin_url": "",
+    "tier": "prospect",
+    "source": "linkedin",
+    "notes": "T0-05. YC W26. On-call AI agents. LinkedIn connect+message 2026-04-23. Pending acceptance. Pitch angle: reliability is the product; tool-call-grader directly maps.",
+    "next_action": "Day 7 unaccepted switch to X/email 2026-04-30"
+  },
+  {
+    "name": "Tensol (founder)",
+    "company": "Tensol",
+    "linkedin_url": "",
+    "tier": "prospect",
+    "source": "linkedin",
+    "notes": "T0-06. YC W26. Hospitality guest comms agents. LinkedIn connect+message 2026-04-23. Pending acceptance. Pitch angle: per-tool-call relevance distribution catches silent-failure pattern.",
+    "next_action": "Day 7 unaccepted switch to X/email 2026-04-30"
+  },
+  {
+    "name": "Rinse (AI lead)",
+    "company": "Rinse",
+    "linkedin_url": "",
+    "tier": "prospect",
+    "source": "linkedin",
+    "notes": "T0-07. Series-funded logistics. Not YC but actively hiring AI engineers. LinkedIn connect+message 2026-04-23. Pending acceptance. Pitch angle: observability for ops-AI tools.",
+    "next_action": "Day 7 unaccepted switch to X/email 2026-04-30"
+  },
+  {
+    "name": "Technical_Standard80",
+    "company": "(unknown — r/MachineLearningJobs OP)",
+    "twitter": "Technical_Standard80",
+    "tier": "prospect",
+    "source": "reddit",
+    "notes": "T0-08. r/MachineLearningJobs urgent AI hire thread. DM sent 2026-04-23. Pending reply. Offer: fractional engagement bridging ship-vs-fix gap.",
+    "next_action": "Day 5 nudge 2026-04-29 if silent"
+  }
+]

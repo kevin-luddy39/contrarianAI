@@ -346,18 +346,31 @@ async function loadDmComposer() {
     const data = await api('/api/admin/dm-composer?limit=15');
     const p1 = data.pool1?.items || [];
     const p2 = data.pool2?.items || [];
-    const total = p1.length + p2.length;
+    const p3 = data.pool3?.items || [];
+    const total = p1.length + p2.length + p3.length;
     document.getElementById('cntDms').textContent = total;
 
     const renderItem = (item, idx, poolName) => {
       const sent = item.dm_sent;
-      const id = poolName === 'pool1' ? item.id : item.id;
-      const header = poolName === 'pool1'
-        ? `<b>${esc(item.name || '(no name)')}</b> <span class="muted">&lt;${esc(item.email || 'no email')}&gt;</span> · ${esc(item.company || '—')} · <span class="muted tiny">submitted ${fmtDay(item.created_at)}</span>`
-        : `<b>${esc(item.name || '@'+(item.github_handle||'?'))}</b> <span class="badge ${item.tier||'visit'}">${esc(item.tier||'—')}</span> · ${esc(item.company || '—')} · <span class="muted tiny">first seen ${fmtDay(item.first_seen)}</span> · score ${fmt(Math.round((item.engagement_score||0)*10)/10)}, icp ${fmt(Math.round((item.icp_fit||0)*10)/10)}`;
-      const contextLine = poolName === 'pool1'
-        ? (item.pain ? `<div class="muted tiny" style="margin:4px 0">Pain: "${esc(item.pain.slice(0,220))}${item.pain.length>220?'…':''}"</div>` : '')
-        : (item.bio ? `<div class="muted tiny" style="margin:4px 0">Bio: ${esc(item.bio.slice(0,180))}${item.bio.length>180?'…':''}</div>` : '');
+      let header, contextLine;
+      if (poolName === 'pool1') {
+        header = `<b>${esc(item.name || '(no name)')}</b> <span class="muted">&lt;${esc(item.email || 'no email')}&gt;</span> · ${esc(item.company || '—')} · <span class="muted tiny">submitted ${fmtDay(item.created_at)}</span>`;
+        contextLine = item.pain ? `<div class="muted tiny" style="margin:4px 0">Pain: "${esc(item.pain.slice(0,220))}${item.pain.length>220?'…':''}"</div>` : '';
+      } else if (poolName === 'pool2') {
+        header = `<b>${esc(item.name || '@'+(item.github_handle||'?'))}</b> <span class="badge ${item.tier||'visit'}">${esc(item.tier||'—')}</span> · ${esc(item.company || '—')} · <span class="muted tiny">first seen ${fmtDay(item.first_seen)}</span> · score ${fmt(Math.round((item.engagement_score||0)*10)/10)}, icp ${fmt(Math.round((item.icp_fit||0)*10)/10)}`;
+        contextLine = item.bio ? `<div class="muted tiny" style="margin:4px 0">Bio: ${esc(item.bio.slice(0,180))}${item.bio.length>180?'…':''}</div>` : '';
+      } else {
+        const handle = item.linkedin_url ? 'linkedin' : (item.email ? 'email' : (item.twitter ? 'twitter' : 'contact'));
+        header = `<b>${esc(item.name || '(no name)')}</b> <span class="badge ${item.tier||'visit'}">${esc(item.tier||'manual')}</span> · ${esc(item.company || '—')} · <span class="muted tiny">added ${fmtDay(item.first_seen)}</span> · via ${esc(handle)}`;
+        const ctxParts = [];
+        if (item.email) ctxParts.push(`<span class="muted tiny">&lt;${esc(item.email)}&gt;</span>`);
+        if (item.linkedin_url) ctxParts.push(`<a href="${esc(item.linkedin_url)}" target="_blank" class="tiny">LinkedIn</a>`);
+        if (item.notes) ctxParts.push(`<span class="muted tiny">Notes: ${esc(String(item.notes).slice(0,180))}${String(item.notes).length>180?'…':''}</span>`);
+        contextLine = ctxParts.length ? `<div style="margin:4px 0;display:flex;gap:8px;flex-wrap:wrap">${ctxParts.join(' · ')}</div>` : '';
+      }
+      const markArgs = poolName === 'pool1'
+        ? `${item.id},null,'pool1'`
+        : `null,${item.id},'${poolName}'`;
       return `
 <div style="background:var(--surface);border:1px solid var(--border);border-left:4px solid ${sent?'var(--green)':'var(--accent)'};border-radius:6px;padding:12px;margin-bottom:10px">
   <div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;align-items:flex-start">
@@ -366,7 +379,7 @@ async function loadDmComposer() {
       <button class="btn" onclick="copyDm(this,${idx},'${poolName}')">📋 Copy DM</button>
       ${sent
         ? `<span class="badge" style="background:var(--green);color:#0a0a0a;padding:5px 10px">✓ Sent</span>`
-        : `<button class="btn primary" onclick="markDmSent(this,${poolName==='pool1'?item.id:'null'},${poolName==='pool2'?item.id:'null'},'${poolName}')">Mark sent</button>`
+        : `<button class="btn primary" onclick="markDmSent(this,${markArgs})">Mark sent</button>`
       }
     </div>
   </div>
@@ -380,13 +393,17 @@ async function loadDmComposer() {
   <h3 style="font-size:0.9rem;margin-bottom:10px;color:var(--accent)">${esc(data.pool1.label)} (${p1.length})</h3>
   ${p1.length === 0 ? '<p class="muted">No unconverted audit_requests. Nothing in this pool.</p>' : p1.map((it,i) => renderItem(it,i,'pool1')).join('')}
 </div>
-<div>
+<div style="margin-bottom:20px">
   <h3 style="font-size:0.9rem;margin-bottom:10px;color:var(--accent)">${esc(data.pool2.label)} (${p2.length})</h3>
   ${p2.length === 0 ? '<p class="muted">No high-tier Lead Intel contacts yet.</p>' : p2.map((it,i) => renderItem(it,i,'pool2')).join('')}
 </div>
+<div>
+  <h3 style="font-size:0.9rem;margin-bottom:10px;color:var(--accent)">${esc(data.pool3?.label || 'Pool 3 — manually added contacts')} (${p3.length})</h3>
+  ${p3.length === 0 ? '<p class="muted">No manual contacts. Add via the Manual tab paste-parse form.</p>' : p3.map((it,i) => renderItem(it,i,'pool3')).join('')}
+</div>
 `;
     // stash data globally for copy handlers
-    window.__dmData = { pool1: p1, pool2: p2 };
+    window.__dmData = { pool1: p1, pool2: p2, pool3: p3 };
     host.innerHTML = html;
   } catch (err) {
     host.innerHTML = `<div class="error" style="display:block">DM Composer load: ${esc(err.message)}</div>`;

@@ -1039,6 +1039,33 @@ function renderPool2DM(contact) {
   ].join('\n');
 }
 
+function renderPool3DM(contact) {
+  const firstName = contact.name ? String(contact.name).split(/\s+/)[0]
+    : (contact.email ? contact.email.split('@')[0] : 'there');
+  const trackingTag = contact.github_handle
+    || (contact.linkedin_url ? 'li-' + contact.id : 'contact-' + contact.id);
+  const trackingLink = `${RAPID_AUDIT_STRIPE}?ref=dm-manual-${trackingTag}`;
+  const ctx = contact.company
+    ? `your work at ${contact.company}`
+    : (contact.notes ? String(contact.notes).slice(0, 120) : 'your AI / RAG / agent setup');
+  return [
+    `Hi ${firstName},`,
+    ``,
+    `Quick note - I'm running 3 Bell Tuning Rapid Audits this week and thought ${ctx} might be a fit.`,
+    ``,
+    `$2,500 fixed, 48hr turnaround. Five sensors run against your retrieval / agent pipeline. 8-12 page PDF report with bell curves of your per-query alignment distribution, flagged pathologies (score miscalibration, rank inversion, redundancy, bimodal retrieval, contamination drift), and a prioritized fix list ranked by effort and impact. 30-min walkthrough call + 7 days of Slack/email Q&A.`,
+    ``,
+    `This is the productized version of audit work I usually do as a 1-2 week engagement. Narrow scope, defensible deliverable, fast turnaround.`,
+    ``,
+    `Pay link: ${trackingLink}`,
+    `Spec: https://contrarianai-landing.onrender.com/bell-tuning-rapid-audit.html`,
+    ``,
+    `Reply with stack details first if you want to confirm fit before paying. Otherwise ignore - no follow-up beyond this.`,
+    ``,
+    `Kevin`,
+  ].join('\n');
+}
+
 app.get('/api/admin/dm-composer', requireAdmin, async (req, res) => {
   try {
     const limit = Math.min(parseInt(req.query.limit, 10) || 10, 50);
@@ -1107,10 +1134,35 @@ app.get('/api/admin/dm-composer', requireAdmin, async (req, res) => {
       tracking_ref: `dm-${c.tier || 'leadintel'}-${c.github_handle || 'contact-' + c.id}`,
     }));
 
+    // Pool 3 — manually added contacts (LinkedIn/conference/email/paste-parse)
+    const pool3Res = await pool.query(`
+      SELECT
+        c.id, c.github_handle, c.name, c.email, c.company, c.bio, c.tier, c.source,
+        c.engagement_score, c.icp_fit, c.twitter, c.linkedin_url, c.notes, c.first_seen,
+        EXISTS(
+          SELECT 1 FROM intel_events e
+          WHERE e.contact_id = c.id
+            AND e.source = 'dm-composer'
+            AND e.event_type = 'dm_sent_pool3'
+        ) AS dm_sent
+      FROM contacts c
+      WHERE c.source = 'manual'
+        AND c.first_seen > NOW() - INTERVAL '12 months'
+      ORDER BY c.icp_fit DESC NULLS LAST, c.engagement_score DESC, c.first_seen DESC
+      LIMIT $1
+    `, [limit]);
+
+    const pool3 = pool3Res.rows.map(c => ({
+      ...c,
+      dm_text: renderPool3DM(c),
+      tracking_ref: `dm-manual-${c.github_handle || (c.linkedin_url ? 'li-' + c.id : 'contact-' + c.id)}`,
+    }));
+
     res.json({
       stripe_link: RAPID_AUDIT_STRIPE,
       pool1: { label: 'Pool 1 — unconverted audit_requests (warmest)', items: pool1 },
       pool2: { label: 'Pool 2 — tier:star+ Lead Intel (code-engaged)', items: pool2 },
+      pool3: { label: 'Pool 3 — manually added contacts (LinkedIn/email/conference)', items: pool3 },
     });
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
@@ -1130,6 +1182,18 @@ app.post('/api/admin/mark-dm-sent', requireAdmin, async (req, res) => {
       await pool.query(
         `INSERT INTO intel_events (contact_id, source, event_type, metadata)
          VALUES ($1, 'dm-composer', 'dm_sent_pool2', $2)`,
+        [contact_id, JSON.stringify({ channel: channel || 'manual', notes: notes || null })]
+      );
+      await pool.query(
+        `UPDATE contacts SET next_action = $1 WHERE id = $2`,
+        [`Rapid Audit DM sent ${new Date().toISOString().slice(0,10)}; follow up +5 days`, contact_id]
+      );
+      return res.json({ ok: true });
+    }
+    if (poolName === 'pool3' && contact_id) {
+      await pool.query(
+        `INSERT INTO intel_events (contact_id, source, event_type, metadata)
+         VALUES ($1, 'dm-composer', 'dm_sent_pool3', $2)`,
         [contact_id, JSON.stringify({ channel: channel || 'manual', notes: notes || null })]
       );
       await pool.query(

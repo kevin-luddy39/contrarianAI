@@ -1134,7 +1134,9 @@ app.get('/api/admin/dm-composer', requireAdmin, async (req, res) => {
       tracking_ref: `dm-${c.tier || 'leadintel'}-${c.github_handle || 'contact-' + c.id}`,
     }));
 
-    // Pool 3 — manually added contacts (LinkedIn/conference/email/paste-parse)
+    // Pool 3 — every contact NOT surfaced by Pool 2 (manual adds, paste-parse,
+    // landing:github-ref visitors, anyone whose tier isn't in the GitHub-signal
+    // set). Requires at least one contact identifier so empty rows don't surface.
     const pool3Res = await pool.query(`
       SELECT
         c.id, c.github_handle, c.name, c.email, c.company, c.bio, c.tier, c.source,
@@ -1146,7 +1148,8 @@ app.get('/api/admin/dm-composer', requireAdmin, async (req, res) => {
             AND e.event_type = 'dm_sent_pool3'
         ) AS dm_sent
       FROM contacts c
-      WHERE c.source = 'manual'
+      WHERE (c.tier IS NULL OR c.tier NOT IN ('star','watcher','fork','issue_author','pr_author','audit_request'))
+        AND (c.email IS NOT NULL OR c.linkedin_url IS NOT NULL OR c.twitter IS NOT NULL OR c.github_handle IS NOT NULL)
         AND c.first_seen > NOW() - INTERVAL '12 months'
       ORDER BY c.icp_fit DESC NULLS LAST, c.engagement_score DESC, c.first_seen DESC
       LIMIT $1
@@ -1162,7 +1165,7 @@ app.get('/api/admin/dm-composer', requireAdmin, async (req, res) => {
       stripe_link: RAPID_AUDIT_STRIPE,
       pool1: { label: 'Pool 1 — unconverted audit_requests (warmest)', items: pool1 },
       pool2: { label: 'Pool 2 — tier:star+ Lead Intel (code-engaged)', items: pool2 },
-      pool3: { label: 'Pool 3 — manually added contacts (LinkedIn/email/conference)', items: pool3 },
+      pool3: { label: 'Pool 3 — non-GitHub contacts (manual, LinkedIn, paste-parse, landing refs)', items: pool3 },
     });
   } catch (err) { res.status(500).json({ error: err.message }); }
 });

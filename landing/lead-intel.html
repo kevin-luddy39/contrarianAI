@@ -388,7 +388,17 @@ async function loadDmComposer() {
 </div>`;
     };
 
+    const diag = data.diagnostic || {};
+    const tierRows = (diag.tier_breakdown || []).map(t => `${esc(t.tier||'(null)')}=${t.n}`).join(' · ');
+    const sourceRows = (diag.source_breakdown || []).map(t => `${esc(t.source||'(null)')}=${t.n}`).join(' · ');
+    const diagBlock = `
+<div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:10px;margin-bottom:16px;font-size:0.78rem" class="muted">
+  <b>contacts diagnostic</b> — total=${diag.total_contacts ?? '?'}, non-github-tier=${diag.non_github_tier ?? '?'}, source=manual=${diag.source_manual ?? '?'}, source=github*=${diag.source_github ?? '?'}<br>
+  tiers: ${tierRows || '—'}<br>sources: ${sourceRows || '—'}
+</div>`;
+
     const html = `
+${diagBlock}
 <div style="margin-bottom:20px">
   <h3 style="font-size:0.9rem;margin-bottom:10px;color:var(--accent)">${esc(data.pool1.label)} (${p1.length})</h3>
   ${p1.length === 0 ? '<p class="muted">No unconverted audit_requests. Nothing in this pool.</p>' : p1.map((it,i) => renderItem(it,i,'pool1')).join('')}

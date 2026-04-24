@@ -1149,8 +1149,7 @@ app.get('/api/admin/dm-composer', requireAdmin, async (req, res) => {
         ) AS dm_sent
       FROM contacts c
       WHERE (c.tier IS NULL OR c.tier NOT IN ('star','watcher','fork','issue_author','pr_author','audit_request'))
-        AND (c.email IS NOT NULL OR c.linkedin_url IS NOT NULL OR c.twitter IS NOT NULL OR c.github_handle IS NOT NULL)
-        AND c.first_seen > NOW() - INTERVAL '12 months'
+        AND (c.name IS NOT NULL OR c.email IS NOT NULL OR c.linkedin_url IS NOT NULL OR c.twitter IS NOT NULL OR c.github_handle IS NOT NULL)
       ORDER BY c.icp_fit DESC NULLS LAST, c.engagement_score DESC, c.first_seen DESC
       LIMIT $1
     `, [limit]);
@@ -1161,11 +1160,28 @@ app.get('/api/admin/dm-composer', requireAdmin, async (req, res) => {
       tracking_ref: `dm-manual-${c.github_handle || (c.linkedin_url ? 'li-' + c.id : 'contact-' + c.id)}`,
     }));
 
+    // Diagnostic — total contact counts by tier/source so empty pools
+    // are debuggable from the UI without DB shell access.
+    const diagRes = await pool.query(`
+      SELECT
+        (SELECT COUNT(*)::int FROM contacts) AS total_contacts,
+        (SELECT COUNT(*)::int FROM contacts WHERE tier IS NULL OR tier NOT IN ('star','watcher','fork','issue_author','pr_author','audit_request')) AS non_github_tier,
+        (SELECT COUNT(*)::int FROM contacts WHERE source = 'manual') AS source_manual,
+        (SELECT COUNT(*)::int FROM contacts WHERE source LIKE 'github%') AS source_github,
+        (SELECT json_agg(row_to_json(t)) FROM (
+          SELECT tier, COUNT(*)::int AS n FROM contacts GROUP BY tier ORDER BY n DESC
+        ) t) AS tier_breakdown,
+        (SELECT json_agg(row_to_json(t)) FROM (
+          SELECT source, COUNT(*)::int AS n FROM contacts GROUP BY source ORDER BY n DESC
+        ) t) AS source_breakdown
+    `);
+
     res.json({
       stripe_link: RAPID_AUDIT_STRIPE,
       pool1: { label: 'Pool 1 — unconverted audit_requests (warmest)', items: pool1 },
       pool2: { label: 'Pool 2 — tier:star+ Lead Intel (code-engaged)', items: pool2 },
       pool3: { label: 'Pool 3 — non-GitHub contacts (manual, LinkedIn, paste-parse, landing refs)', items: pool3 },
+      diagnostic: diagRes.rows[0] || null,
     });
   } catch (err) { res.status(500).json({ error: err.message }); }
 });

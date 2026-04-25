@@ -39,6 +39,8 @@ Bell-curve statistics over the current context-window chunks.
 
 | Metric | Value |
 |---|---:|
+| health | 0.6810 |
+| regime | drift |
 | mean alignment | 0.6729 |
 | stdDev | 0.2331 |
 | skewness | -0.6839 |

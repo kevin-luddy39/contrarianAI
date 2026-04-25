@@ -17,7 +17,7 @@
         "meanRelevance": 0.594375,
         "toolDiversity": 0.75,
         "meanSize": 112.25,
-        "meanLatency": 100.83333333333333,
+        "meanLatency": 100.16666666666667,
         "toolCounts": {
           "search": 3,
           "summarize": 3,
@@ -125,7 +125,7 @@
         "meanRelevance": 0.6969875000000001,
         "toolDiversity": 0.75,
         "meanSize": 88.41666666666667,
-        "meanLatency": 96.33333333333333,
+        "meanLatency": 104.91666666666667,
         "toolCounts": {
           "search": 3,
           "summarize": 3,
@@ -252,7 +252,7 @@
         "meanRelevance": 0.6515500000000001,
         "toolDiversity": 0,
         "meanSize": 148.5,
-        "meanLatency": 93.91666666666667,
+        "meanLatency": 100.33333333333333,
         "toolCounts": {
           "search": 12
         }
@@ -367,7 +367,7 @@
         "meanRelevance": 0.5354416666666667,
         "toolDiversity": 0.75,
         "meanSize": 613.4166666666666,
-        "meanLatency": 96.58333333333333,
+        "meanLatency": 99.16666666666667,
         "toolCounts": {
           "search": 3,
           "summarize": 3,
@@ -485,7 +485,7 @@
         "meanRelevance": 0.3413083333333333,
         "toolDiversity": 0.75,
         "meanSize": 81.08333333333333,
-        "meanLatency": 102.75,
+        "meanLatency": 96.41666666666667,
         "toolCounts": {
           "search": 3,
           "summarize": 3,
@@ -603,7 +603,7 @@
         "meanRelevance": 0,
         "toolDiversity": 0.75,
         "meanSize": 104,
-        "meanLatency": 102.08333333333333,
+        "meanLatency": 101.41666666666667,
         "toolCounts": {
           "search": 3,
           "summarize": 3,
@@ -722,7 +722,7 @@
         "meanRelevance": 0.5667636363636364,
         "toolDiversity": 0.75,
         "meanSize": 75.9375,
-        "meanLatency": 98.5,
+        "meanLatency": 98.125,
         "toolCounts": {
           "search": 4,
           "summarize": 4,

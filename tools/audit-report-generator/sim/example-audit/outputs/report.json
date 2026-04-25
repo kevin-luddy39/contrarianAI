@@ -304,7 +304,7 @@
         "meanRelevance": 0.5667636363636364,
         "toolDiversity": 0.75,
         "meanSize": 75.9375,
-        "meanLatency": 98.5,
+        "meanLatency": 98.125,
         "toolCounts": {
           "search": 4,
           "summarize": 4,

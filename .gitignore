@@ -8,3 +8,8 @@ Thumbs.db
 tools/context-inspector/node_modules/
 tools/context-inspector/sim/sim.db
 diary.md
+
+# Personal finance / assistant intake — contains private data, never commit
+docs/luddy-assistant/
+.claude/scheduled_tasks.lock
+docs/source_articles - Copy.md

@@ -61,5 +61,14 @@
     "source": "reddit",
     "notes": "T0-08. r/MachineLearningJobs urgent AI hire thread. DM sent 2026-04-23. Pending reply. Offer: fractional engagement bridging ship-vs-fix gap.",
     "next_action": "Day 5 nudge 2026-04-29 if silent"
+  },
+  {
+    "name": "Boris Nakshun",
+    "company": "(former colleague)",
+    "linkedin_url": "",
+    "tier": "peer-collaborator",
+    "source": "linkedin",
+    "notes": "Replied 2026-04-27 to Kevin's outreach. Senior eng, contrarian read on microservices ('SaaS hijacked the term, just same HTTP services but micro'). NOT a buyer — explicitly stopped looking due to age + 'AI taking over' resignation. Right target for peer-collaborator framing, not sales pitch. Reply sent 2026-04-27 reframing AI-takeover as MORE-failure-modes thesis, no Bell Tuning pitch, soft offer to share whitepapers if he wants. Watch for 'send the whitepapers' = green light to convert to deeper conversation.",
+    "next_action": "Reply sent 2026-04-27. Watch for whitepaper-request = green light. If silent 14d, low-priority follow-up with one whitepaper link 2026-05-11."
   }
 ]

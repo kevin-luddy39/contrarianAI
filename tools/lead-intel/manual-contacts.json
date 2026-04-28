@@ -1,12 +1,13 @@
 [
   {
     "name": "Jeffrey Lin",
-    "company": "Arzule",
+    "company": "Datoric (YC W26)",
+    "company_history": "Arzule (intake noted 2026-04-23) → Datoric (observed 2026-04-27). Either rename, pivot, or original research had wrong company name.",
     "linkedin_url": "",
     "tier": "prospect",
     "source": "linkedin",
-    "notes": "T0-02. YC W26. CTO, multi-agent coordination. Connected 2026-04-23, accepted 2026-04-24. Follow-up DM w/ partnership axes + 3 time slots sent 2026-04-24. Awaiting reply.",
-    "next_action": "Day 5 nudge 2026-04-29 if silent; Bell Tuning teardown offer"
+    "notes": "T0-02. YC W26 CTO. Connected 2026-04-23, accepted 2026-04-24. Follow-up DM w/ partnership axes + 3 time slots sent 2026-04-24. Title verified 2026-04-27 as 'CTO @ Datoric (YC W26)' — Datoric is data-brokerage for multimodal AI training (licensed/ethically-sourced voice+video+multimodal). NOT retrieval/agent-side. Bell Tuning fit is weak for their core product but Jeffrey's prior multi-agent runtime background is adjacent. Teardown DM sent 2026-04-27 (LangChain quickstart finding) — slight fit-mismatch acknowledged.",
+    "next_action": "Watch for reply post-teardown DM. If reply: pivot conversation to data-ingestion observability angle (provenance signal, contributor consistency, contamination detection — same statistical method, different application). Day 7 fallback 2026-04-30 if silent."
   },
   {
     "name": "Burt (founder)",
@@ -61,6 +62,62 @@
     "source": "reddit",
     "notes": "T0-08. r/MachineLearningJobs urgent AI hire thread. DM sent 2026-04-23. Pending reply. Offer: fractional engagement bridging ship-vs-fix gap.",
     "next_action": "Day 5 nudge 2026-04-29 if silent"
+  },
+  {
+    "name": "Joel Schwarzmann",
+    "company": "PhysicsX",
+    "email": "joel.schwarzmann@physicsx.ai",
+    "tier": "prospect",
+    "source": "hn-who-is-hiring-april-2026",
+    "notes": "From HN Who is Hiring April 2026 (item 47601859). Principal AI Engineer role mentions 'running agents in production' for CFD/FEA physics simulation surrogates. Strong fit: production agents in domain where wrong-output cost is high (engineering simulation accuracy). Cold email sent 2026-04-27 with LangChain teardown link + free 30-min audit offer. Pitch angle: distributional observability on tool-call traces + retrieval distributions for physics-agent silent failure modes.",
+    "next_action": "Watch for reply 7 days. Day 7 fallback 2026-05-04: LinkedIn DM if no email reply, with whitepaper attached."
+  },
+  {
+    "name": "Starbridge (recruiting)",
+    "company": "Starbridge",
+    "email": "recruiting@starbridge.ai",
+    "tier": "prospect",
+    "source": "hn-who-is-hiring-april-2026",
+    "notes": "From HN Who is Hiring April 2026 (item 47601859). AI Engineer role explicitly mentions 'LLM-driven deep document analysis and interactive chat' = textbook RAG product. Sales-insights platform, real customer corpora = drift risk. Cold email sent 2026-04-27 to recruiting@ inbox (HR routing, but active) with LangChain teardown link + forwarding ask + free 30-min audit offer.",
+    "next_action": "Watch for reply 7 days. Day 7 fallback 2026-05-04: find founder/CTO direct via Hunter.io + LinkedIn, send personalized direct email."
+  },
+  {
+    "name": "Max (GodelNumbering)",
+    "company": "SignalBloom",
+    "linkedin_url": "",
+    "twitter": "SignalBloom",
+    "tier": "prospect",
+    "source": "hn-comment-mining-2026-04-28",
+    "notes": "HN handle GodelNumbering. Founder @ signalbloom.ai (financial data analysis AI — 13F, earnings, ETF, superinvestor portfolios). Ex-Meta HHVM, ex-HFT. 614 HN karma. Comment on TerminalBench OSS Agent thread (4/27) showed depth on context management + caching. Strong fit: regulated financial AI = audit-grade reliability matters. Cold-message via signalbloom.ai/contact form sent 2026-04-28 with LangChain teardown link + free tools offer + peer-collaborator framing.",
+    "next_action": "Watch contact-form reply 7d. Day 7 fallback 2026-05-05: X DM @SignalBloom with shorter version of same message."
+  },
+  {
+    "name": "Fatih (thisisfatih)",
+    "company": "Wasteer GmbH",
+    "linkedin_url": "https://linkedin.com/in/thisisfatih",
+    "github": "thisisfatih",
+    "blog": "https://thisisfatih.com",
+    "tier": "prospect",
+    "source": "hn-comment-mining-2026-04-28",
+    "notes": "CTO at Wasteer (Berlin, AI-powered waste management — CV/ML for contaminant detection). 5yr exec leadership. Blog has 22 posts on AI-in-production + 20 on building startups. 'Built things. Broke things. Wrote it down.' HN comment on EvanFlow thread (4/27) showed direct experience with multi-agent merge-failure pattern. HN public reply posted 2026-04-28 referencing tool-call-grader. LinkedIn DM DEFERRED — wait for HN engagement first; send LinkedIn 2026-04-30 if HN silent.",
+    "next_action": "If HN reply gets engagement → respond fast. If silent through 2026-04-30 → send LinkedIn DM (drafted in docs/outreach/2026-04-28-hn-mining.md)."
+  },
+  {
+    "name": "skissane (HN)",
+    "company": "unknown",
+    "github": "skissane",
+    "tier": "engagement-only",
+    "source": "hn-comment-mining-2026-04-28",
+    "notes": "Simon Kissane. 16.6k HN karma, 11yr account, 79 GitHub repos. No bio/contact. Comment on 'AI agent deleted production database' thread (4/27): 'answer is in the RAG but the model can't find it.' HN public reply posted 2026-04-28 with rank-inversion methodology + teardown reference.",
+    "next_action": "Engagement-only via HN reply chain. No direct contact path."
+  },
+  {
+    "name": "SkyPuncher (HN)",
+    "company": "unknown ('cutting edge of agentic dev')",
+    "tier": "engagement-only",
+    "source": "hn-comment-mining-2026-04-28",
+    "notes": "8.3k HN karma, 9yr account. No bio/contact. Comment on Affirm Retooled thread (4/24): 'I'm in the cutting edge of agentic dev at my company, but...can barely get a repeatable process.' HN public reply posted 2026-04-28 with repeatability-via-distributional-metrics framing.",
+    "next_action": "Engagement-only via HN reply chain. No direct contact path."
   },
   {
     "name": "Boris Nakshun",

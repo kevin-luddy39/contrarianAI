@@ -43,9 +43,9 @@ After push, verify URL resolves: https://github.com/kevin-luddy39/contrarianAI/t
 
 ## Step 3 — capture URL into this file
 
-Replace `<TEARDOWN_URL>` below with the LinkedIn URL captured in Step 2. Each outreach template uses the same placeholder.
+Replace `https://www.linkedin.com/pulse/i-ran-retrieval-auditor-against-langchains-rag-quickstart-kevin-luddy-mxyme` below with the LinkedIn URL captured in Step 2. Each outreach template uses the same placeholder.
 
-`<TEARDOWN_URL>` = `_____________________________________________________`
+`https://www.linkedin.com/pulse/i-ran-retrieval-auditor-against-langchains-rag-quickstart-kevin-luddy-mxyme` = `_____________________________________________________`
 
 ---
 
@@ -63,7 +63,7 @@ core topic of the corpus) showed rank inversion: top-ranked chunk
 was less relevant than the chunk it ranked fourth. Thought of
 Arzule's coordination-failure angle while writing it.
 
-<TEARDOWN_URL>
+https://www.linkedin.com/pulse/i-ran-retrieval-auditor-against-langchains-rag-quickstart-kevin-luddy-mxyme
 
 Still keen on a 30-min if any time slots from last week work, or
 pick a new one. Either way, 5 minutes of your read on the methodology
@@ -82,7 +82,7 @@ LangChain's RAG quickstart. Found rank inversion + score
 miscalibration on 5 of 6 queries — the kind of failure-pattern
 data that could feed your fine-tuning pipeline.
 
-<TEARDOWN_URL>
+https://www.linkedin.com/pulse/i-ran-retrieval-auditor-against-langchains-rag-quickstart-kevin-luddy-mxyme
 
 20-min explore if useful?
 ```
@@ -97,7 +97,7 @@ inversion finding (top chunk less relevant than #4) is exactly the
 kind of silent failure that shows up in regulated-decision audit
 trails.
 
-<TEARDOWN_URL>
+https://www.linkedin.com/pulse/i-ran-retrieval-auditor-against-langchains-rag-quickstart-kevin-luddy-mxyme
 
 Free 30-min teardown of Panta's stack if useful.
 ```
@@ -110,7 +110,7 @@ instrumenting LangChain's RAG quickstart — 5 of 6 queries flagged
 distributional pathologies invisible to precision@K. Same class of
 "looks fine, fails silently" issue that sinks on-call agents.
 
-<TEARDOWN_URL>
+https://www.linkedin.com/pulse/i-ran-retrieval-auditor-against-langchains-rag-quickstart-kevin-luddy-mxyme
 
 Free 30-min teardown of Corelayer's stack if useful.
 ```
@@ -124,7 +124,7 @@ LangChain's RAG quickstart — score miscalibration + rank inversion
 patterns are exactly what produce "plausible but wrong" guest
 replies in production.
 
-<TEARDOWN_URL>
+https://www.linkedin.com/pulse/i-ran-retrieval-auditor-against-langchains-rag-quickstart-kevin-luddy-mxyme
 
 Free 30-min teardown of Tensol's stack if useful.
 ```
@@ -137,7 +137,7 @@ running retrieval-auditor against LangChain's RAG quickstart, finding
 distribution pathologies that precision@K can't see — same failure
 modes that sink internal ops AI tools at scale.
 
-<TEARDOWN_URL>
+https://www.linkedin.com/pulse/i-ran-retrieval-auditor-against-langchains-rag-quickstart-kevin-luddy-mxyme
 
 If part of the urgency is "the thing we already shipped is silently
 degrading," I do fractional engagements that bridge that. Free 30-min
@@ -154,7 +154,7 @@ LangChain's RAG quickstart. 5 of 6 test queries flagged distributional
 pathologies — including rank inversion, where the top-ranked chunk
 was LESS relevant than the chunk ranked fourth.
 
-<TEARDOWN_URL>
+https://www.linkedin.com/pulse/i-ran-retrieval-auditor-against-langchains-rag-quickstart-kevin-luddy-mxyme
 
 Still happy to do a free 30-min teardown of your team's stack if the
 urgency from your hiring post is "the thing we already shipped needs

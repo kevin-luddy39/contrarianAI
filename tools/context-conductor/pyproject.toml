@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "context-conductor"
+version = "0.1.0a0"
+description = "Bayesian context routing for agent workflows. Fix-side companion to the contrarianAI Bell Tuning sensor suite."
+readme = "README.md"
+license = { text = "MIT" }
+authors = [{ name = "Kevin Luddy", email = "luddy.kevin@gmail.com" }]
+requires-python = ">=3.10"
+dependencies = [
+    "numpy>=1.24",
+    "pydantic>=2.0",
+]
+
+[project.optional-dependencies]
+mcp = ["mcp>=1.0"]
+sim = ["matplotlib>=3.7"]
+dev = ["pytest>=7.4", "pytest-cov>=4.1", "ruff>=0.4"]
+
+[project.urls]
+Homepage = "https://github.com/kevin-luddy39/contrarianAI"
+Whitepaper = "https://github.com/kevin-luddy39/contrarianAI/blob/main/tools/context-conductor/docs/whitepaper.md"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["context_conductor*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"

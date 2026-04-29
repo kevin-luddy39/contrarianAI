@@ -120,7 +120,7 @@ def retrieve(model, coll, query: str, k: int = TOP_K) -> dict:
 
 def run_auditor(payload: dict) -> dict | None:
     proc = subprocess.run(
-        ["node", str(RETRIEVAL_AUDITOR_CLI), "-", "--json"],
+        ["node", str(RETRIEVAL_AUDITOR_CLI), "-", "--json", "--profile", "dense"],
         input=json.dumps(payload),
         capture_output=True,
         text=True,

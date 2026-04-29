@@ -21,6 +21,21 @@ const DEFAULT_TOLERANCE = {
   bimodalSignal:  0.40,   // above this penalises
 };
 
+// Profile-aware tolerance presets — pair with the same-named profile in
+// pathologies.js. Dense (embedding) retrievers produce intrinsically lower
+// TF-IDF mean alignment than sparse retrievers do, so the alignment tolerance
+// must drop or healthy retrieval tops out around 0.35 health.
+const TOLERANCE_PROFILES = {
+  tfidf: DEFAULT_TOLERANCE,
+  dense: {
+    meanAlignment:  0.20,
+    rankQualityR:   0.30,
+    diversity:      0.40,
+    scoreCalibration: 0.30,
+    bimodalSignal:  0.40,
+  },
+};
+
 const PENALTY_WEIGHT = 0.15;  // max health reduction per secondary signal
 
 function scoreFromSignals(signals, tolerance = DEFAULT_TOLERANCE) {
@@ -63,4 +78,4 @@ function regime(score) {
 
 function clip(v) { return Math.max(0, Math.min(1, v)); }
 
-module.exports = { scoreFromSignals, regime, DEFAULT_TOLERANCE };
+module.exports = { scoreFromSignals, regime, DEFAULT_TOLERANCE, TOLERANCE_PROFILES };

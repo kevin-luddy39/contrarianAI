@@ -21,7 +21,7 @@ const ciCore = require('contrarianai-context-inspector');
 const { scoreChunks, scoreCalibration, rankQualityCorrelation } = require('./scoring');
 const { diversityMetrics } = require('./diversity');
 const { detectPathologies, detectBimodality } = require('./pathologies');
-const { scoreFromSignals, regime, DEFAULT_TOLERANCE } = require('./health');
+const { scoreFromSignals, regime, DEFAULT_TOLERANCE, TOLERANCE_PROFILES } = require('./health');
 
 /**
  * Audit a single retrieval event.
@@ -66,8 +66,10 @@ function auditRetrieval({ query, retrieved, options = {} }) {
     alignments,
   };
 
-  const tolerance = { ...DEFAULT_TOLERANCE, ...(options.tolerance || {}) };
-  const pathologies = detectPathologies(signals, options.thresholds);
+  const profile = options.profile || 'tfidf';
+  const baseTolerance = TOLERANCE_PROFILES[profile] || DEFAULT_TOLERANCE;
+  const tolerance = { ...baseTolerance, ...(options.tolerance || {}) };
+  const pathologies = detectPathologies(signals, options.thresholds, profile);
   const health = scoreFromSignals(signals, tolerance);
   const regimeLabel = regime(health);
 

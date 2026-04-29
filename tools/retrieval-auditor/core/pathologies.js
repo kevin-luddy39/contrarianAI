@@ -54,13 +54,20 @@ function detectBimodality(histogram) {
  * Run all pathology checks over computed signals.
  * Returns an array of { kind, severity, description }.
  */
-function detectPathologies(signals, thresholds = {}) {
-  // Thresholds calibrated against the RAG Needle baseline: clean
-  // TF-IDF retrieval on our test queries produces mean alignment
-  // around 0.38-0.45. OFF_TOPIC at 0.30 fires when mean alignment
-  // drops meaningfully below clean-retrieval baseline but not on
-  // ordinary query-to-query variation.
-  const t = {
+// Profile presets — pick the one matching the retriever family used
+// upstream. The auditor's grader is TF-IDF cosine, so dense (embedding)
+// retrievers produce intrinsically lower TF-IDF alignment than sparse
+// retrievers do, even on healthy retrievals. Without a profile, OFF_TOPIC
+// fires constantly on dense-retrieved chunks.
+//
+// Use "tfidf" (default) when the upstream retriever is TF-IDF / BM25 / sparse.
+// Use "dense" when the upstream retriever is sentence-transformers / OpenAI /
+// any embedding-model cosine retrieval.
+const PROFILES = {
+  tfidf: {
+    // Calibrated against RAG Needle baseline; clean TF-IDF retrieval on test
+    // queries produces mean alignment around 0.38-0.45. OFF_TOPIC at 0.30
+    // fires below baseline but not on query-to-query variation.
     offTopic: 0.30,
     redundant: 0.75,
     rankInversion: -0.15,
@@ -68,8 +75,27 @@ function detectPathologies(signals, thresholds = {}) {
     bimodal: 0.35,
     longTail: 0.55,
     outOfDistribution: 0.10,
-    ...thresholds,
-  };
+  },
+  dense: {
+    // Calibrated against dense-embedding retrieval (sentence-transformers
+    // MiniLM) over the contrived RAG scenario corpus; clean retrieval
+    // produces TF-IDF mean alignment around 0.15-0.25, so absolute alignment
+    // thresholds (offTopic, outOfDistribution) drop accordingly. Relative
+    // measures (rankInversion, scoreMiscalibrated, redundant) stay the same
+    // since they are scale-free correlations.
+    offTopic: 0.10,
+    redundant: 0.75,
+    rankInversion: -0.15,
+    scoreMiscalibrated: 0.25,
+    bimodal: 0.35,
+    longTail: 0.40,
+    outOfDistribution: 0.05,
+  },
+};
+
+function detectPathologies(signals, thresholds = {}, profile = 'tfidf') {
+  const base = PROFILES[profile] || PROFILES.tfidf;
+  const t = { ...base, ...thresholds };
 
   const out = [];
 
@@ -140,4 +166,4 @@ function detectPathologies(signals, thresholds = {}) {
 
 function clip(v) { return Math.max(0, Math.min(1, v)); }
 
-module.exports = { detectPathologies, detectBimodality, PATHOLOGY_DEFS };
+module.exports = { detectPathologies, detectBimodality, PATHOLOGY_DEFS, PROFILES };

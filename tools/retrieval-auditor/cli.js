@@ -72,16 +72,25 @@ function main() {
   const args = parseArgs(process.argv.slice(2));
   if (args.help || args.h) {
     process.stdout.write(
-      'retrieval-auditor <trace.json|->   [--json]\n' +
+      'retrieval-auditor <trace.json|->   [--json] [--profile tfidf|dense]\n' +
       '  Reads one retrieval trace (or array of traces) and prints audit report.\n' +
-      '  With --json, emits structured JSON instead of the text summary.\n'
+      '  With --json, emits structured JSON instead of the text summary.\n' +
+      '  --profile selects pathology-threshold preset; default is "tfidf".\n' +
+      '  Use "dense" when the upstream retriever is sentence-transformers /\n' +
+      '  OpenAI / any embedding-model cosine retrieval.\n'
     );
     return;
   }
 
+  const profile = args.profile || 'tfidf';
+  if (profile !== 'tfidf' && profile !== 'dense') {
+    process.stderr.write(`retrieval-auditor: unknown profile '${profile}' (expected tfidf|dense)\n`);
+    process.exit(2);
+  }
+
   const input = loadInput(args);
   const traces = Array.isArray(input) ? input : [input];
-  const audits = traces.map(t => auditRetrieval(t));
+  const audits = traces.map(t => auditRetrieval({ ...t, options: { ...(t.options || {}), profile } }));
 
   if (args.json) {
     process.stdout.write(JSON.stringify(audits.length === 1 ? audits[0] : audits, null, 2) + '\n');

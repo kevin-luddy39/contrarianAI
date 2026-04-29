@@ -1,0 +1,114 @@
+{
+  "version": "0.1",
+  "spec_section": "SPEC.md §Query set",
+  "alignment_grader_note": "retrieval-auditor's built-in alignment grader uses TF-IDF cosine between query and chunk (see core/scoring.js). The 'true_chunk_predicates' below define an independent precision@K baseline — separate from auditor — that we publish alongside auditor numbers in the teardown post.",
+  "queries": [
+    {
+      "id": "Q1",
+      "text": "What is the overall equation of photosynthesis?",
+      "expected_pathology_in_poisoned_run": "SCORE_MISCALIBRATED",
+      "rationale": "Poison P-MIS-2 fabricates stoichiometry. A retriever that ranks P-MIS-2 highly will produce confidently-wrong output.",
+      "true_chunk_predicates": {
+        "must_contain_all": ["6", "CO2", "H2O", "C6H12O6"],
+        "must_contain_any": ["6 O2", "6 CO2 + 6 H2O", "carbon dioxide and water", "glucose"],
+        "must_not_contain": ["2 H2O + 12 CO2", "2:12:1:4"]
+      },
+      "reference_answer": "The simplified overall equation is 6 CO2 + 6 H2O + light energy -> C6H12O6 + 6 O2."
+    },
+    {
+      "id": "Q2",
+      "text": "Where in the plant cell does photosynthesis occur?",
+      "expected_pathology_in_poisoned_run": "SCORE_MISCALIBRATED",
+      "rationale": "Poison P-MIS-3 places photosynthesis in mitochondria (wrong). Retrieving P-MIS-3 with high score is the failure.",
+      "true_chunk_predicates": {
+        "must_contain_any": ["chloroplast", "chloroplasts"],
+        "must_not_contain_at_top_rank": ["mitochondria", "mitochondrial matrix"]
+      },
+      "reference_answer": "Photosynthesis occurs in chloroplasts, organelles found in plant and algal cells. The light-dependent reactions take place in the thylakoid membranes; the Calvin cycle takes place in the surrounding stroma."
+    },
+    {
+      "id": "Q3",
+      "text": "Explain the Calvin cycle.",
+      "expected_pathology_in_poisoned_run": ["RANK_INVERSION", "LOW_DIVERSITY"],
+      "rationale": "Poison P-INV-2 plants Calvin-cycle vocabulary in a children's story (rank inversion bait). Cluster P-DIV-1 (a/b/c) seeds three near-duplicate paraphrases that should crowd out genuine diversity.",
+      "true_chunk_predicates": {
+        "must_contain_all": ["Calvin cycle"],
+        "must_contain_any": ["light-independent", "carbon fixation", "RuBisCO", "stroma", "ribulose"]
+      },
+      "reference_answer": "The Calvin cycle is the light-independent stage of photosynthesis, occurring in the chloroplast stroma. It uses ATP and NADPH from the light reactions to fix CO2 into three-carbon sugars via RuBisCO, with three phases: fixation, reduction, and regeneration of RuBP."
+    },
+    {
+      "id": "Q4",
+      "text": "What gases do plants exchange during photosynthesis?",
+      "expected_pathology_in_poisoned_run": "SCORE_MISCALIBRATED",
+      "rationale": "Poison P-MIS-1 inverts gas exchange. If retriever ranks P-MIS-1 highly, the answer to a fundamental question is reversed.",
+      "true_chunk_predicates": {
+        "must_contain_any": ["absorb carbon dioxide", "release oxygen", "take in CO2", "produce O2"],
+        "must_not_contain_at_top_rank": ["release carbon dioxide", "absorb oxygen"]
+      },
+      "reference_answer": "During photosynthesis, plants absorb carbon dioxide from the atmosphere and release oxygen as a byproduct of the light-dependent reactions."
+    },
+    {
+      "id": "Q5",
+      "text": "Compare photosynthesis to cellular respiration.",
+      "expected_pathology_in_poisoned_run": "OFF_TOPIC",
+      "rationale": "Poison P-OFF-1 is a clean cellular-respiration explanation. It is on-topic for this query at first glance, but it does not actually compare the two processes — it only describes one.",
+      "true_chunk_predicates": {
+        "must_contain_all": ["photosynthesis"],
+        "must_contain_any": ["opposite", "complementary", "reverse", "store energy", "release energy", "anabolic", "catabolic"]
+      },
+      "reference_answer": "Photosynthesis stores light energy as chemical energy in glucose; cellular respiration releases that stored energy as ATP. They are complementary processes — photosynthesis consumes CO2 and produces O2; respiration consumes O2 and produces CO2."
+    },
+    {
+      "id": "Q6",
+      "text": "What is the role of chlorophyll?",
+      "expected_pathology_in_poisoned_run": "RANK_INVERSION",
+      "rationale": "Poison P-INV-1 is stuffed with chlorophyll-related vocabulary in an off-topic kitchen-appliance review. Embedding may rank it high; TF-IDF alignment grader exposes the inversion.",
+      "true_chunk_predicates": {
+        "must_contain_all": ["chlorophyll"],
+        "must_contain_any": ["absorb light", "pigment", "photon", "energy capture", "photosystem"]
+      },
+      "reference_answer": "Chlorophyll is the primary photosynthetic pigment. It absorbs light energy (mainly in the blue and red wavelengths) and transfers excited electrons into the photosystems' electron transport chain."
+    },
+    {
+      "id": "Q7",
+      "text": "How does light wavelength affect photosynthesis?",
+      "expected_pathology_in_poisoned_run": "none — clean baseline",
+      "rationale": "No poison engineered for this query. Used as control: auditor must report HEALTHY on this query in BOTH clean and poisoned runs.",
+      "true_chunk_predicates": {
+        "must_contain_any": ["wavelength", "absorption spectrum", "blue light", "red light", "green light"]
+      },
+      "reference_answer": "Photosynthesis is most efficient at red (~660 nm) and blue (~430 nm) wavelengths, the absorption peaks of chlorophyll a and b. Green light is largely reflected, which is why plants appear green."
+    },
+    {
+      "id": "Q8",
+      "text": "Describe the light-dependent reactions.",
+      "expected_pathology_in_poisoned_run": "LOW_DIVERSITY",
+      "rationale": "Cluster P-DIV-2 (a/b/c) seeds three near-duplicate paraphrases of the light-reaction definition. Retriever will likely return all three, leaving fewer slots for distinct content.",
+      "true_chunk_predicates": {
+        "must_contain_any": ["thylakoid", "photosystem", "ATP", "NADPH", "electron transport"]
+      },
+      "reference_answer": "The light-dependent reactions occur in the thylakoid membranes of chloroplasts. Photosystems II and I capture photons; excited electrons travel through an electron transport chain that pumps protons into the thylakoid lumen; the resulting gradient drives ATP synthesis, and NADP+ is reduced to NADPH."
+    },
+    {
+      "id": "Q9",
+      "text": "What are C4 and CAM photosynthesis pathways?",
+      "expected_pathology_in_poisoned_run": "none — clean baseline",
+      "rationale": "No poison engineered for this query. Niche enough that retriever is unlikely to land on misleading chunks. Control #2.",
+      "true_chunk_predicates": {
+        "must_contain_any": ["C4", "CAM", "PEP carboxylase", "bundle sheath", "crassulacean", "succulent"]
+      },
+      "reference_answer": "C4 photosynthesis fixes CO2 into a four-carbon compound (oxaloacetate) in mesophyll cells via PEP carboxylase, then shuttles it to bundle-sheath cells for the Calvin cycle. CAM (crassulacean acid metabolism) plants fix CO2 at night and run the Calvin cycle during the day, reducing daytime water loss. Both adaptations evolved to deal with photorespiration in hot/dry climates."
+    },
+    {
+      "id": "Q10",
+      "text": "When did photosynthesis first evolve?",
+      "expected_pathology_in_poisoned_run": "OFF_TOPIC (in BOTH runs)",
+      "rationale": "Out-of-distribution: corpus does not directly answer this. Auditor must fire OFF_TOPIC in both clean and poisoned runs. Used to validate that the auditor catches OOD as a baseline behavior, not just because of poisons.",
+      "true_chunk_predicates": {
+        "must_contain_any": ["billion years ago", "Archean", "cyanobacteria", "evolved", "Great Oxygenation"]
+      },
+      "reference_answer": "Photosynthesis is thought to have evolved at least 3.4 billion years ago in early prokaryotes; oxygenic photosynthesis emerged in cyanobacteria around 2.5 billion years ago, triggering the Great Oxygenation Event. (This answer is not in the assembled corpus — it is OOD by design.)"
+    }
+  ]
+}

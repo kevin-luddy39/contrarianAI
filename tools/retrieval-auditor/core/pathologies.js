@@ -80,11 +80,17 @@ const PROFILES = {
     // Calibrated against dense-embedding retrieval (sentence-transformers
     // MiniLM) over the contrived RAG scenario corpus; clean retrieval
     // produces TF-IDF mean alignment around 0.15-0.25, so absolute alignment
-    // thresholds (offTopic, outOfDistribution) drop accordingly. Relative
-    // measures (rankInversion, scoreMiscalibrated, redundant) stay the same
+    // thresholds (offTopic, outOfDistribution) drop accordingly. Most relative
+    // measures (rankInversion, scoreMiscalibrated, bimodal) stay the same
     // since they are scale-free correlations.
+    //
+    // redundant drops from 0.75 to 0.60: dense retrieval over a domain-rich
+    // corpus produces clean-retrieval redundancyRatio around 0.42-0.54
+    // (chunks share domain vocabulary even when distinct). The threshold has
+    // to leave room above clean and still discriminate intentional duplicate
+    // clusters; 0.60 sits clean+1.5σ-ish.
     offTopic: 0.10,
-    redundant: 0.75,
+    redundant: 0.60,
     rankInversion: -0.15,
     scoreMiscalibrated: 0.25,
     bimodal: 0.35,

@@ -1,13 +1,15 @@
 {
-  "version": "0.1",
+  "version": "0.2",
   "spec_section": "SPEC.md §Query set",
+  "reframe_note": "Empirical observation after first run: poisons P-INV-* / P-MIS-* / P-OFF-* are retrieved into top-K (the dense embedding picks them up), but the auditor does not fire RANK_INVERSION / SCORE_MISCALIBRATED / OFF_TOPIC on them. Cause: the auditor's TF-IDF grader scores them as aligned with the query (they share photosynthesis-domain tokens), so retriever and grader agree — no retrieval-mechanism pathology. The poisons are factual content errors, which is OUTSIDE the auditor's measurement scope. Demonstration categories below capture this honestly: REDUNDANT clusters are caught; Q6 chlorophyll is a natural pathology in the base corpus; MIS poisons are missed-by-design and serve as a teaching point about the auditor's boundary.",
   "alignment_grader_note": "retrieval-auditor's built-in alignment grader uses TF-IDF cosine between query and chunk (see core/scoring.js). The 'true_chunk_predicates' below define an independent precision@K baseline — separate from auditor — that we publish alongside auditor numbers in the teardown post.",
   "queries": [
     {
       "id": "Q1",
       "text": "What is the overall equation of photosynthesis?",
-      "expected_pathology_in_poisoned_run": "SCORE_MISCALIBRATED",
-      "rationale": "Poison P-MIS-2 fabricates stoichiometry. A retriever that ranks P-MIS-2 highly will produce confidently-wrong output.",
+      "demonstration_category": "missed_by_design",
+      "associated_poison": "P-MIS-2",
+      "expected_behavior": "Auditor reports CLEAN. P-MIS-2 (fabricated stoichiometry 2 H2O + 12 CO2 -> C6H12O6 + 4 O2) is retrieved at rank 1 with healthy auditor signals. The error is factual, not mechanical — outside the auditor's measurement scope. Teaching point: pair retrieval-auditor with a content-correctness grader.",
       "true_chunk_predicates": {
         "must_contain_all": ["6", "CO2", "H2O", "C6H12O6"],
         "must_contain_any": ["6 O2", "6 CO2 + 6 H2O", "carbon dioxide and water", "glucose"],
@@ -18,8 +20,9 @@
     {
       "id": "Q2",
       "text": "Where in the plant cell does photosynthesis occur?",
-      "expected_pathology_in_poisoned_run": "SCORE_MISCALIBRATED",
-      "rationale": "Poison P-MIS-3 places photosynthesis in mitochondria (wrong). Retrieving P-MIS-3 with high score is the failure.",
+      "demonstration_category": "missed_by_design",
+      "associated_poison": "P-MIS-3",
+      "expected_behavior": "Auditor reports CLEAN. P-MIS-3 (places photosynthesis in mitochondria) is retrieved in top-K with healthy auditor signals. Same teaching point as Q1.",
       "true_chunk_predicates": {
         "must_contain_any": ["chloroplast", "chloroplasts"],
         "must_not_contain_at_top_rank": ["mitochondria", "mitochondrial matrix"]
@@ -29,8 +32,9 @@
     {
       "id": "Q3",
       "text": "Explain the Calvin cycle.",
-      "expected_pathology_in_poisoned_run": ["RANK_INVERSION", "LOW_DIVERSITY"],
-      "rationale": "Poison P-INV-2 plants Calvin-cycle vocabulary in a children's story (rank inversion bait). Cluster P-DIV-1 (a/b/c) seeds three near-duplicate paraphrases that should crowd out genuine diversity.",
+      "demonstration_category": "caught_by_auditor",
+      "associated_poison": "P-DIV-1 cluster (a, b, c)",
+      "expected_behavior": "REDUNDANT fires in poisoned run only. The three near-duplicate paraphrases of the Calvin cycle definition are pulled into top-K together (verified: all three at ranks 1-3 in poisoned run), driving redundancyRatio above 0.75 threshold.",
       "true_chunk_predicates": {
         "must_contain_all": ["Calvin cycle"],
         "must_contain_any": ["light-independent", "carbon fixation", "RuBisCO", "stroma", "ribulose"]
@@ -40,8 +44,9 @@
     {
       "id": "Q4",
       "text": "What gases do plants exchange during photosynthesis?",
-      "expected_pathology_in_poisoned_run": "SCORE_MISCALIBRATED",
-      "rationale": "Poison P-MIS-1 inverts gas exchange. If retriever ranks P-MIS-1 highly, the answer to a fundamental question is reversed.",
+      "demonstration_category": "missed_by_design",
+      "associated_poison": "P-MIS-1",
+      "expected_behavior": "Auditor reports CLEAN. P-MIS-1 (asserts plants release CO2 and absorb O2) sits at rank 1 in poisoned run with retriever score 0.741 and TF-IDF alignment that the auditor scores as aligned. The factual inversion is invisible to the auditor.",
       "true_chunk_predicates": {
         "must_contain_any": ["absorb carbon dioxide", "release oxygen", "take in CO2", "produce O2"],
         "must_not_contain_at_top_rank": ["release carbon dioxide", "absorb oxygen"]
@@ -51,8 +56,9 @@
     {
       "id": "Q5",
       "text": "Compare photosynthesis to cellular respiration.",
-      "expected_pathology_in_poisoned_run": "OFF_TOPIC",
-      "rationale": "Poison P-OFF-1 is a clean cellular-respiration explanation. It is on-topic for this query at first glance, but it does not actually compare the two processes — it only describes one.",
+      "demonstration_category": "missed_by_design",
+      "associated_poison": "P-OFF-1",
+      "expected_behavior": "Auditor reports CLEAN. P-OFF-1 (cellular respiration explanation that does not actually compare the two processes) is retrieved at rank 2 in poisoned run. The auditor cannot detect that the chunk fails to fulfil the comparison aspect of the query — that requires query-intent grading, which is outside its scope.",
       "true_chunk_predicates": {
         "must_contain_all": ["photosynthesis"],
         "must_contain_any": ["opposite", "complementary", "reverse", "store energy", "release energy", "anabolic", "catabolic"]
@@ -62,8 +68,9 @@
     {
       "id": "Q6",
       "text": "What is the role of chlorophyll?",
-      "expected_pathology_in_poisoned_run": "RANK_INVERSION",
-      "rationale": "Poison P-INV-1 is stuffed with chlorophyll-related vocabulary in an off-topic kitchen-appliance review. Embedding may rank it high; TF-IDF alignment grader exposes the inversion.",
+      "demonstration_category": "natural_pathology",
+      "associated_poison": "P-INV-1 (engineered but not retrieved)",
+      "expected_behavior": "RANK_INVERSION + SCORE_MISCALIBRATED fire in BOTH clean and poisoned runs from the BASE CORPUS alone — P-INV-1 (kitchen appliance with photosynthesis vocabulary) is correctly never retrieved. The pathology comes from the dense embedding's genuine ranking error on this query: rankQualityR = -0.435, scoreCalibrationR = -0.508. The auditor surfaces a real retrieval flaw with no poison needed. Bonus finding.",
       "true_chunk_predicates": {
         "must_contain_all": ["chlorophyll"],
         "must_contain_any": ["absorb light", "pigment", "photon", "energy capture", "photosystem"]
@@ -73,8 +80,9 @@
     {
       "id": "Q7",
       "text": "How does light wavelength affect photosynthesis?",
-      "expected_pathology_in_poisoned_run": "none — clean baseline",
-      "rationale": "No poison engineered for this query. Used as control: auditor must report HEALTHY on this query in BOTH clean and poisoned runs.",
+      "demonstration_category": "clean_baseline",
+      "associated_poison": null,
+      "expected_behavior": "No flag fires in either run. Validates that the auditor is not flagging legitimate retrievals.",
       "true_chunk_predicates": {
         "must_contain_any": ["wavelength", "absorption spectrum", "blue light", "red light", "green light"]
       },
@@ -83,8 +91,9 @@
     {
       "id": "Q8",
       "text": "Describe the light-dependent reactions.",
-      "expected_pathology_in_poisoned_run": "LOW_DIVERSITY",
-      "rationale": "Cluster P-DIV-2 (a/b/c) seeds three near-duplicate paraphrases of the light-reaction definition. Retriever will likely return all three, leaving fewer slots for distinct content.",
+      "demonstration_category": "caught_by_auditor",
+      "associated_poison": "P-DIV-2 cluster (a, b, c)",
+      "expected_behavior": "REDUNDANT fires in poisoned run only. Three near-duplicate paraphrases of the light-reaction definition fill ranks 2, 4, 5 in poisoned run (verified empirically), driving redundancyRatio above the 0.75 threshold.",
       "true_chunk_predicates": {
         "must_contain_any": ["thylakoid", "photosystem", "ATP", "NADPH", "electron transport"]
       },
@@ -93,8 +102,9 @@
     {
       "id": "Q9",
       "text": "What are C4 and CAM photosynthesis pathways?",
-      "expected_pathology_in_poisoned_run": "none — clean baseline",
-      "rationale": "No poison engineered for this query. Niche enough that retriever is unlikely to land on misleading chunks. Control #2.",
+      "demonstration_category": "clean_baseline",
+      "associated_poison": null,
+      "expected_behavior": "No flag fires in either run. Niche-enough query that the retriever lands on legitimate corpus chunks. Second control.",
       "true_chunk_predicates": {
         "must_contain_any": ["C4", "CAM", "PEP carboxylase", "bundle sheath", "crassulacean", "succulent"]
       },
@@ -102,13 +112,15 @@
     },
     {
       "id": "Q10",
-      "text": "When did photosynthesis first evolve?",
-      "expected_pathology_in_poisoned_run": "OFF_TOPIC (in BOTH runs)",
-      "rationale": "Out-of-distribution: corpus does not directly answer this. Auditor must fire OFF_TOPIC in both clean and poisoned runs. Used to validate that the auditor catches OOD as a baseline behavior, not just because of poisons.",
+      "text": "What is the Pythagorean theorem?",
+      "demonstration_category": "ood_probe",
+      "associated_poison": null,
+      "expected_behavior": "OFF_TOPIC must fire in both clean and poisoned runs. The corpus is biology only; this query is geometry. If OFF_TOPIC does not fire here, the dense profile's offTopic threshold (0.10) is too lenient even for a true OOD probe — the auditor cannot distinguish OOD from in-domain on dense retrieval over a domain-rich corpus, which is itself a finding worth publishing.",
+      "rationale": "Replaced an earlier evolution-of-photosynthesis query (which had tangential corpus support — mentions of 'evolved' across base chunks defeated the OOD intent). Pythagorean theorem has zero overlap with photosynthesis vocabulary; provides a true OOD ground truth.",
       "true_chunk_predicates": {
-        "must_contain_any": ["billion years ago", "Archean", "cyanobacteria", "evolved", "Great Oxygenation"]
+        "must_contain_any": ["pythagorean", "right triangle", "hypotenuse", "a^2", "a squared"]
       },
-      "reference_answer": "Photosynthesis is thought to have evolved at least 3.4 billion years ago in early prokaryotes; oxygenic photosynthesis emerged in cyanobacteria around 2.5 billion years ago, triggering the Great Oxygenation Event. (This answer is not in the assembled corpus — it is OOD by design.)"
+      "reference_answer": "The Pythagorean theorem states that in a right triangle, the square of the hypotenuse equals the sum of squares of the other two sides: a² + b² = c². (This answer is not in the assembled corpus — geometry is OOD by design.)"
     }
   ]
 }

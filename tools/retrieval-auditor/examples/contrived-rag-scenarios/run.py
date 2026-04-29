@@ -188,7 +188,9 @@ def run(mode: str) -> Path:
         out["queries"].append({
             "id": q["id"],
             "query": q["text"],
-            "expected_pathology_in_poisoned_run": q["expected_pathology_in_poisoned_run"],
+            "demonstration_category": q.get("demonstration_category"),
+            "associated_poison": q.get("associated_poison"),
+            "expected_behavior": q.get("expected_behavior"),
             "retrieved": payload["retrieved"],
             "audit": audit,
             "precision": prec,

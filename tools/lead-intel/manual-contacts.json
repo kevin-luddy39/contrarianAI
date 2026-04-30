@@ -127,5 +127,14 @@
     "source": "linkedin",
     "notes": "Replied 2026-04-27 to Kevin's outreach. Senior eng, contrarian read on microservices ('SaaS hijacked the term, just same HTTP services but micro'). NOT a buyer — explicitly stopped looking due to age + 'AI taking over' resignation. Right target for peer-collaborator framing, not sales pitch. Reply sent 2026-04-27 reframing AI-takeover as MORE-failure-modes thesis, no Bell Tuning pitch, soft offer to share whitepapers if he wants. Watch for 'send the whitepapers' = green light to convert to deeper conversation.",
     "next_action": "Reply sent 2026-04-27. Watch for whitepaper-request = green light. If silent 14d, low-priority follow-up with one whitepaper link 2026-05-11."
+  },
+  {
+    "name": "LinkedIn boost post — LangChain teardown",
+    "company": "(self-broadcast)",
+    "linkedin_url": "https://www.linkedin.com/in/kevinluddy",
+    "tier": "self-broadcast",
+    "source": "linkedin",
+    "notes": "Posted 2026-04-30 10:27 ET on Kevin's personal LinkedIn (Thursday B2B peak window). Hook: 0.114 vs 0.235 alignment numbers from LangChain quickstart teardown — top-ranked chunk less aligned than chunk #4. Body avoids eval-framework language (per Hamel-brush-off lesson); frames as observability/APM. CTA = 'npx contrarianai-context-inspector --install-mcp', no audit/Bell Tuning pitch in body. First-comment posted with link to teardown article + context-inspector repo (LinkedIn algo bias against in-body outbound links). Closer asks readers running their own RAG to drop screenshots in DMs — DM channel = qualified-lead filter.",
+    "next_action": "Monitor LinkedIn views/reactions/comments 30min then hourly through end of day. Reply <60 min to any DM. Watch context-inspector GH clones + landing form fills for downstream traffic. Pin first comment ONLY after 2-3 organic replies land. If the post stalls (<50 views by EOD 2026-04-30): reframe + re-test in 7-10 days with different number-pair hook. If it hits >500 views: extract DM senders into this file as new prospects."
   }
 ]

@@ -510,27 +510,17 @@
         <p class="sub">Tell me what you're running and what's not working. I'll respond within 24 hours.</p>
 
         <form class="audit-form" id="audit-form-el">
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="name">Name</label>
-                    <input type="text" id="name" name="name" required placeholder="Your full name">
-                </div>
-                <div class="form-group">
-                    <label for="company">Company</label>
-                    <input type="text" id="company" name="company" required placeholder="Company name">
-                </div>
-            </div>
             <div class="form-group">
-                <label for="email">Work Email</label>
+                <label for="email">Email</label>
                 <input type="email" id="email" name="email" required placeholder="you@company.com">
             </div>
             <div class="form-group">
-                <label for="ai_stack">What are you running and what's not working?</label>
-                <textarea id="ai_stack" name="ai_stack" placeholder="e.g., Multi-agent system on Claude, costs are 3x what we expected, users getting wrong answers..."></textarea>
+                <label for="ai_stack">One line on what you're running and what's not working <span style="font-weight:400;color:var(--text-muted);">(optional)</span></label>
+                <input type="text" id="ai_stack" name="ai_stack" placeholder="e.g., Multi-agent on Claude, costs 3x expected, plausible-but-wrong outputs">
             </div>
-            <button type="submit" class="form-submit">Send me a message</button>
+            <button type="submit" class="form-submit">Send</button>
             <p id="form-status" style="text-align:center;margin-top:12px;display:none;font-weight:600;"></p>
-            <p class="form-note">No spam. No sales sequences. Just a direct reply from me.</p>
+            <p class="form-note">Direct reply from me within 24 hours. No spam. No sales sequences.</p>
         </form>
     </div>
 </section>
@@ -553,9 +543,9 @@ document.getElementById('audit-form-el').addEventListener('submit', async (e) =>
     status.style.display = 'none';
 
     const data = {
-        name: form.name.value,
+        name: '',
         email: form.email.value,
-        company: form.company.value,
+        company: '',
         role: '',
         ai_stack: form.ai_stack.value,
         pain: '',

@@ -399,14 +399,14 @@ app.use(express.static('landing'));
 app.post('/api/audit-request', async (req, res) => {
   const { name, email, company, role, ai_stack, pain } = req.body;
 
-  if (!name || !email || !company) {
-    return res.status(400).json({ error: 'Name, email, and company are required.' });
+  if (!email) {
+    return res.status(400).json({ error: 'Email is required.' });
   }
 
   try {
     await pool.query(
       'INSERT INTO audit_requests (name, email, company, role, ai_stack, pain) VALUES ($1, $2, $3, $4, $5, $6)',
-      [name, email, company, role || null, ai_stack || null, pain || null]
+      [name || null, email, company || null, role || null, ai_stack || null, pain || null]
     );
   } catch (err) {
     console.error('DB insert error:', err);
@@ -414,16 +414,18 @@ app.post('/api/audit-request', async (req, res) => {
   }
 
   if (transporter) {
+    const subjectName = name || email;
+    const subjectCompany = company ? ` at ${company}` : '';
     transporter.sendMail({
       from: `"contrarianAI" <${process.env.SMTP_USER}>`,
       to: NOTIFY_EMAIL,
-      subject: `New Diagnostic Request: ${name} at ${company}`,
+      subject: `New Diagnostic Request: ${subjectName}${subjectCompany}`,
       text: [
         'New diagnostic request submitted:',
         '',
-        `Name:     ${name}`,
         `Email:    ${email}`,
-        `Company:  ${company}`,
+        `Name:     ${name || '(not provided)'}`,
+        `Company:  ${company || '(not provided)'}`,
         `Role:     ${role || '(not provided)'}`,
         `AI Stack: ${ai_stack || '(not provided)'}`,
         `Pain:     ${pain || '(not provided)'}`,

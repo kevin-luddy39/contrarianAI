@@ -426,7 +426,7 @@
 <nav>
     <div class="container">
         <a href="/" class="logo">contrarian<span>AI</span></a>
-        <a href="/#audit-form" class="cta">Request Diagnostic</a>
+        <a href="/bell-tuning-rapid-audit.html" class="cta">Buy Rapid Audit — $2,500</a>
     </div>
 </nav>
 
@@ -477,19 +477,11 @@
 
     <div class="email-form">
         <h3>Email me my results</h3>
-        <p>We'll send your full scored report + a PDF version you can share with your team. You'll also hear from us if you want help on the lowest-scoring items.</p>
+        <p>We'll send your full scored report so you can share it with your team. Optional, but useful if you want to reference it later.</p>
         <form id="email-results-form">
             <div class="form-group">
-                <label for="r-name">Name</label>
-                <input type="text" id="r-name" name="name" required placeholder="Your full name">
-            </div>
-            <div class="form-group">
-                <label for="r-email">Work Email</label>
+                <label for="r-email">Email</label>
                 <input type="email" id="r-email" name="email" required placeholder="you@company.com">
-            </div>
-            <div class="form-group">
-                <label for="r-company">Company</label>
-                <input type="text" id="r-company" name="company" required placeholder="Company name">
             </div>
             <button type="submit" id="email-submit-btn">Send me my results</button>
             <div id="email-status" class="email-status"></div>
@@ -497,7 +489,7 @@
     </div>
 
     <div class="next-cta">
-        <p>Ready to fix what's broken? <a href="/#audit-form">Request the paid AI Production Diagnostic →</a></p>
+        <p>Ready to fix what's broken? <a href="/bell-tuning-rapid-audit.html">Buy the Rapid Audit — $2,500, 48-hour turnaround →</a></p>
     </div>
 </section>
 
@@ -747,9 +739,9 @@ document.getElementById('email-results-form').addEventListener('submit', async (
     const band = bands.find(b => score >= b.min && score <= b.max);
 
     const payload = {
-        name: form.name.value,
+        name: '',
         email: form.email.value,
-        company: form.company.value,
+        company: '',
         score: score,
         band: band.title,
         answers: answers,

@@ -514,14 +514,14 @@ function buildAssessmentEmail(name, score, band, answers) {
 app.post('/api/assessment', async (req, res) => {
   const { name, email, company, score, band, answers } = req.body;
 
-  if (!name || !email || !company || typeof score !== 'number' || !band || !answers) {
-    return res.status(400).json({ error: 'Missing required fields.' });
+  if (!email || typeof score !== 'number' || !band || !answers) {
+    return res.status(400).json({ error: 'Email, score, band, and answers are required.' });
   }
 
   try {
     await pool.query(
       'INSERT INTO assessments (name, email, company, score, band, answers) VALUES ($1, $2, $3, $4, $5, $6)',
-      [name, email, company, score, band, JSON.stringify(answers)]
+      [name || null, email, company || null, score, band, JSON.stringify(answers)]
     );
   } catch (err) {
     console.error('Assessment insert error:', err);
@@ -529,26 +529,30 @@ app.post('/api/assessment', async (req, res) => {
   }
 
   if (transporter) {
+    const greeting = name || 'there';
+    const subjectName = name || email;
+    const subjectCompany = company ? ` at ${company}` : '';
+
     // Send results to the user
     transporter.sendMail({
       from: `"contrarianAI" <${process.env.SMTP_USER}>`,
       to: email,
       bcc: NOTIFY_EMAIL,
       subject: `Your AI Production Readiness Score: ${score}/24 — ${band}`,
-      text: buildAssessmentEmail(name, score, band, answers),
+      text: buildAssessmentEmail(greeting, score, band, answers),
     }).catch(err => console.error('Assessment email error:', err));
 
     // Lead notification (separate so subject is distinct)
     transporter.sendMail({
       from: `"contrarianAI" <${process.env.SMTP_USER}>`,
       to: NOTIFY_EMAIL,
-      subject: `New Assessment Lead: ${name} at ${company} — ${score}/24`,
+      subject: `New Assessment Lead: ${subjectName}${subjectCompany} — ${score}/24`,
       text: [
         `Self-assessment completed:`,
         ``,
-        `Name:    ${name}`,
         `Email:   ${email}`,
-        `Company: ${company}`,
+        `Name:    ${name || '(not provided)'}`,
+        `Company: ${company || '(not provided)'}`,
         `Score:   ${score} / 24`,
         `Band:    ${band}`,
         ``,

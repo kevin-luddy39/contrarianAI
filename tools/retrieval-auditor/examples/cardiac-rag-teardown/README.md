@@ -2,8 +2,6 @@
 
 A vertical-specific follow-up to the [LangChain RAG quickstart teardown](../langchain-quickstart-teardown/) and the [contrived-RAG pathology scenarios](../contrived-rag-scenarios/). Same instrument, same methodology, applied to cardiology — the medical sub-domain where wrong AI retrieval has the highest stakes.
 
-> Reviewed by [name], retired Hopkins cardiac surgeon — _[placeholder; see PUBLISH_NOTE.md for status]_
-
 ## TL;DR
 
 I assembled a 1.03M-character corpus from 40 Wikipedia cardiology pages — heart failure, MI, AFib, valve disease, ECG interpretation, antiarrhythmics, anticoagulation, the usual suspects — and ran 50 cardiology USMLE-style clinical vignettes against it via sentence-transformers/MiniLM embeddings at top-K=5. I piped each retrieval through `retrieval-auditor --profile dense` for pathology analysis.
@@ -60,15 +58,13 @@ Components:
 
 ## Five most striking findings
 
-The full per-query JSON ships in `results/cardiac.json`. Five worth reading in detail are documented in `cousin_review_top5.md` — formatted for a clinical reader:
+The full per-query JSON ships in `results/cardiac.json`. Five worth reading in detail:
 
 1. **70yo obese man, acute pulmonary edema** (medqa/0380) — health 0.10, all 3 mechanism flags. Top chunk was less aligned than chunk 4 by a factor of 9× on TF-IDF measurement.
 2. **69yo hypertensive with abdominal pain + foot bruising** (medqa/0448) — classic vascular emergency presentation. Health 0.41, all 3 flags.
 3. **18yo woman, palpitations + lightheadedness** (medqa/0757) — health 0.02, the worst score in the run. SVT/POTS-spectrum query that retrieved generic chunks.
 4. **5yo immigrant, post-strep carditis** (medqa/0730) — health 0.08. The retriever pulled vague chunks; rheumatic heart disease specifics were absent.
 5. **65yo with stroke symptoms, likely cardioembolic** (medqa/1079) — health 0.29. Cross-system query (neuro presentation, cardiac source) where retrieval missed the cardiac angle entirely.
-
-These five were sent for clinical review pre-publication. Cardiologist-cousin reviewer was asked: are the retrieval failures clinically meaningful, or is the AI's behavior actually defensible in context? Reviewer attribution above will be filled in (or kept anonymous) post-reply.
 
 ## What this means if you ship a clinical RAG
 

@@ -1,0 +1,159 @@
+{
+  "version": "0.1",
+  "schema_note": "Target buckets for outreach. Bucket 'cardiac_recipients' = healthcare AI / cardiology AI / health-tech leaders who'd care about the cardiac retrieval teardown when published. Bucket 'ai_pain_complaints' = LinkedIn / X / public posts where someone is venting about RAG/agent/AI production failure. Each entry = candidate to be contacted or commented on. Update as targets are surfaced via search.",
+  "buckets": {
+    "cardiac_recipients": {
+      "criteria": "Decision-makers or near-decision-makers with budget exposure to clinical AI / cardiology AI; titles like Director of Clinical AI, VP Healthcare AI, Chief Medical Information Officer, Chief AI Officer; or technical leads on cardiology-flavored AI products.",
+      "search_queries_to_run_manually_on_linkedin": [
+        "Director clinical AI cardiology",
+        "VP healthcare AI cardiac",
+        "Chief Medical Information Officer cardiology",
+        "Chief AI Officer hospital",
+        "Head of AI cardiology",
+        "Head of clinical informatics cardiac",
+        "AI engineer cardiac decision support",
+        "(\"clinical decision support\" OR \"CDS\") AND (RAG OR retrieval) AND (cardiology OR cardiac)"
+      ],
+      "search_queries_for_companies": [
+        "Cleveland Clinic AI",
+        "Johns Hopkins AI clinical",
+        "Mass General Brigham AI",
+        "Mayo Clinic AI",
+        "Stanford Health AI",
+        "Kaiser AI clinical",
+        "Optum clinical AI",
+        "Epic AI",
+        "Oracle Health (Cerner) AI",
+        "Hippocratic AI",
+        "Glass Health",
+        "K Health"
+      ],
+      "candidates": [
+        {
+          "name": "Faraz Ahmad, MD",
+          "role": "Associate Director, Bluhm Cardiovascular Institute Center for Artificial Intelligence",
+          "org": "Northwestern Medicine",
+          "extra": "Associate editor for AI in JAMA Cardiology",
+          "fit": "high — direct cardiology AI lead at major academic center",
+          "source": "websearch 2026-05-01",
+          "next_action": "Find his LinkedIn profile manually, log URL, queue DM after cardiac teardown publishes"
+        },
+        {
+          "name": "Thomas M. Maddox, MD",
+          "role": "VP Digital Products and Innovation",
+          "org": "BJC HealthCare / Washington University School of Medicine",
+          "extra": "Cardiologist by training",
+          "fit": "high — VP-level decision-maker, cardiology background, digital innovation portfolio",
+          "source": "websearch 2026-05-01",
+          "next_action": "Manual LinkedIn lookup, log URL, queue DM"
+        },
+        {
+          "name": "Rajendra Makkar, MD",
+          "role": "VP of Innovation, Stephen R. Corday Chair in Interventional Cardiology",
+          "org": "Cedars-Sinai Medical Center",
+          "fit": "medium-high — innovation portfolio + interventional cardiology specifically",
+          "source": "websearch 2026-05-01",
+          "next_action": "Manual LinkedIn lookup, log URL, queue DM"
+        },
+        {
+          "name": "Marie-Noelle Langan, MD",
+          "role": "Former Director of Operations, Electrophysiology; Chief Medical Advisor",
+          "org": "Mount Sinai (former) / 91Life",
+          "fit": "medium — EP specifically; vendor-side now",
+          "source": "websearch 2026-05-01",
+          "next_action": "Manual LinkedIn lookup; check 91Life fit"
+        },
+        {
+          "name": "Ami Bhatt, MD",
+          "role": "FDA leadership",
+          "org": "FDA",
+          "fit": "medium — regulator, not buyer; useful for credibility distribution",
+          "source": "websearch 2026-05-01",
+          "next_action": "Manual LinkedIn lookup; tag-not-DM (would be inappropriate to DM a regulator with paid pitch)"
+        },
+        {
+          "name": "Deepti Pandita, MD",
+          "role": "Chief Medical Information Officer / VP Clinical Informatics",
+          "org": "UCI Health",
+          "fit": "high — CMIO + clinical informatics + AI governance focus",
+          "source": "websearch 2026-05-01",
+          "next_action": "Manual LinkedIn lookup, log URL, queue DM after cardiac teardown publishes"
+        }
+      ]
+    },
+    "ai_pain_complaints": {
+      "criteria": "Public posts (LinkedIn, X, Reddit, HN, Medium) where someone vents about RAG / agent / AI / eval failure modes in production. The OP is the lead. Comment with substance, end with profile signal toward landing page. Medium articles whose authors are reachable via LinkedIn are a particularly good substrate.",
+      "search_queries_to_run_manually_on_linkedin": [
+        "RAG production fail",
+        "hallucination retrieval AI",
+        "agent loop production",
+        "eval suite passing wrong",
+        "AI production embarrassing",
+        "LLM accuracy regression",
+        "context window degraded",
+        "RAG quality silent",
+        "vector search broken"
+      ],
+      "candidates": [
+        {
+          "author": "Tommy Adeliyi",
+          "title": "Why Most RAG Systems Fail in Production (And How to Fix Them)",
+          "platform": "Medium",
+          "url": "https://medium.com/@tommyadeliyi/why-most-rag-systems-fail-in-production-and-how-to-fix-them-82cde6782b50",
+          "published": "Mar 2026",
+          "fit": "high — directly aligned framing (RAG production failure)",
+          "next_action": "Comment on Medium post + find author's LinkedIn + send connection request with substantive note referencing teardown"
+        },
+        {
+          "author": "Sai Nikhil Mekala",
+          "title": "RAG at Scale: What Actually Breaks in Production (And How to Fix It)",
+          "platform": "Medium",
+          "url": "https://sainikhilmekala.medium.com/rag-at-scale-what-actually-breaks-in-production-and-how-to-fix-it-ba36bc492022",
+          "published": "Feb 2026",
+          "fit": "high — production-shape, scale-shape",
+          "next_action": "Same — Medium comment + LinkedIn cross-link"
+        },
+        {
+          "author": "Sunil Rangwani",
+          "title": "Why 73% of RAG Systems Fail in Production",
+          "platform": "Medium (mindtechharbour)",
+          "url": "https://mindtechharbour.medium.com/why-73-of-rag-systems-fail-in-production-and-how-to-build-one-that-actually-works-part-1-6a888af915fa",
+          "fit": "high — number-led framing matches our teardown style",
+          "next_action": "Same"
+        },
+        {
+          "author": "(Data Science Collective)",
+          "title": "Why RAGAS Fails 83% of Time — Air Canada lost a lawsuit because their RAG hallucinated, yours will too",
+          "platform": "Medium",
+          "url": "https://medium.com/data-science-collective/air-canada-lost-a-lawsuit-because-their-rag-hallucinated-yours-will-too-b92b6b9a4d39",
+          "fit": "very high — explicitly argues current eval frameworks fail; that's our positioning's exact wedge",
+          "next_action": "Comment with the contrived-RAG-scenarios artifact framing once it's published — 'ran a controlled experiment showing precisely this'"
+        },
+        {
+          "author": "Yash S",
+          "title": "The RAG Design Flaw — Why Your System is Quietly Failing",
+          "platform": "Medium",
+          "url": "https://medium.com/@yashs3326/the-rag-design-flaw-why-your-system-is-quietly-failing-9b55e72a9ddc",
+          "fit": "high — 'quietly failing' = our core thesis",
+          "next_action": "Comment + author LinkedIn lookup"
+        },
+        {
+          "author": "Thinking Loop",
+          "title": "RAG Isn't Accuracy: 8 Confident Failure Modes",
+          "platform": "Medium",
+          "url": "https://medium.com/@ThinkingLoop/rag-isnt-accuracy-8-confident-failure-modes-568cfe855694",
+          "fit": "high — confident-failure-modes is the 'precision@K passes while substance fails' shape",
+          "next_action": "Comment + author lookup"
+        },
+        {
+          "author": "Amarnath Byakod",
+          "title": "Why RAG Systems Fail in Production — Part 2: Security, Scale, Data Quality, and Cost",
+          "platform": "Medium",
+          "url": "https://medium.com/@abyakod/why-rag-systems-fail-in-production-part-2-security-scale-data-quality-and-cost-999e17dd5b36",
+          "fit": "medium — broader scope, less retrieval-mechanism-shape",
+          "next_action": "Comment if time; lower priority"
+        }
+      ]
+    }
+  }
+}

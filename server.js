@@ -87,6 +87,40 @@ async function initDb() {
   `);
   await pool.query(`INSERT INTO report_state (id) VALUES (1) ON CONFLICT DO NOTHING`);
 
+  // bridge_visit_stats: structured per-window snapshot of visit reports.
+  // Written by the stats-ingest webhook each time a report is sent.
+  // bump_flagged + bump_reason carry the analysis decision so trend queries
+  // can use a single table. visits_filtered = total minus noise (bots,
+  // T-Mobile self-test, recurring scanners). baseline_avg_per_hour holds the
+  // 7-day rolling average used at decision time.
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS bridge_visit_stats (
+      id SERIAL PRIMARY KEY,
+      reported_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      window_start TIMESTAMPTZ NOT NULL,
+      window_end TIMESTAMPTZ NOT NULL,
+      visits_total INTEGER NOT NULL,
+      visits_filtered INTEGER NOT NULL,
+      uniques_total INTEGER NOT NULL,
+      uniques_filtered INTEGER NOT NULL,
+      by_referrer JSONB NOT NULL,
+      by_browser JSONB NOT NULL,
+      by_os JSONB NOT NULL,
+      by_device JSONB NOT NULL,
+      by_language JSONB NOT NULL,
+      by_ip JSONB NOT NULL,
+      hourly_distribution JSONB NOT NULL,
+      noise_breakdown JSONB,
+      baseline_avg_per_hour NUMERIC,
+      observed_max_per_hour NUMERIC,
+      bump_flagged BOOLEAN NOT NULL DEFAULT FALSE,
+      bump_reason TEXT,
+      reason TEXT
+    )
+  `);
+  await pool.query(`CREATE INDEX IF NOT EXISTS bridge_visit_stats_reported_idx ON bridge_visit_stats(reported_at DESC)`);
+  await pool.query(`CREATE INDEX IF NOT EXISTS bridge_visit_stats_bump_idx ON bridge_visit_stats(bump_flagged, reported_at DESC)`);
+
   // ============================================================
   // Lead Intel schema
   // ============================================================
@@ -1530,6 +1564,194 @@ async function sendVisitReport(reason) {
   }
 
   await pool.query('UPDATE report_state SET last_report_at = NOW() WHERE id = 1');
+
+  // Decoupled webhook: post structured stats to the ingest endpoint for
+  // analysis (noise filter + bump detection + alerts). Fire-and-forget so
+  // a webhook failure can't block the email path.
+  setImmediate(() => {
+    postStatsWebhook(since, new Date(), reason).catch((err) =>
+      console.error('postStatsWebhook failed', err)
+    );
+  });
+}
+
+// ============================================================
+// Visit-stats analysis pipeline (Postgres store + bump detection + alerts)
+// Spec: docs/visit-stats-spec.md (or local memory).
+// Triggered by sendVisitReport; runs as a separate code path so the email
+// reporter stays simple.
+// ============================================================
+const T_MOBILE_NAT_PREFIXES = ['172.58.252.', '172.58.253.'];
+const KNOWN_BOT_IPS = new Set([
+  '144.76.19.157', // Hetzner recurring scanner
+]);
+const TENCENT_PREFIXES = ['43.164.', '170.106.', '124.156.', '43.133.'];
+
+function isNoiseRow(row) {
+  // Returns one of: false (real), 'self-test', 'scanner-zh-cn', 'scanner-hetzner', 'scanner-tencent', 'ua-stripped-cellular'
+  const ip = row.ip || '';
+  const ua = row.user_agent || '';
+  const browser = row.browser || '';
+  const os = row.os || '';
+  const lang = row.language || '';
+  if (KNOWN_BOT_IPS.has(ip)) return 'scanner-hetzner';
+  if (TENCENT_PREFIXES.some((p) => ip.startsWith(p))) return 'scanner-tencent';
+  if (browser.includes('Mobile Safari 13.0.3') && lang === 'zh-CN') return 'scanner-zh-cn';
+  if (T_MOBILE_NAT_PREFIXES.some((p) => ip.startsWith(p)) && (!browser || browser === '(unknown)')) return 'self-test';
+  return false;
+}
+
+async function loadHourlyBaselineFromVisits() {
+  // Returns avg visits per hour over the last 7 days, computed AFTER noise
+  // filter applied. Used as the baseline for bump detection.
+  const r = await pool.query(`
+    SELECT ip, user_agent, browser, os, language, created_at
+    FROM visits
+    WHERE created_at > NOW() - INTERVAL '7 days'
+  `);
+  const realRows = r.rows.filter((v) => !isNoiseRow(v));
+  if (realRows.length === 0) return 0;
+  const hours = 7 * 24;
+  return realRows.length / hours;
+}
+
+async function postStatsWebhook(windowStart, windowEnd, reason) {
+  const r = await pool.query(
+    `SELECT ip, user_agent, browser, os, device, referrer, language, created_at
+     FROM visits WHERE created_at > $1 AND created_at <= $2`,
+    [windowStart, windowEnd]
+  );
+  const rows = r.rows;
+  const filtered = rows.filter((v) => !isNoiseRow(v));
+  const noiseCounts = {};
+  rows.forEach((v) => {
+    const tag = isNoiseRow(v);
+    if (tag) noiseCounts[tag] = (noiseCounts[tag] || 0) + 1;
+  });
+
+  // Group helpers
+  const groupBy = (rs, fn) => {
+    const out = {};
+    rs.forEach((r) => {
+      const k = fn(r) || '(unknown)';
+      out[k] = (out[k] || 0) + 1;
+    });
+    return out;
+  };
+  const byReferrer = groupBy(rows, (v) => v.referrer || '(direct)');
+  const byBrowser = groupBy(rows, (v) => v.browser);
+  const byOS = groupBy(rows, (v) => v.os);
+  const byDevice = groupBy(rows, (v) => v.device || 'desktop');
+  const byLanguage = groupBy(rows, (v) => v.language);
+  const byIp = groupBy(rows, (v) => v.ip || '');
+  const hourly = {};
+  rows.forEach((v) => {
+    const h = new Date(v.created_at).toISOString().slice(0, 13);
+    hourly[h] = (hourly[h] || 0) + 1;
+  });
+
+  // Bump detection: 7-day rolling avg/hour vs observed max/hour in window.
+  const baseline = await loadHourlyBaselineFromVisits();
+  const filteredHourly = {};
+  filtered.forEach((v) => {
+    const h = new Date(v.created_at).toISOString().slice(0, 13);
+    filteredHourly[h] = (filteredHourly[h] || 0) + 1;
+  });
+  const observedMax = Math.max(0, ...Object.values(filteredHourly));
+  const bumpFlagged = baseline > 0 && observedMax >= 2 * baseline && observedMax >= 3;
+  const bumpReason = bumpFlagged
+    ? `observed peak ${observedMax}/hr vs 7-day baseline ${baseline.toFixed(2)}/hr (>=2x and >=3 absolute)`
+    : null;
+
+  await pool.query(
+    `INSERT INTO bridge_visit_stats
+      (window_start, window_end, visits_total, visits_filtered,
+       uniques_total, uniques_filtered, by_referrer, by_browser, by_os,
+       by_device, by_language, by_ip, hourly_distribution, noise_breakdown,
+       baseline_avg_per_hour, observed_max_per_hour, bump_flagged, bump_reason, reason)
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19)`,
+    [
+      windowStart,
+      windowEnd,
+      rows.length,
+      filtered.length,
+      new Set(rows.map((v) => v.ip)).size,
+      new Set(filtered.map((v) => v.ip)).size,
+      JSON.stringify(byReferrer),
+      JSON.stringify(byBrowser),
+      JSON.stringify(byOS),
+      JSON.stringify(byDevice),
+      JSON.stringify(byLanguage),
+      JSON.stringify(byIp),
+      JSON.stringify(hourly),
+      JSON.stringify(noiseCounts),
+      baseline,
+      observedMax,
+      bumpFlagged,
+      bumpReason,
+      reason,
+    ]
+  );
+
+  if (bumpFlagged) {
+    await dispatchBumpAlert({
+      windowStart,
+      windowEnd,
+      observedMax,
+      baseline,
+      filteredCount: filtered.length,
+      totalCount: rows.length,
+      noiseCounts,
+      bumpReason,
+    });
+  }
+}
+
+async function dispatchBumpAlert(ctx) {
+  const subject = `[contrarianAI] TRAFFIC BUMP — ${ctx.observedMax}/hr peak (baseline ${ctx.baseline.toFixed(2)}/hr)`;
+  const body = [
+    `Traffic bump detected on contrarianAI landing.`,
+    ``,
+    `Window:           ${new Date(ctx.windowStart).toISOString()}  ->  ${new Date(ctx.windowEnd).toISOString()}`,
+    `Visits (total):   ${ctx.totalCount}`,
+    `Visits (real):    ${ctx.filteredCount}  (noise filtered: ${ctx.totalCount - ctx.filteredCount})`,
+    `Peak (real/hr):   ${ctx.observedMax}`,
+    `Baseline (7d):    ${ctx.baseline.toFixed(2)}/hr`,
+    `Reason:           ${ctx.bumpReason}`,
+    ``,
+    `Noise breakdown:`,
+    Object.entries(ctx.noiseCounts).map(([k, v]) => `  ${k.padEnd(28)} ${v}`).join('\n') || '  (none)',
+  ].join('\n');
+
+  // Send email alert to the stats notification address
+  if (transporter && STATS_EMAIL) {
+    transporter
+      .sendMail({
+        from: `"contrarianAI Alerts" <${process.env.SMTP_USER}>`,
+        to: STATS_EMAIL,
+        subject,
+        text: body,
+      })
+      .then(() => console.log('bump-alert email sent'))
+      .catch((err) => console.error('bump-alert email failed', err));
+  }
+
+  // Send email-to-SMS alert to Kevin's phone gateway address (when configured)
+  const smsTo = process.env.SMS_TO_ADDRESS;
+  if (smsTo && transporter) {
+    const smsBody = `[contrarianAI] traffic bump: ${ctx.observedMax}/hr (baseline ${ctx.baseline.toFixed(1)}/hr). Window ${new Date(ctx.windowStart).toISOString().slice(11, 16)}-${new Date(ctx.windowEnd).toISOString().slice(11, 16)} UTC.`;
+    transporter
+      .sendMail({
+        from: `"contrarianAI" <${process.env.SMTP_USER}>`,
+        to: smsTo,
+        subject: '',
+        text: smsBody,
+      })
+      .then(() => console.log(`bump-alert SMS sent to ${smsTo}`))
+      .catch((err) => console.error('bump-alert SMS failed', err));
+  } else if (!smsTo) {
+    console.log('SMS_TO_ADDRESS not configured — skipping SMS dispatch (email-only alert)');
+  }
 }
 
 // Rate-limit checkReport to avoid hammering the DB on every incoming request

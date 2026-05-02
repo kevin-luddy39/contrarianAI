@@ -82,7 +82,14 @@
       ]
     },
     "ai_pain_complaints": {
-      "criteria": "Public posts (LinkedIn, X, Reddit, HN, Medium) where someone vents about RAG / agent / AI / eval failure modes in production. The OP is the lead. Comment with substance, end with profile signal toward landing page. Medium articles whose authors are reachable via LinkedIn are a particularly good substrate.",
+      "criteria": "Public posts (LinkedIn, X, Reddit, HN, Medium, Substack) where someone vents about RAG / agent / AI / eval failure modes in production. The OP is the lead. Comment with substance, end with profile signal toward landing page. Medium articles whose authors are reachable via LinkedIn are a particularly good substrate.",
+      "platform_notes": {
+        "Towards Data Science": "Spun off from Medium early 2026. NO comment system on articles. Reader profiles are name-only (no bio field for non-authors). Route engagement via LinkedIn DM to author instead — most TDS authors link their LinkedIn from the article footer. Same play applies to any paywall/comment-killed publication.",
+        "Medium": "Comments enabled by default. Body links allowed (less algo-suppressive than LinkedIn). Comment-then-author-LinkedIn-cross-link is the conversion path.",
+        "LinkedIn": "Comments + posts both work. Body links are algo-suppressed; first-comment links get ~2x organic reach. DM with substantive note is the conversion-path move when someone is venting in a post.",
+        "Substack": "Comments often enabled for subscribers; subscribing first costs nothing and unlocks comment ability. Author DMs not always exposed.",
+        "HN": "Karma-gated. Body links from low-karma accounts auto-flag. Profile-bio-link-only is the safer route. See reddit_shadowban_playbook.md for the equivalent karma-build pattern."
+      },
       "search_queries_to_run_manually_on_linkedin": [
         "RAG production fail",
         "hallucination retrieval AI",
@@ -95,6 +102,17 @@
         "vector search broken"
       ],
       "candidates": [
+        {
+          "author": "Benjamin Nweke",
+          "title": "Why AI Engineers Are Moving Beyond LangChain to Native Agent Architectures",
+          "platform": "Towards Data Science",
+          "url": "(TDS article published 2026-04-30; URL not captured)",
+          "fit": "very high — explicitly describes 'memory module silently cutting context', 3-hour debug, 'framework swallowed context', 'observability hits a ceiling' — verbatim our positioning's wedge",
+          "newsletter_substack": "Linked from article footer",
+          "linkedin": "Linked from article footer; Kevin to look up + connect",
+          "next_action": "LinkedIn connection request with the 270-char note (TDS killed comments; LinkedIn is the only direct path); after acceptance, DM full numbers + teardown link; if he engages, send cardiac teardown link when it publishes mid-May",
+          "draft_connection_note": "Read your 'Native Agent Architectures' piece on TDS. Your 3-hour memory-module debug matched exactly what I found when I audited LangChain's RAG quickstart with a distributional grader — 5 of 6 queries flagged silent retrieval pathology. Wrote it up if useful."
+        },
         {
           "author": "Tommy Adeliyi",
           "title": "Why Most RAG Systems Fail in Production (And How to Fix Them)",

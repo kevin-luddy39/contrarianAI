@@ -9,18 +9,14 @@
   },
   {
     "action": "wait_for_user",
-    "prompt": "Gmail compose open. Click body field, then Enter here."
+    "prompt": "Gmail compose open. Switch to browser, click into the body field. Auto-paste in 10s."
   },
   {
     "action": "key",
     "combo": "ctrl+v"
   },
   {
-    "action": "wait_for_user",
-    "prompt": "Body pasted. Review. Press Enter to send (Ctrl+Enter)."
-  },
-  {
-    "action": "key",
-    "combo": "ctrl+enter"
+    "action": "sleep",
+    "ms": 500
   }
 ]

@@ -20,6 +20,8 @@ $escaped = $Text -replace '([+^%~(){}\[\]])', '{$1}'
 $rand = New-Object System.Random
 foreach ($ch in $escaped.ToCharArray()) {
     [System.Windows.Forms.SendKeys]::SendWait([string]$ch)
-    Start-Sleep -Milliseconds ($DelayMs + $rand.Next(-5, 6))
+    $jitter = $DelayMs + $rand.Next(-5, 6)
+    if ($jitter -lt 0) { $jitter = 0 }
+    Start-Sleep -Milliseconds $jitter
 }
 Write-Host "[type] sent $($Text.Length) chars"

@@ -16,11 +16,7 @@
     "combo": "ctrl+v"
   },
   {
-    "action": "wait_for_user",
-    "prompt": "Body pasted. Review the email. Press Enter to send (Ctrl+Enter in Gmail)."
-  },
-  {
-    "action": "key",
-    "combo": "ctrl+enter"
+    "action": "sleep",
+    "ms": 500
   }
 ]

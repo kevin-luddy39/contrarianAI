@@ -37,6 +37,7 @@ PS1_TYPE = ROOT / "type.ps1"
 PS1_CLICK = ROOT / "click.ps1"
 PS1_KEY = ROOT / "key.ps1"
 PS1_OPEN = ROOT / "open.ps1"
+assert PS1_KEY.exists(), f"missing {PS1_KEY}"
 
 KEY_COMBO_MAP = {
     "ctrl+v": "^v", "ctrl+c": "^c", "ctrl+a": "^a", "ctrl+x": "^x",
@@ -101,10 +102,11 @@ def step_key(combo):
     sk = KEY_COMBO_MAP.get(combo.lower())
     if sk is None:
         sys.exit(f"ERR: unknown key combo '{combo}'. Add to KEY_COMBO_MAP in seq.py.")
-    # Reuse type.ps1 with no jitter for combos (single keystroke)
+    # Use key.ps1 — does NOT char-escape, so SendKeys macros like ^v / ^{ENTER}
+    # / {TAB} pass through to SendWait directly.
     args = [
-        "powershell.exe", "-ExecutionPolicy", "Bypass", "-File", wslpath_w(PS1_TYPE),
-        "-Text", sk, "-DelayMs", "0", "-StartDelayMs", "200",
+        "powershell.exe", "-ExecutionPolicy", "Bypass", "-File", wslpath_w(PS1_KEY),
+        "-Macro", sk,
     ]
     subprocess.run(args, check=True)
 
@@ -114,10 +116,11 @@ def step_sleep(ms):
     print(f"[sleep] {ms}ms")
 
 
-def step_wait_for_user(prompt, fallback_sleep_ms=4000):
+def step_wait_for_user(prompt, fallback_sleep_ms=10000):
     # When stdin is not a TTY (e.g. running from Claude Code's `!` shell or
     # any subprocess wrapper), input() EOFs immediately. Fall back to a timed
     # pause so the run completes — user can still see the prompt.
+    # 10s default gives time to switch window, focus the right field, etc.
     if sys.stdin.isatty():
         input(f"\n>>> {prompt}\n>>> Press Enter to continue. ")
     else:

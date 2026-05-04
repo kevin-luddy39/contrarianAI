@@ -31,7 +31,8 @@ SELECT
     'no_payment_sent'
   ) AS payment_status
 FROM audit_requests ar
-WHERE ar.created_at > NOW() - INTERVAL '6 months'
+WHERE ar.is_test = FALSE
+  AND ar.created_at > NOW() - INTERVAL '6 months'
   AND NOT EXISTS (
     SELECT 1 FROM payments p
     WHERE p.audit_request_id = ar.id

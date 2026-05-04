@@ -132,7 +132,7 @@ pip install sentence-transformers chromadb requests beautifulsoup4 numpy matplot
 npx contrarianai-retrieval-auditor --help
 ```
 
-Full script + raw results JSON: [GitHub repo link — Kevin to add]
+Full script + raw results JSON: https://github.com/kevin-luddy39/contrarianAI/tree/main/tools/retrieval-auditor/examples/langchain-quickstart-teardown
 
 retrieval-auditor itself is MIT-licensed: `npx contrarianai-retrieval-auditor`
 
@@ -144,7 +144,7 @@ If you run it against your own production retrieval and you get clean health sco
 
 I do this as a fixed-scope engagement: $2,500, 48-hour turnaround, 3 clients per week. Five sensors run against your stack. 8-12 page report with flagged pathologies, the bell curve of your retrieval distribution per query class, and one prioritized fix.
 
-Stripe link: [Kevin to add Bell Tuning Rapid Audit URL]
+Stripe / details: https://contrarianai-landing.onrender.com/bell-tuning-rapid-audit.html
 
 Or skip the audit entirely and run the tool yourself — it's MIT, one command, no account required. The point is that this layer of measurement exists and is cheap. Whether you do the work or I do isn't the important part. Measuring the layer is.
 

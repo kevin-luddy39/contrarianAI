@@ -38,6 +38,7 @@ async function initDb() {
     )
   `);
   await pool.query(`ALTER TABLE audit_requests ADD COLUMN IF NOT EXISTS status TEXT DEFAULT 'new'`);
+  await pool.query(`ALTER TABLE audit_requests ADD COLUMN IF NOT EXISTS is_test BOOLEAN NOT NULL DEFAULT FALSE`);
   await pool.query(`
     CREATE TABLE IF NOT EXISTS payments (
       id SERIAL PRIMARY KEY,
@@ -638,10 +639,10 @@ app.get('/admin', requireAdmin, async (req, res) => {
 
     const totalsResult = await pool.query(`
       SELECT
-        (SELECT COUNT(*)::int FROM audit_requests) as total_leads,
-        (SELECT COUNT(*)::int FROM audit_requests WHERE status = 'new') as new_leads,
-        (SELECT COUNT(*)::int FROM audit_requests WHERE status = 'payment_sent') as payment_sent,
-        (SELECT COUNT(*)::int FROM audit_requests WHERE status = 'paid') as paid_leads,
+        (SELECT COUNT(*)::int FROM audit_requests WHERE is_test = FALSE) as total_leads,
+        (SELECT COUNT(*)::int FROM audit_requests WHERE is_test = FALSE AND status = 'new') as new_leads,
+        (SELECT COUNT(*)::int FROM audit_requests WHERE is_test = FALSE AND status = 'payment_sent') as payment_sent,
+        (SELECT COUNT(*)::int FROM audit_requests WHERE is_test = FALSE AND status = 'paid') as paid_leads,
         (SELECT COALESCE(SUM(amount_cents), 0)::int FROM payments WHERE status = 'paid') as total_revenue_cents
     `);
     const t = totalsResult.rows[0];
@@ -723,9 +724,9 @@ app.get('/api/admin/stats', requireAdmin, async (req, res) => {
   try {
     const result = await pool.query(`
       SELECT
-        (SELECT COUNT(*)::int FROM audit_requests) as total_leads,
-        (SELECT COUNT(*)::int FROM audit_requests WHERE status = 'new') as new_leads,
-        (SELECT COUNT(*)::int FROM audit_requests WHERE status = 'paid') as paid_leads,
+        (SELECT COUNT(*)::int FROM audit_requests WHERE is_test = FALSE) as total_leads,
+        (SELECT COUNT(*)::int FROM audit_requests WHERE is_test = FALSE AND status = 'new') as new_leads,
+        (SELECT COUNT(*)::int FROM audit_requests WHERE is_test = FALSE AND status = 'paid') as paid_leads,
         (SELECT COALESCE(SUM(amount_cents),0)::int FROM payments WHERE status = 'paid') as total_revenue_cents,
         (SELECT COUNT(*)::int FROM visits) as total_visits,
         (SELECT COUNT(DISTINCT ip)::int FROM visits) as unique_visitors
@@ -796,7 +797,7 @@ app.get('/api/admin/intel-overview', requireAdmin, async (req, res) => {
           (SELECT COUNT(*)::int FROM visits WHERE created_at > NOW() - INTERVAL '30 days') as visits_30d,
           (SELECT COUNT(DISTINCT ip)::int FROM visits WHERE created_at > NOW() - INTERVAL '30 days') as unique_30d,
           (SELECT COUNT(*)::int FROM assessments WHERE created_at > NOW() - INTERVAL '30 days') as assessments_30d,
-          (SELECT COUNT(*)::int FROM audit_requests WHERE created_at > NOW() - INTERVAL '30 days') as leads_30d,
+          (SELECT COUNT(*)::int FROM audit_requests WHERE is_test = FALSE AND created_at > NOW() - INTERVAL '30 days') as leads_30d,
           (SELECT COUNT(*)::int FROM payments WHERE status='paid' AND paid_at > NOW() - INTERVAL '30 days') as paid_30d
       `),
       pool.query(`
@@ -1127,7 +1128,8 @@ app.get('/api/admin/dm-composer', requireAdmin, async (req, res) => {
             AND (e.metadata->>'audit_request_id')::int = ar.id
         ) AS dm_sent
       FROM audit_requests ar
-      WHERE ar.created_at > NOW() - INTERVAL '12 months'
+      WHERE ar.is_test = FALSE
+        AND ar.created_at > NOW() - INTERVAL '12 months'
         AND NOT EXISTS (
           SELECT 1 FROM payments p
           WHERE p.audit_request_id = ar.id

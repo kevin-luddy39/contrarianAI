@@ -110,18 +110,29 @@
           "fit": "very high — explicitly describes 'memory module silently cutting context', 3-hour debug, 'framework swallowed context', 'observability hits a ceiling' — verbatim our positioning's wedge",
           "newsletter_substack": "Linked from article footer",
           "linkedin": "Linked from article footer; Kevin to look up + connect",
-          "status": "sent",
+          "status": "connected_warm_close",
           "touchpoints": [
             {
               "ts": "2026-05-02",
               "channel": "LinkedIn",
               "action": "connection request with 270-char note (draft_connection_note below)",
               "by": "Kevin"
+            },
+            {
+              "ts": "2026-05-03",
+              "channel": "LinkedIn",
+              "action": "connection accepted; Benjamin replied warmly: '👏👍😊 Ha exactly, we all can relate to one thing or the other. I'm glad you enjoyed your read Kevin. I've accepted your connection request so definitely we would always be in touch. Cheers!' — closing-vibe message, no ask",
+              "by": "Benjamin Nweke"
+            },
+            {
+              "ts": "2026-05-03",
+              "channel": "LinkedIn",
+              "action": "Kevin sent thumbs-up reaction; conversation cleanly closed on warm note, no push, no link sent",
+              "by": "Kevin"
             }
           ],
-          "next_action": "Watch for connection accept (typical 1-3 days). On accept: send full DM with numbers + LangChain-teardown link + (optional) cardiac-teardown teaser. Day-7 fallback (2026-05-09): if still pending acceptance, look for him on X/Substack and engage there. If accepted but silent on followup DM by Day-14 (2026-05-16), do not nudge — log silent and move on.",
-          "draft_connection_note": "Read your 'Native Agent Architectures' piece on TDS. Your 3-hour memory-module debug matched exactly what I found when I audited LangChain's RAG quickstart with a distributional grader — 5 of 6 queries flagged silent retrieval pathology. Wrote it up if useful.",
-          "draft_followup_dm": "(See conversation log; long-form numbers DM with teardown URL — to be sent on connection acceptance.)"
+          "next_action": "DO NOT push followup DM. Connection established + warm-closed. The 'wrote it up if useful' teaser in connect note got no bite — respect the non-ask. Pivot to content-led nurture: Benjamin sees Kevin's LinkedIn posts in feed organically. If a post lands with his thesis (Native Agent Architectures, RAG production failure modes, observability ceiling), HE re-opens the thread on his timing. Watch his feed for any like/comment/share signal on Kevin's posts as the re-engagement gate. No action item from Kevin's side until that happens.",
+          "draft_connection_note": "Read your 'Native Agent Architectures' piece on TDS. Your 3-hour memory-module debug matched exactly what I found when I audited LangChain's RAG quickstart with a distributional grader — 5 of 6 queries flagged silent retrieval pathology. Wrote it up if useful."
         },
         {
           "author": "Tommy Adeliyi",

@@ -156,5 +156,25 @@
         "by": "Kevin"
       }
     ]
+  },
+  {
+    "name": "Eve team",
+    "company": "Eve / helloeve.co",
+    "tier": "prospect",
+    "source": "hn-who-is-hiring-may-2026",
+    "linkedin_url": null,
+    "email": "hello@helloeve.co",
+    "twitter": null,
+    "bio": "Executive voice engine - multi-agent AI system that learns how a leader thinks and produces content indistinguishable from what they'd write. Coordinated specialized agents, persistent context graphs, learning flywheel. 4-person team, paying customers, growing agency channel. Founder is technical. Stack: TypeScript, SvelteKit, Cloudflare Workers, Postgres. Per HN posting (item 47979026, @supriyag15) and helloeve.co.",
+    "notes": "From HN Who-is-Hiring May 2026. ICP fit high: paying customers + budget signal, multi-agent eval-pain explicit in their stack. Cold email sent 2026-05-04 via sequencer to hello@helloeve.co with subject 'Distributional read on multi-agent voice fidelity'. Pitch angle: distributional read on the voice-quality output of their multi-agent pipeline (rank inversion, score calibration drift in voice-model alignment scores, cascade composition drift). Same Bell Tuning thesis applied to voice fidelity instead of RAG retrieval.",
+    "next_action": "Watch for reply 7 days. Day 7 fallback 2026-05-11: comment on Eve LinkedIn or X post with peer-substance reply (no DM nudge). If still silent through 2026-05-18: log silent_close and drop.",
+    "touchpoints": [
+      {
+        "ts": "2026-05-04",
+        "channel": "email",
+        "action": "cold email to hello@helloeve.co - voice-fidelity distributional-read pitch, partnership framing, LangChain teardown link, free 30-min offer. Sent via sequencer.",
+        "by": "Kevin"
+      }
+    ]
   }
 ]

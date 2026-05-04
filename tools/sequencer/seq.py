@@ -114,8 +114,15 @@ def step_sleep(ms):
     print(f"[sleep] {ms}ms")
 
 
-def step_wait_for_user(prompt):
-    input(f"\n>>> {prompt}\n>>> Press Enter to continue. ")
+def step_wait_for_user(prompt, fallback_sleep_ms=4000):
+    # When stdin is not a TTY (e.g. running from Claude Code's `!` shell or
+    # any subprocess wrapper), input() EOFs immediately. Fall back to a timed
+    # pause so the run completes — user can still see the prompt.
+    if sys.stdin.isatty():
+        input(f"\n>>> {prompt}\n>>> Press Enter to continue. ")
+    else:
+        print(f"\n>>> [no TTY — auto-pausing {fallback_sleep_ms}ms] {prompt}", flush=True)
+        time.sleep(fallback_sleep_ms / 1000.0)
 
 
 def execute(steps, start=0, dry=False):

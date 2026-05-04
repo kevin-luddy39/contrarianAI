@@ -10,17 +10,18 @@
 
 ## NOW — do these in order, one at a time
 
-### 1. `[ ]` Pick next cold-email prospect (sequencer-driven)
+### 1. `[ ]` Pick next cold-email prospect (3 sent today: Lineation, Eve, ?)
 
-After Lineation: 5 more from yesterday's HN scan, ranked by ICP fit:
+Eve sent via sequencer 2026-05-04 — manual-contacts.json entry 17. Day-7 fallback 2026-05-11.
 
-- **Eve / helloeve.co** — multi-agent voice engine, paying customers (budget signal)
-- **Wick / @SHeinrichatWick** — "watch real users break them" verbatim Bell Tuning value prop
+Remaining from yesterday's HN scan (ranked by ICP fit):
+
+- **Wick / @SHeinrichatWick** — "watch real users break them" verbatim
 - **VLM Run / vlm.run** — vision-language; "observability to iterate on them" verbatim
-- **Engineering Square / @ESqHiring** — production AI, "end-to-end accuracy" pain
-- **Gladly / gladly.ai** — Crate&Barrel/Sephora/REI scale, big budget
+- **Engineering Square / @ESqHiring** — production AI, "end-to-end accuracy"
+- **Gladly / gladly.ai** — Crate&Barrel/Sephora/REI scale, budget
 
-Tell me which next. I run `lookup-founder.py <domain>` + write `tools/sequencer/queues/<prospect>.json` + you run **one command** (`python3 tools/sequencer/seq.py tools/sequencer/queues/<prospect>.json`) — sequencer drives keying, you confirm focus + final send.
+Tell me which next. I run `lookup-founder.py <domain>` (Hunter key debug pending — may need to use HN-posted contacts again) + write `tools/sequencer/queues/<prospect>.json` + you run one command.
 
 ---
 
@@ -93,6 +94,8 @@ Tell me which next. I run `lookup-founder.py <domain>` + write `tools/sequencer/
 - `[x]` whitepaper.md CTA refresh in context-inspector — replaced pre-launch "free 1-hour, first 10 teams" framing + old `/bell-tuning` slug with the productized $2,500 Rapid Audit SKU pointing to `/bell-tuning-rapid-audit.html`. Commit `33a6840` pushed to context-inspector main.
 - `[x]` Lineation cold email sent — `hello@lineation.ai`, partnership framing, distributional-read-on-lineage angle. Hunter.io returned 0 (domain too new), used HN posting contact. Logged in `manual-contacts.json` (entry 16). Day-7 fallback 2026-05-11 if silent.
 - `[x]` Sequencer toolkit built — `tools/sequencer/` w/ clip.sh, type.ps1, click.ps1, seq.py. Removes manual click/type friction for future cold-email batches. Commit `aaf58e6` pushed.
+- `[x]` Sequencer fixes (commits `2cd0c91`, `9286902`): URL `&` handling via `open.ps1` -File parameter; TTY-fallback in `wait_for_user` so non-TTY runs (`!` shell) auto-pause instead of EOF-crashing.
+- `[x]` Eve cold email sent — `hello@helloeve.co`, voice-fidelity distributional-read pitch, sequencer-driven. manual-contacts.json entry 17. Day-7 fallback 2026-05-11.
 - `[skip]` Pool 1 sweep — sweep ran 2026-05-04 morning but cohort was all test contacts; no real outreach occurred. Cleanup migration above prevents recurrence.
 - `[skip]` Starbridge melissamrec upgrade — LinkedIn search returns no match for that handle. Path dead. Starbridge falls back to original recruiting@ entry status (silent, can drop or wait).
 - `[skip]` Arzule (Jeffrey Lin) final-touch — dropped from active pipeline. Higher ROI elsewhere. Per `feedback_outreach_pressure_drift.md`: live signal (silence) confirms move-on, no further nudge.

@@ -1,0 +1,22 @@
+[
+  {
+    "action": "clip",
+    "text": "Before going local, worth checking how much of that 600-1100ms is actually OpenAI server-side vs network. Two things I see eat budget on hosted-embedding RAG that get missed: (1) fresh TLS handshake per request - if you're using a new requests.post() per query instead of a kept-alive httpx.AsyncClient or aiohttp session, you're paying 100-300ms in handshake costs you can recover for free; (2) the dimensions parameter on text-embedding-3-small - default is 1536 but you can pass dimensions=512 or 256 and the API returns a truncated embedding, which doesn't speed up their processing but cuts your downstream similarity-compute and payload size meaningfully. Curious what your client setup looks like (raw requests, openai SDK, async, connection pooling)? That'll narrow whether to chase network optimizations first or jump straight to local hosting like the others have suggested."
+  },
+  {
+    "action": "open_url",
+    "url": "https://www.reddit.com/r/Rag/comments/1t3f72i/embedding_latency_killing_my_rag_speed_any_fixes/"
+  },
+  {
+    "action": "wait_for_user",
+    "prompt": "Reddit thread open. CONFIRM you are logged in as Late_Researcher232 (top-right). Scroll to bottom, click reply box, click into the textarea. Auto-paste in 10s."
+  },
+  {
+    "action": "key",
+    "combo": "ctrl+v"
+  },
+  {
+    "action": "sleep",
+    "ms": 500
+  }
+]

@@ -10,26 +10,14 @@
 
 ## NOW — do these in order, one at a time
 
-### 1. `[ ]` Lineation cold email — highest-ROI single prospect from yesterday's HN scan
+### 1. `[ ]` Lineation cold email — paste-and-send (draft refined w/ their site copy)
 
-Why: direct cousin to grith.ai positioning ("Agentic AI Security Platform — policy enforcement, runtime monitoring, incident workflows, auditability"). Same orthogonal-observability angle as your dead HN comment, this time as cold email where you control delivery.
-
-- Hunter.io → search `lineation.ai` → capture founder/CTO name + direct email
-  - Free tier: https://hunter.io/search/lineation.ai (25 searches/mo)
-- LinkedIn cross-check the name (confirm role + active)
-- If Hunter returns nothing, fallback: `hello@lineation.ai` (their HN posting contact)
-- Send email — draft is in chat scrollback (Lineation §Email — named-founder version OR hello@ version per result). Let me know if you want it pasted again.
-- Update `manual-contacts.json` after send (template in chat).
-- Time: 20 min total (5 lookup + 5 draft tweak + 10 paste-and-send)
-
-### 2. `[ ]` whitepaper.md CTA fix in context-inspector repo
-
-Why: parallel to yesterday's teardown README fix. context-inspector is your highest-converting top-of-funnel (47 npm dl/wk + LinkedIn referrers + Product Hunt + Reddit organic). Whitepaper is the most-read path inside it (14 views / 8 uniq). Currently has zero buy-flow CTA at the bottom = readers leave with nowhere to go.
-
-- Clone or open: `kevin-luddy39/context-inspector` repo
-- Edit: `docs/whitepaper.md` → add a closing section with Stripe URL + landing URL (mirror the shape of yesterday's teardown README fix at lines ~140-150)
-- Push from PowerShell (per `npm_publish_security_key.md` memory — npm publish needs PowerShell, but git push works in WSL too; either is fine for this since no npm publish here)
-- Time: 15 min
+- Hunter.io: https://hunter.io/search/lineation.ai → capture founder/CTO name + direct email
+- LinkedIn cross-check the name
+- Fallback if Hunter returns nothing: `hello@lineation.ai`
+- Email body: paste from chat scrollback (refined draft uses Lineation's own quoted phrasing - "single line of defense", "forensic-grade trace", "lineage Lineation already collects" - to show you read the site)
+- After send, append to `tools/lead-intel/manual-contacts.json` per template in chat
+- Time: ~10 min (lookup + paste + send)
 
 ---
 
@@ -99,6 +87,7 @@ Why: parallel to yesterday's teardown README fix. context-inspector is your high
 - `[x]` Test-data cleanup migration — `is_test BOOLEAN` column added to `audit_requests`, all 3 existing rows (ids 1,2,3) marked TRUE, Pool 1 query + 5 funnel-count queries gated by `is_test = FALSE`, target-queries.sql Q1 same. Verified in Render shell. Pool 1 now returns 0 rows cleanly.
 - `[x]` Nweke thread close — connection + warm close + thumbs-up reaction logged in linkedin-targets.json; pivoted next_action to content-led nurture; feedback memory `feedback_outreach_pressure_drift.md` saved.
 - `[x]` Teardown README CTA placeholders filled (yesterday's pending) — GH source link + Bell Tuning landing URL now live in `tools/retrieval-auditor/examples/langchain-quickstart-teardown/README.md`.
+- `[x]` whitepaper.md CTA refresh in context-inspector — replaced pre-launch "free 1-hour, first 10 teams" framing + old `/bell-tuning` slug with the productized $2,500 Rapid Audit SKU pointing to `/bell-tuning-rapid-audit.html`. Commit `33a6840` pushed to context-inspector main.
 - `[skip]` Pool 1 sweep — sweep ran 2026-05-04 morning but cohort was all test contacts; no real outreach occurred. Cleanup migration above prevents recurrence.
 - `[skip]` Starbridge melissamrec upgrade — LinkedIn search returns no match for that handle. Path dead. Starbridge falls back to original recruiting@ entry status (silent, can drop or wait).
 - `[skip]` Arzule (Jeffrey Lin) final-touch — dropped from active pipeline. Higher ROI elsewhere. Per `feedback_outreach_pressure_drift.md`: live signal (silence) confirms move-on, no further nudge.

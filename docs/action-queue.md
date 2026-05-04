@@ -10,14 +10,17 @@
 
 ## NOW — do these in order, one at a time
 
-### 1. `[ ]` Lineation cold email — paste-and-send (draft refined w/ their site copy)
+### 1. `[ ]` Pick next cold-email prospect (sequencer-driven)
 
-- Hunter.io: https://hunter.io/search/lineation.ai → capture founder/CTO name + direct email
-- LinkedIn cross-check the name
-- Fallback if Hunter returns nothing: `hello@lineation.ai`
-- Email body: paste from chat scrollback (refined draft uses Lineation's own quoted phrasing - "single line of defense", "forensic-grade trace", "lineage Lineation already collects" - to show you read the site)
-- After send, append to `tools/lead-intel/manual-contacts.json` per template in chat
-- Time: ~10 min (lookup + paste + send)
+After Lineation: 5 more from yesterday's HN scan, ranked by ICP fit:
+
+- **Eve / helloeve.co** — multi-agent voice engine, paying customers (budget signal)
+- **Wick / @SHeinrichatWick** — "watch real users break them" verbatim Bell Tuning value prop
+- **VLM Run / vlm.run** — vision-language; "observability to iterate on them" verbatim
+- **Engineering Square / @ESqHiring** — production AI, "end-to-end accuracy" pain
+- **Gladly / gladly.ai** — Crate&Barrel/Sephora/REI scale, big budget
+
+Tell me which next. I run `lookup-founder.py <domain>` + write `tools/sequencer/queues/<prospect>.json` + you run **one command** (`python3 tools/sequencer/seq.py tools/sequencer/queues/<prospect>.json`) — sequencer drives keying, you confirm focus + final send.
 
 ---
 

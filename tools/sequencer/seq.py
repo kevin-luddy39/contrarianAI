@@ -36,6 +36,7 @@ ROOT = Path(__file__).parent
 PS1_TYPE = ROOT / "type.ps1"
 PS1_CLICK = ROOT / "click.ps1"
 PS1_KEY = ROOT / "key.ps1"
+PS1_OPEN = ROOT / "open.ps1"
 
 KEY_COMBO_MAP = {
     "ctrl+v": "^v", "ctrl+c": "^c", "ctrl+a": "^a", "ctrl+x": "^x",
@@ -68,13 +69,16 @@ def step_clip(text):
 
 
 def step_open_url(url):
-    # Use powershell Start-Process; cmd.exe /c start treats `&` in URLs as
-    # command chain separator, breaking query strings.
+    # URL passed via -File parameter so PowerShell does not parse `&` in
+    # query strings as a shell call operator. cmd.exe /c start has the
+    # same problem (treats & as command-chain separator).
     subprocess.run(
-        ["powershell.exe", "-NoProfile", "-Command", "Start-Process", url],
+        [
+            "powershell.exe", "-NoProfile", "-ExecutionPolicy", "Bypass",
+            "-File", wslpath_w(PS1_OPEN), "-Url", url,
+        ],
         check=True,
     )
-    print(f"[open_url] {url}")
 
 
 def step_type(text, delay_ms=15):

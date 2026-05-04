@@ -88,6 +88,8 @@
 - `[x]` Nweke thread close — connection + warm close + thumbs-up reaction logged in linkedin-targets.json; pivoted next_action to content-led nurture; feedback memory `feedback_outreach_pressure_drift.md` saved.
 - `[x]` Teardown README CTA placeholders filled (yesterday's pending) — GH source link + Bell Tuning landing URL now live in `tools/retrieval-auditor/examples/langchain-quickstart-teardown/README.md`.
 - `[x]` whitepaper.md CTA refresh in context-inspector — replaced pre-launch "free 1-hour, first 10 teams" framing + old `/bell-tuning` slug with the productized $2,500 Rapid Audit SKU pointing to `/bell-tuning-rapid-audit.html`. Commit `33a6840` pushed to context-inspector main.
+- `[x]` Lineation cold email sent — `hello@lineation.ai`, partnership framing, distributional-read-on-lineage angle. Hunter.io returned 0 (domain too new), used HN posting contact. Logged in `manual-contacts.json` (entry 16). Day-7 fallback 2026-05-11 if silent.
+- `[x]` Sequencer toolkit built — `tools/sequencer/` w/ clip.sh, type.ps1, click.ps1, seq.py. Removes manual click/type friction for future cold-email batches. Commit `aaf58e6` pushed.
 - `[skip]` Pool 1 sweep — sweep ran 2026-05-04 morning but cohort was all test contacts; no real outreach occurred. Cleanup migration above prevents recurrence.
 - `[skip]` Starbridge melissamrec upgrade — LinkedIn search returns no match for that handle. Path dead. Starbridge falls back to original recruiting@ entry status (silent, can drop or wait).
 - `[skip]` Arzule (Jeffrey Lin) final-touch — dropped from active pipeline. Higher ROI elsewhere. Per `feedback_outreach_pressure_drift.md`: live signal (silence) confirms move-on, no further nudge.

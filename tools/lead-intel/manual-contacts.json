@@ -2,12 +2,12 @@
   {
     "name": "Jeffrey Lin",
     "company": "Datoric (YC W26)",
-    "company_history": "Arzule (intake noted 2026-04-23) → Datoric (observed 2026-04-27). Either rename, pivot, or original research had wrong company name.",
+    "company_history": "Arzule (intake noted 2026-04-23) \u2192 Datoric (observed 2026-04-27). Either rename, pivot, or original research had wrong company name.",
     "linkedin_url": "",
     "tier": "prospect",
     "source": "linkedin",
-    "notes": "T0-02. YC W26 CTO. Connected 2026-04-23, accepted 2026-04-24. Follow-up DM w/ partnership axes + 3 time slots sent 2026-04-24. Title verified 2026-04-27 as 'CTO @ Datoric (YC W26)' — Datoric is data-brokerage for multimodal AI training (licensed/ethically-sourced voice+video+multimodal). NOT retrieval/agent-side. Bell Tuning fit is weak for their core product but Jeffrey's prior multi-agent runtime background is adjacent. Teardown DM sent 2026-04-27 (LangChain quickstart finding) — slight fit-mismatch acknowledged.",
-    "next_action": "Watch for reply post-teardown DM. If reply: pivot conversation to data-ingestion observability angle (provenance signal, contributor consistency, contamination detection — same statistical method, different application). Day 7 fallback 2026-04-30 if silent."
+    "notes": "T0-02. YC W26 CTO. Connected 2026-04-23, accepted 2026-04-24. Follow-up DM w/ partnership axes + 3 time slots sent 2026-04-24. Title verified 2026-04-27 as 'CTO @ Datoric (YC W26)' \u2014 Datoric is data-brokerage for multimodal AI training (licensed/ethically-sourced voice+video+multimodal). NOT retrieval/agent-side. Bell Tuning fit is weak for their core product but Jeffrey's prior multi-agent runtime background is adjacent. Teardown DM sent 2026-04-27 (LangChain quickstart finding) \u2014 slight fit-mismatch acknowledged.",
+    "next_action": "Watch for reply post-teardown DM. If reply: pivot conversation to data-ingestion observability angle (provenance signal, contributor consistency, contamination detection \u2014 same statistical method, different application). Day 7 fallback 2026-04-30 if silent."
   },
   {
     "name": "Burt (founder)",
@@ -56,7 +56,7 @@
   },
   {
     "name": "Technical_Standard80",
-    "company": "(unknown — r/MachineLearningJobs OP)",
+    "company": "(unknown \u2014 r/MachineLearningJobs OP)",
     "twitter": "Technical_Standard80",
     "tier": "prospect",
     "source": "reddit",
@@ -88,7 +88,7 @@
     "twitter": "SignalBloom",
     "tier": "prospect",
     "source": "hn-comment-mining-2026-04-28",
-    "notes": "HN handle GodelNumbering. Founder @ signalbloom.ai (financial data analysis AI — 13F, earnings, ETF, superinvestor portfolios). Ex-Meta HHVM, ex-HFT. 614 HN karma. Comment on TerminalBench OSS Agent thread (4/27) showed depth on context management + caching. Strong fit: regulated financial AI = audit-grade reliability matters. Cold-message via signalbloom.ai/contact form sent 2026-04-28 with LangChain teardown link + free tools offer + peer-collaborator framing.",
+    "notes": "HN handle GodelNumbering. Founder @ signalbloom.ai (financial data analysis AI \u2014 13F, earnings, ETF, superinvestor portfolios). Ex-Meta HHVM, ex-HFT. 614 HN karma. Comment on TerminalBench OSS Agent thread (4/27) showed depth on context management + caching. Strong fit: regulated financial AI = audit-grade reliability matters. Cold-message via signalbloom.ai/contact form sent 2026-04-28 with LangChain teardown link + free tools offer + peer-collaborator framing.",
     "next_action": "Watch contact-form reply 7d. Day 7 fallback 2026-05-05: X DM @SignalBloom with shorter version of same message."
   },
   {
@@ -99,8 +99,8 @@
     "blog": "https://thisisfatih.com",
     "tier": "prospect",
     "source": "hn-comment-mining-2026-04-28",
-    "notes": "CTO at Wasteer (Berlin, AI-powered waste management — CV/ML for contaminant detection). 5yr exec leadership. Blog has 22 posts on AI-in-production + 20 on building startups. 'Built things. Broke things. Wrote it down.' HN comment on EvanFlow thread (4/27) showed direct experience with multi-agent merge-failure pattern. HN public reply posted 2026-04-28 referencing tool-call-grader. LinkedIn DM DEFERRED — wait for HN engagement first; send LinkedIn 2026-04-30 if HN silent.",
-    "next_action": "If HN reply gets engagement → respond fast. If silent through 2026-04-30 → send LinkedIn DM (drafted in docs/outreach/2026-04-28-hn-mining.md)."
+    "notes": "CTO at Wasteer (Berlin, AI-powered waste management \u2014 CV/ML for contaminant detection). 5yr exec leadership. Blog has 22 posts on AI-in-production + 20 on building startups. 'Built things. Broke things. Wrote it down.' HN comment on EvanFlow thread (4/27) showed direct experience with multi-agent merge-failure pattern. HN public reply posted 2026-04-28 referencing tool-call-grader. LinkedIn DM DEFERRED \u2014 wait for HN engagement first; send LinkedIn 2026-04-30 if HN silent.",
+    "next_action": "If HN reply gets engagement \u2192 respond fast. If silent through 2026-04-30 \u2192 send LinkedIn DM (drafted in docs/outreach/2026-04-28-hn-mining.md)."
   },
   {
     "name": "skissane (HN)",
@@ -125,16 +125,36 @@
     "linkedin_url": "",
     "tier": "peer-collaborator",
     "source": "linkedin",
-    "notes": "Replied 2026-04-27 to Kevin's outreach. Senior eng, contrarian read on microservices ('SaaS hijacked the term, just same HTTP services but micro'). NOT a buyer — explicitly stopped looking due to age + 'AI taking over' resignation. Right target for peer-collaborator framing, not sales pitch. Reply sent 2026-04-27 reframing AI-takeover as MORE-failure-modes thesis, no Bell Tuning pitch, soft offer to share whitepapers if he wants. Watch for 'send the whitepapers' = green light to convert to deeper conversation. | 2026-05-02 00:37: Boris replied with a thumbs-up 👍 emoji to Kevin's 2026-04-27 reframe. Read: polite acknowledgment, not engagement. Likely 'read it, agreed, no further conversation needed' shape. Late-night feed-skimming behavior consistent with the 'stopped looking' framing. Honor the signal — do not pitch, do not push, do not send whitepapers unsolicited. Thread can rest; door stays open for organic future conversation.",
-    "next_action": "No reply needed. Boris's 👍 closed the thread politely. Drop the planned 'silent 14d → whitepaper link' fallback (the 👍 makes that read as nag). Re-engage only if Boris initiates."
+    "notes": "Replied 2026-04-27 to Kevin's outreach. Senior eng, contrarian read on microservices ('SaaS hijacked the term, just same HTTP services but micro'). NOT a buyer \u2014 explicitly stopped looking due to age + 'AI taking over' resignation. Right target for peer-collaborator framing, not sales pitch. Reply sent 2026-04-27 reframing AI-takeover as MORE-failure-modes thesis, no Bell Tuning pitch, soft offer to share whitepapers if he wants. Watch for 'send the whitepapers' = green light to convert to deeper conversation. | 2026-05-02 00:37: Boris replied with a thumbs-up \ud83d\udc4d emoji to Kevin's 2026-04-27 reframe. Read: polite acknowledgment, not engagement. Likely 'read it, agreed, no further conversation needed' shape. Late-night feed-skimming behavior consistent with the 'stopped looking' framing. Honor the signal \u2014 do not pitch, do not push, do not send whitepapers unsolicited. Thread can rest; door stays open for organic future conversation.",
+    "next_action": "No reply needed. Boris's \ud83d\udc4d closed the thread politely. Drop the planned 'silent 14d \u2192 whitepaper link' fallback (the \ud83d\udc4d makes that read as nag). Re-engage only if Boris initiates."
   },
   {
-    "name": "LinkedIn boost post — LangChain teardown",
+    "name": "LinkedIn boost post \u2014 LangChain teardown",
     "company": "(self-broadcast)",
     "linkedin_url": "https://www.linkedin.com/in/kevinluddy",
     "tier": "self-broadcast",
     "source": "linkedin",
-    "notes": "Posted 2026-04-30 10:27 ET on Kevin's personal LinkedIn (Thursday B2B peak window). Hook: 0.114 vs 0.235 alignment numbers from LangChain quickstart teardown — top-ranked chunk less aligned than chunk #4. Body avoids eval-framework language (per Hamel-brush-off lesson); frames as observability/APM. CTA = 'npx contrarianai-context-inspector --install-mcp', no audit/Bell Tuning pitch in body. First-comment posted with link to teardown article + context-inspector repo (LinkedIn algo bias against in-body outbound links). Closer asks readers running their own RAG to drop screenshots in DMs — DM channel = qualified-lead filter.",
+    "notes": "Posted 2026-04-30 10:27 ET on Kevin's personal LinkedIn (Thursday B2B peak window). Hook: 0.114 vs 0.235 alignment numbers from LangChain quickstart teardown \u2014 top-ranked chunk less aligned than chunk #4. Body avoids eval-framework language (per Hamel-brush-off lesson); frames as observability/APM. CTA = 'npx contrarianai-context-inspector --install-mcp', no audit/Bell Tuning pitch in body. First-comment posted with link to teardown article + context-inspector repo (LinkedIn algo bias against in-body outbound links). Closer asks readers running their own RAG to drop screenshots in DMs \u2014 DM channel = qualified-lead filter.",
     "next_action": "Monitor LinkedIn views/reactions/comments 30min then hourly through end of day. Reply <60 min to any DM. Watch context-inspector GH clones + landing form fills for downstream traffic. Pin first comment ONLY after 2-3 organic replies land. If the post stalls (<50 views by EOD 2026-04-30): reframe + re-test in 7-10 days with different number-pair hook. If it hits >500 views: extract DM senders into this file as new prospects."
+  },
+  {
+    "name": "Lineation team",
+    "company": "Lineation",
+    "tier": "prospect",
+    "source": "hn-who-is-hiring-may-2026",
+    "linkedin_url": null,
+    "email": "hello@lineation.ai",
+    "twitter": null,
+    "bio": "Agentic AI Security platform - policy enforcement, runtime monitoring, incident workflows, lineage capture (prompt -> tool -> data -> output -> identity). Self-described 'single line of defense' for autonomous AI workflows. Mid-market IT + security-mature SaaS. Per HN posting and lineation.ai.",
+    "notes": "From HN Who-is-Hiring May 2026 (item 47975571 / camsjams). Direct cousin to grith.ai positioning. Hunter.io returned 0 indexed emails for lineation.ai (domain too new), so used hello@ from HN posting. Cold email sent 2026-05-04 with partnership framing, Lineation-quoted phrasing ('single line of defense', 'forensic-grade trace', 'lineage Lineation already collects'), LangChain teardown link, free 30-min offer. Pitch angle: distributional read of the trace they already capture - sensors live a layer above their enforcement decisions, downstream of trace capture.",
+    "next_action": "Watch for reply 7 days. Day 7 fallback 2026-05-11: comment on a recent Lineation LinkedIn post or X post with peer-substance reply (no DM nudge). If still silent through 2026-05-18: log silent_close and drop from active pipeline.",
+    "touchpoints": [
+      {
+        "ts": "2026-05-04",
+        "channel": "email",
+        "action": "cold email to hello@lineation.ai - partnership framing, distributional-read-on-lineage angle, LangChain teardown link, free 30-min offer",
+        "by": "Kevin"
+      }
+    ]
   }
 ]

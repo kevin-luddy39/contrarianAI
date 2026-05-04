@@ -1,0 +1,26 @@
+[
+  {
+    "action": "clip",
+    "text": "Hi Eve team,\n\nRead through helloeve.co and the Founding Engineer post on HN. Reaching via hello@ since you mentioned it as the routing channel. Happy to be forwarded to whoever owns the eval / quality-assurance side of the multi-agent pipeline.\n\nThe positioning - \"voice model captures how you think... your judgment, your framing, the instincts that make your ideas yours... drafts get closer to publish-ready with each cycle\" - lands on a specific output-quality problem I work on, and there's an angle worth surfacing.\n\nIn multi-agent content pipelines I audit, the recurring failure mode is the one where every individual call succeeds (voice model returns scores in band, retrieval hits similar past content, prompt chain executes without errors) but the COMPOSITE draft drifts off the trained voice in a way the in-loop self-eval doesn't catch. Three concrete shapes:\n\n  - The voice model's per-paragraph alignment scores look fine in aggregate, but the rank ordering of which paragraphs the model rated highest is anti-correlated with what the actual leader would publish. Mean alignment passes; rank inversion is the failure.\n\n  - A 5-call agent cascade (research -> outline -> draft -> voice-tune -> polish) where each call's output looks coherent, but composition drifts the working context into a distribution shape the trained voice model wasn't validated against. Call 5 produces something that sounds like-the-leader-but-not-quite. No single call is the bug.\n\n  - Voice-model score calibration drift: model says 0.85 confidence the draft matches the leader's voice, ground truth (the leader's read) says 0.4. Confidence and accuracy decouple silently as the voice model accumulates training cycles.\n\nThese survive in-loop self-eval because they aren't policy violations or threshold breaches. They're shape problems in the per-call distributional moments: rank ordering, score calibration, redundancy, bimodality. Cheap to compute, no ground-truth labels needed, runs alongside the agent loop.\n\nI built a set of OSS sensors for this layer. Public teardown of the LangChain RAG quickstart shows what the analysis looks like (5 of 6 queries flagged, retrieval-side rather than voice-side but same statistical method):\n\nhttps://github.com/kevin-luddy39/contrarianAI/tree/main/tools/retrieval-auditor/examples/langchain-quickstart-teardown\n\nIf a 30-min on whether the same distributional read adds signal to your voice-quality eval is useful, happy to do it free against a sample of your pipeline. Conversation is partnership-shaped, not sales (sensors live a layer above your model decisions). If now isn't right, no follow-up from me.\n\nKevin Luddy\ncontrarianAI"
+  },
+  {
+    "action": "open_url",
+    "url": "https://mail.google.com/mail/?view=cm&fs=1&to=hello%40helloeve.co&su=Distributional%20read%20on%20multi-agent%20voice%20fidelity"
+  },
+  {
+    "action": "wait_for_user",
+    "prompt": "Gmail compose should be open with To: hello@helloeve.co and Subject pre-filled. Click into the body field, then press Enter here."
+  },
+  {
+    "action": "key",
+    "combo": "ctrl+v"
+  },
+  {
+    "action": "wait_for_user",
+    "prompt": "Body pasted. Review the email. Press Enter to send (Ctrl+Enter in Gmail)."
+  },
+  {
+    "action": "key",
+    "combo": "ctrl+enter"
+  }
+]

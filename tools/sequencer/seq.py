@@ -40,6 +40,8 @@ PS1_KEY = ROOT / "key.ps1"
 KEY_COMBO_MAP = {
     "ctrl+v": "^v", "ctrl+c": "^c", "ctrl+a": "^a", "ctrl+x": "^x",
     "ctrl+s": "^s", "ctrl+t": "^t", "ctrl+w": "^w",
+    "ctrl+enter": "^{ENTER}", "ctrl+shift+enter": "^+{ENTER}",
+    "shift+tab": "+{TAB}",
     "enter": "{ENTER}", "tab": "{TAB}", "esc": "{ESC}",
     "down": "{DOWN}", "up": "{UP}", "left": "{LEFT}", "right": "{RIGHT}",
 }
@@ -66,8 +68,12 @@ def step_clip(text):
 
 
 def step_open_url(url):
-    # Opens in default Windows browser via cmd.exe start
-    subprocess.run(["cmd.exe", "/c", "start", "", url], check=True)
+    # Use powershell Start-Process; cmd.exe /c start treats `&` in URLs as
+    # command chain separator, breaking query strings.
+    subprocess.run(
+        ["powershell.exe", "-NoProfile", "-Command", "Start-Process", url],
+        check=True,
+    )
     print(f"[open_url] {url}")
 
 

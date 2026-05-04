@@ -38,11 +38,16 @@ def get_key() -> str:
     k = os.environ.get("HUNTER_API_KEY", "").strip()
     if k:
         return k
-    try:
-        with open("/tmp/hunterkey") as f:
-            return f.read().strip()
-    except FileNotFoundError:
-        sys.exit("ERR: no HUNTER_API_KEY env var and no /tmp/hunterkey file. Provide one.")
+    for path in [
+        os.path.expanduser("~/.config/contrarianai/hunter.key"),
+        "/tmp/hunterkey",
+    ]:
+        try:
+            with open(path) as f:
+                return f.read().strip()
+        except FileNotFoundError:
+            continue
+    sys.exit("ERR: no HUNTER_API_KEY env var, no ~/.config/contrarianai/hunter.key, no /tmp/hunterkey. Provide one.")
 
 
 def main():

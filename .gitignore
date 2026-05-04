@@ -1,5 +1,8 @@
 .env
 .npmrc
+.config/
+*.key
+*.key.txt
 *.log
 node_modules/
 data/

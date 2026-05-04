@@ -1,0 +1,26 @@
+[
+  {
+    "action": "clip",
+    "text": "Hi Gerad,\n\nSaw the Staff SWE AI & Automation post on HN. Crate & Barrel, Sephora, REI in production = customer-facing AI where silent failures are expensive in a way most prototypes aren't, and that's the layer I work on.\n\nReaching out partnership-shaped, not as a job application. The pitch is short: in customer-service multi-agent systems I audit, the recurring failure mode is the one where every individual call passes its check (intent classifier returns valid label, retrieval pulls relevant policy doc, response generator's self-eval scores high) but the COMPOSITE customer interaction silently goes off-brand or off-policy in a way the per-step monitoring misses. Three concrete patterns:\n\n  - A customer asks a return policy question. Retrieval call succeeds, returns valid policy chunks, agent self-eval rates the response 4/5. Chunks are rank-inverted vs actual relevance: most-relevant chunk is at rank 4, response built off rank 1. Agent confidently quotes the wrong policy. Customer escalates.\n\n  - 5-call cascade (intent -> retrieval -> draft -> brand-voice check -> polish) where each call passes its individual check. Composition drifts the working context into a distribution shape the model wasn't trained on. Final response sounds plausible, doesn't quite match the brand's actual customer-service voice. Brand team flags it weeks later.\n\n  - Self-eval score calibration drift: agent says 0.9 confidence the response is on-brand, brand-team review shows 0.4. Decouples silently across prompt revisions, accumulates as confidence-but-wrong responses ship to customers.\n\nThese survive standard observability because they aren't threshold breaches or schema violations. They're distributional moments: rank ordering, score calibration, redundancy, bimodality. Cheap to compute alongside the agent loop, no ground-truth labels needed.\n\nI built a set of OSS sensors for this layer. Public teardown of the LangChain RAG quickstart shows the analysis (5 of 6 queries flagged):\n\nhttps://github.com/kevin-luddy39/contrarianAI/tree/main/tools/retrieval-auditor/examples/langchain-quickstart-teardown\n\nIf a 30-min on whether this distributional read adds signal to Gladly's customer-facing AI quality work is useful, happy to do it free against a sample. Conversation is partnership-shaped (sensors live above the per-step monitoring you already have), not a sales pitch. If now isn't right, no follow-up from me.\n\nKevin Luddy\ncontrarianAI"
+  },
+  {
+    "action": "open_url",
+    "url": "https://mail.google.com/mail/?view=cm&fs=1&to=gerad%40gladly.ai&su=Distributional%20read%20on%20customer-facing%20AI%20response%20quality"
+  },
+  {
+    "action": "wait_for_user",
+    "prompt": "Gmail compose open. Click body field, then Enter here."
+  },
+  {
+    "action": "key",
+    "combo": "ctrl+v"
+  },
+  {
+    "action": "wait_for_user",
+    "prompt": "Body pasted. Review. Press Enter to send (Ctrl+Enter)."
+  },
+  {
+    "action": "key",
+    "combo": "ctrl+enter"
+  }
+]

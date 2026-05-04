@@ -38,8 +38,11 @@ def get_key() -> str:
     k = os.environ.get("HUNTER_API_KEY", "").strip()
     if k:
         return k
+    repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     for path in [
         os.path.expanduser("~/.config/contrarianai/hunter.key"),
+        os.path.join(repo_root, ".config/hunter.key.txt"),
+        os.path.join(repo_root, ".config/hunter.key"),
         "/tmp/hunterkey",
     ]:
         try:

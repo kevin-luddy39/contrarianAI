@@ -1,0 +1,26 @@
+[
+  {
+    "action": "clip",
+    "text": "Hi Sudeep,\n\nSaw the Product + ML Staff Engineer posts on HN; reaching you direct as CEO since the angle below is more architecture-shaped than recruiting-shaped.\n\nThe positioning - \"reliable structured outputs, and the observability to iterate on them\" - lands on the layer I work on, and there's an angle worth surfacing (not a job application).\n\nWhat I work on is the distributional read of model outputs - per-call alignment moments (rank ordering, score calibration, redundancy, bimodality) that catch silent drift before it shows up as user-visible failure. Most of the production audits I do have been text-side (RAG retrieval, agent tool-call cascades), but the same statistical method applies to vision-language outputs: the structured-output distribution has shape, and pathological shape is a leading indicator.\n\nThree concrete patterns from text-side audits that I'd expect to map to your domain (chat.vlm.run, Orion, mm-ctx, vlmbench):\n\n  - Per-frame / per-image alignment scores look fine in aggregate, but rank ordering of which frames the model rated highest is anti-correlated with what an oracle would pick. Mean alignment passes; rank inversion is the failure.\n\n  - Multi-step visual reasoning cascade where each step passes its check individually, but the composition drifts the working visual context into a distribution shape the model wasn't validated against. Final answer is coherent, factually drifted.\n\n  - Score calibration drift between the structured-output confidence and ground-truth correctness, accumulating silently as the model handles more prompt variants.\n\nI built a set of OSS sensors for this layer. Public teardown of the LangChain RAG quickstart shows what the analysis looks like (5 of 6 queries flagged - retrieval-side rather than vision-side, but same statistical method):\n\nhttps://github.com/kevin-luddy39/contrarianAI/tree/main/tools/retrieval-auditor/examples/langchain-quickstart-teardown\n\nHonest disclosure: my sensors are text-side; vision-side adaptation is TBD. If there's interest, the conversation is partnership-shaped (does this method add signal to vlmbench / Orion telemetry?) and exploratory rather than a sales pitch. Free 30-min if useful. If now isn't right, no follow-up from me.\n\nKevin Luddy\ncontrarianAI"
+  },
+  {
+    "action": "open_url",
+    "url": "https://mail.google.com/mail/?view=cm&fs=1&to=sudeep%40vlm.run&su=Distributional%20read%20on%20VLM%20output%20observability"
+  },
+  {
+    "action": "wait_for_user",
+    "prompt": "Gmail compose open. Click body field, then Enter here."
+  },
+  {
+    "action": "key",
+    "combo": "ctrl+v"
+  },
+  {
+    "action": "wait_for_user",
+    "prompt": "Body pasted. Review. Press Enter to send (Ctrl+Enter)."
+  },
+  {
+    "action": "key",
+    "combo": "ctrl+enter"
+  }
+]

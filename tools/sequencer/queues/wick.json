@@ -1,0 +1,26 @@
+[
+  {
+    "action": "clip",
+    "text": "Hi Jason,\n\nSaw the Applied AI Product Engineer post Stephanie put up on HN; reaching you direct as CTO since the angle below is more architecture-shaped than recruiting-shaped. The line in the description - \"watch real users break them, make them measurably better\" - is the exact problem I work on, and I wanted to surface a partnership-shaped angle (not a job application).\n\nIn production LLM features I audit, the recurring failure mode is the one where every individual call passes eval (Braintrust says green, Langfuse traces look clean, model returns structured output that validates) but the SHAPE of the output distribution silently drifts off what users actually need. Three concrete patterns:\n\n  - Prompt-and-eval pair where the eval suite scores 0.9+ across the test set, but the per-query alignment distribution on production traffic is rank-inverted vs the eval set. The eval set was the wrong distribution; nobody noticed until a market-research user asked a question outside it.\n\n  - A 5-call cascade (retrieve audience context -> reason about question -> draft response -> check against brand voice -> polish) where each call passes its individual check, but the composition drifts the working context into a shape the model wasn't trained on. Output looks coherent, is factually drifted. No single call is the bug.\n\n  - Score calibration drift: model returns 0.85 confidence, ground truth (user behavior) shows 0.4 actual relevance. Confidence and accuracy decouple silently as the prompt accumulates revisions.\n\nThese survive Braintrust + Langfuse evals because they aren't threshold breaches or schema violations. They're shape problems in the per-call distributional moments: rank ordering, score calibration, redundancy, bimodality. Cheap to compute, no ground-truth labels needed, runs alongside the agent loop.\n\nI built a set of OSS sensors for this layer. Public teardown of the LangChain RAG quickstart shows what the analysis looks like in practice (5 of 6 queries flagged):\n\nhttps://github.com/kevin-luddy39/contrarianAI/tree/main/tools/retrieval-auditor/examples/langchain-quickstart-teardown\n\nIf a 30-min on whether the same distributional read adds signal to your audience-intelligence pipeline is useful, happy to do it free. Conversation is partnership-shaped (sensors live a layer above your eval thresholds), not a sales pitch. If now isn't right, no follow-up from me.\n\nKevin Luddy\ncontrarianAI"
+  },
+  {
+    "action": "open_url",
+    "url": "https://mail.google.com/mail/?view=cm&fs=1&to=jadams%40wick.io&su=Distributional%20read%20on%20prompt%20eval%20drift"
+  },
+  {
+    "action": "wait_for_user",
+    "prompt": "Gmail compose open. Click body field, then Enter here."
+  },
+  {
+    "action": "key",
+    "combo": "ctrl+v"
+  },
+  {
+    "action": "wait_for_user",
+    "prompt": "Body pasted. Review. Press Enter to send (Ctrl+Enter)."
+  },
+  {
+    "action": "key",
+    "combo": "ctrl+enter"
+  }
+]

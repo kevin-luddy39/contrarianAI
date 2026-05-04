@@ -370,8 +370,12 @@ app.all('/api/cron/intel-refresh', async (req, res) => {
 });
 
 // Visit tracking
+// Defaults exclude Kevin's known self-test IPs:
+//   98.24.147.4   = home IP (Day 2-4 diary)
+//   172.58.252.4  = W5 phone tab left open (T-Mobile cellular)
+//   69.251.216.8  = W6 son's house tab left open (Comcast residential, confirmed 2026-05-04)
 const EXCLUDED_IPS = new Set(
-  (process.env.EXCLUDED_IPS || '98.24.147.4').split(',').map(s => s.trim()).filter(Boolean)
+  (process.env.EXCLUDED_IPS || '98.24.147.4,172.58.252.4,69.251.216.8').split(',').map(s => s.trim()).filter(Boolean)
 );
 
 function isPageRequest(req) {

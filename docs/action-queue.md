@@ -10,18 +10,19 @@
 
 ## NOW — do these in order, one at a time
 
-### 1. `[ ]` Pick next cold-email prospect (3 sent today: Lineation, Eve, ?)
+### 1. `[ ]` Wait + reply window for today's 5 cold emails
 
-Eve sent via sequencer 2026-05-04 — manual-contacts.json entry 17. Day-7 fallback 2026-05-11.
+5 emails out today. 7-day reply window. Day 7 fallback 2026-05-11 = LinkedIn-comment on each prospect's recent post (peer-substance, no DM nudge). If silent through 2026-05-18 = silent_close, drop from active pipeline.
 
-Remaining from yesterday's HN scan (ranked by ICP fit):
+| Prospect | Contact | Channel |
+|---|---|---|
+| Lineation | hello@lineation.ai | hello@ (Hunter returned 0; domain too new) |
+| Eve | hello@helloeve.co | HN posting contact |
+| Wick | jadams@wick.io | CTO via Hunter |
+| VLM Run | sudeep@vlm.run | CEO via Hunter |
+| Gladly | gerad@gladly.ai | HN poster |
 
-- **Wick / @SHeinrichatWick** — "watch real users break them" verbatim
-- **VLM Run / vlm.run** — vision-language; "observability to iterate on them" verbatim
-- **Engineering Square / @ESqHiring** — production AI, "end-to-end accuracy"
-- **Gladly / gladly.ai** — Crate&Barrel/Sephora/REI scale, budget
-
-Tell me which next. I run `lookup-founder.py <domain>` (Hunter key debug pending — may need to use HN-posted contacts again) + write `tools/sequencer/queues/<prospect>.json` + you run one command.
+No new outbound action today. Move to next NOW item below.
 
 ---
 
@@ -96,6 +97,13 @@ Tell me which next. I run `lookup-founder.py <domain>` (Hunter key debug pending
 - `[x]` Sequencer toolkit built — `tools/sequencer/` w/ clip.sh, type.ps1, click.ps1, seq.py. Removes manual click/type friction for future cold-email batches. Commit `aaf58e6` pushed.
 - `[x]` Sequencer fixes (commits `2cd0c91`, `9286902`): URL `&` handling via `open.ps1` -File parameter; TTY-fallback in `wait_for_user` so non-TTY runs (`!` shell) auto-pause instead of EOF-crashing.
 - `[x]` Eve cold email sent — `hello@helloeve.co`, voice-fidelity distributional-read pitch, sequencer-driven. manual-contacts.json entry 17. Day-7 fallback 2026-05-11.
+- `[x]` Wick cold email sent — Jason Adams CTO `jadams@wick.io` (via Hunter). Prompt-eval-drift pitch. Entry 18. Day-7 fallback 2026-05-11.
+- `[x]` VLM Run cold email sent — Sudeep Pillai CEO `sudeep@vlm.run` (via Hunter). VLM observability pitch (text-side→vision-side honest disclosure). Entry 19. Day-7 fallback 2026-05-11.
+- `[x]` Gladly cold email sent — `gerad@gladly.ai` (HN poster). Retail-CX silent-failure pitch. Entry 20. Day-7 fallback 2026-05-11.
+- `[x]` Engineering Square dropped — Hunter returned 100% recruiters/HR/sales/DevOps. Likely staffing/body-shop firm. Not Bell Tuning ICP. Saved a cold-email shot.
+- `[x]` Sequencer fixes (commits `2cd0c91`, `9286902`, `c3d29dc`): URL `&` handling via `open.ps1` -File parameter; TTY-fallback in `wait_for_user` so non-TTY runs auto-pause; key.ps1 separated from type.ps1 to fix combo-escape bug; auto-pause raised to 10s; queues end at body-pasted (manual send by Kevin).
+- `[x]` Hunter API key path support — `lookup-founder.py` now reads `.config/hunter.key.txt` in addition to env var and `/tmp/hunterkey`. `.gitignore` protects `.config/`, `*.key`, `*.key.txt` from accidental `git add .` (commit `639dd28`).
+- `[x]` Visit-tracker IP exclusions — added `172.58.252.4` (W5 phone tab) + `69.251.216.8` (W6 son's house, confirmed by Kevin) to default `EXCLUDED_IPS` in `server.js`. Future visit-stats reports filter both at source.
 - `[skip]` Pool 1 sweep — sweep ran 2026-05-04 morning but cohort was all test contacts; no real outreach occurred. Cleanup migration above prevents recurrence.
 - `[skip]` Starbridge melissamrec upgrade — LinkedIn search returns no match for that handle. Path dead. Starbridge falls back to original recruiting@ entry status (silent, can drop or wait).
 - `[skip]` Arzule (Jeffrey Lin) final-touch — dropped from active pipeline. Higher ROI elsewhere. Per `feedback_outreach_pressure_drift.md`: live signal (silence) confirms move-on, no further nudge.

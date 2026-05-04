@@ -176,5 +176,68 @@
         "by": "Kevin"
       }
     ]
+  },
+  {
+    "name": "Jason Adams",
+    "company": "Wick",
+    "tier": "prospect",
+    "source": "hn-who-is-hiring-may-2026",
+    "linkedin_url": "https://www.linkedin.com/in/jasonmadams",
+    "email": "jadams@wick.io",
+    "twitter": null,
+    "role": "Chief Technology Officer",
+    "bio": "Wick = Atlanta-based audience-intelligence platform sitting between enterprise market data (surveys, engagement, research) and AI stack. Production LLM features, eval-tooling-aware (Braintrust, Langfuse). Hiring Applied AI Product Engineer 'who lives in prompts' - 'watch real users break them, make them measurably better.' Per HN posting (item 47979161, @SHeinrichatWick = Stephanie). Found via Hunter.io domain search.",
+    "notes": "Hunter.io returned Jason Adams CTO as top match (vs the recruiter Stephanie posted on HN). Cold email sent 2026-05-04 via sequencer to jadams@wick.io with subject 'Distributional read on prompt eval drift'. Pitch angle: distributional read on prompt-eval distributions in production LLM features (rank inversion vs eval set, cascade composition drift, score calibration drift). Bell Tuning sensors as the layer above Braintrust/Langfuse threshold checks.",
+    "next_action": "Watch for reply 7 days. Day 7 fallback 2026-05-11: comment on Jason's recent LinkedIn post w/ peer-substance reply. Silent through 2026-05-18: log silent_close.",
+    "touchpoints": [
+      {
+        "ts": "2026-05-04",
+        "channel": "email",
+        "action": "cold email to jadams@wick.io (CTO via Hunter) - prompt-eval-drift pitch, partnership framing, LangChain teardown link, free 30-min offer. Sent via sequencer.",
+        "by": "Kevin"
+      }
+    ]
+  },
+  {
+    "name": "Sudeep Pillai",
+    "company": "VLM Run",
+    "tier": "prospect",
+    "source": "hn-who-is-hiring-may-2026",
+    "linkedin_url": "https://www.linkedin.com/in/sudeeppillai",
+    "email": "sudeep@vlm.run",
+    "twitter": null,
+    "role": "CEO",
+    "bio": "VLM Run = inference + orchestration layer for production Vision-Language Models. Shipped: Orion (visual agent), mm-ctx (Unix-style multimodal CLI), vlmbench (VLM inference benchmark). Santa Clara HQ. Hiring 1x Product + 1x ML Staff Engineer. Per HN posting (item 47981876, @fzysingularity). Stated value prop: 'reliable structured outputs, and the observability to iterate on them.'",
+    "notes": "Hunter.io returned Sudeep Pillai CEO as top match. Cold email sent 2026-05-04 via sequencer with subject 'Distributional read on VLM output observability'. Pitch angle: distributional read of model outputs (rank ordering, score calibration drift, cascade composition drift) - text-side audits to date but statistical method generalizes. Honest disclosure included that vision-side adaptation is TBD. Partnership-shaped framing.",
+    "next_action": "Watch for reply 7 days. Day 7 fallback 2026-05-11: comment on Sudeep's recent LinkedIn or X post w/ peer-substance reply. Silent through 2026-05-18: log silent_close.",
+    "touchpoints": [
+      {
+        "ts": "2026-05-04",
+        "channel": "email",
+        "action": "cold email to sudeep@vlm.run (CEO via Hunter) - VLM observability pitch with text-side->vision-side honest disclosure, LangChain teardown link, free 30-min offer. Sent via sequencer.",
+        "by": "Kevin"
+      }
+    ]
+  },
+  {
+    "name": "Gerad (Gladly Eng)",
+    "company": "Gladly",
+    "tier": "prospect",
+    "source": "hn-who-is-hiring-may-2026",
+    "linkedin_url": null,
+    "email": "gerad@gladly.ai",
+    "twitter": null,
+    "role": "Senior/Staff Engineer (likely AI & Automation lead, per HN posting)",
+    "bio": "Gladly = retail customer-service AI in production at Crate & Barrel, Sephora, REI. Hiring Senior + Staff SWE for AI & Automation initiatives. Remote-first. Multi-agent systems, RAG pipelines. Per HN posting (item 47977919, @gerad).",
+    "notes": "Hunter.io returned only generic emails for gladly.ai - used gerad@ from his own HN posting (he listed it as direct contact). Cold email sent 2026-05-04 via sequencer with subject 'Distributional read on customer-facing AI response quality'. Pitch angle: distributional read on multi-agent customer-service responses (rank-inverted retrieval -> wrong policy quote -> escalation, cascade composition drift -> off-brand voice, score calibration drift). Customer-facing AI = high-stakes silent failure cost.",
+    "next_action": "Watch for reply 7 days. Day 7 fallback 2026-05-11: find Gerad on LinkedIn (Hunter didn't return), comment on a recent post w/ peer-substance. Silent through 2026-05-18: log silent_close.",
+    "touchpoints": [
+      {
+        "ts": "2026-05-04",
+        "channel": "email",
+        "action": "cold email to gerad@gladly.ai (HN poster, likely AI & Automation eng lead) - retail-CX silent-failure pitch, partnership framing, LangChain teardown link, free 30-min offer. Sent via sequencer.",
+        "by": "Kevin"
+      }
+    ]
   }
 ]

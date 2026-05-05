@@ -1,0 +1,22 @@
+[
+  {
+    "action": "clip",
+    "text": "Adding to the broker-pattern call above - two things buy meaningful safety on long-running agents that aren't usually in the first cut. First, issue tokens scoped to THIS workflow execution rather than the union of permissions the agent might ever need: your broker generates a token at the start of each run that can read exactly the Stripe charges, DB tables, and log streams the dispute workflow touches, expires when the run ends. Second, keep a server-side append-only audit log keyed by execution-id of every action against those resources, because the day you have to debug 'why did agent X read 50,000 records on Tuesday' you'll want it. On Cloudflare specifically, Workers KV plus D1 work well for the broker plus audit storage without leaving the same edge runtime your agents already live in. Curious - are you doing dispute management on the user's behalf, or just decision support? The audit story matters more if it's the former."
+  },
+  {
+    "action": "open_url",
+    "url": "https://www.reddit.com/r/LLMDevs/comments/1t4bpoe/whats_the_best_way_to_give_an_ai_agent_access_to/"
+  },
+  {
+    "action": "wait_for_user",
+    "prompt": "Reddit thread open. Confirm Late_Researcher232 logged in. Scroll to bottom, click reply box, click into textarea. Auto-paste in 10s."
+  },
+  {
+    "action": "key",
+    "combo": "ctrl+v"
+  },
+  {
+    "action": "sleep",
+    "ms": 500
+  }
+]

@@ -239,5 +239,47 @@
         "by": "Kevin"
       }
     ]
+  },
+  {
+    "name": "Sarah Buchner",
+    "company": "Trunk Tools, Inc.",
+    "tier": "prospect",
+    "source": "job-scrape-remoteok-2026-05-05",
+    "linkedin_url": null,
+    "email": "sarah@trunktools.com",
+    "twitter": null,
+    "role": "CEO",
+    "bio": "Construction-AI startup, $40M Series B led by Insight Partners (total $70M). Hiring ML Engineer (RemoteOK). Per RemoteOK posting: 'leading AI company revolutionizing construction, the second-largest industry on earth.'",
+    "notes": "From job-scraper Phase 1 (RemoteOK). ICP score 50, tags: agent/orchestration/eval/production-ai/vector. CEO via Hunter.io. Cold email sent 2026-05-04 [actually 2026-05-05] via job-scraper sequencer queue. Pitch angle: multi-agent composition drift (cross-agent context shape problems in production). Free 30-min offer with explicit upgrade path mentioned ($15K Full Diagnostic / $35K + onsite).",
+    "next_action": "Watch for reply 7 days. Day 7 fallback 2026-05-12: comment on a Trunk Tools LinkedIn post or article with peer-substance reply. Silent through 2026-05-19: log silent_close.",
+    "touchpoints": [
+      {
+        "ts": "2026-05-05",
+        "channel": "email",
+        "action": "cold email to sarah@trunktools.com (CEO via Hunter) - multi-agent composition pitch, free 30-min with $15K/$35K upgrade path mention. Sent via job-scraper-pipeline sequencer.",
+        "by": "Kevin"
+      }
+    ]
+  },
+  {
+    "name": "Liam King",
+    "company": "Haast",
+    "tier": "prospect",
+    "source": "job-scrape-remoteok-2026-05-05",
+    "linkedin_url": "https://www.linkedin.com/in/liamking97",
+    "email": "liam@haast.io",
+    "twitter": null,
+    "role": "Co-Founder",
+    "bio": "AI marketing compliance software / compliance automation platform. NY-based startup. Hiring Founding Engineer ($180-220k + equity). Per RemoteOK: 'Build the AI platform that's rewriting a $50B industry.'",
+    "notes": "From job-scraper Phase 1 (RemoteOK). ICP score 22, tags: agent/reliability/llm. Co-Founder via Hunter.io. Cold email sent 2026-05-05 via job-scraper sequencer queue. Pitch angle: agent cascade composition drift (5-7 call cascade where each call passes individually but composition drifts). Free 30-min with explicit $15K/$35K upgrade path mention.",
+    "next_action": "Watch for reply 7 days. Day 7 fallback 2026-05-12: comment on Liam's recent LinkedIn post (linkedin.com/in/liamking97) with peer-substance reply. Silent through 2026-05-19: log silent_close.",
+    "touchpoints": [
+      {
+        "ts": "2026-05-05",
+        "channel": "email",
+        "action": "cold email to liam@haast.io (Co-Founder via Hunter) - agent cascade composition pitch, free 30-min with $15K/$35K upgrade path mention. Sent via job-scraper-pipeline sequencer.",
+        "by": "Kevin"
+      }
+    ]
   }
 ]

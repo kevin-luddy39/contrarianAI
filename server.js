@@ -807,18 +807,30 @@ app.get('/api/admin/intel-overview', requireAdmin, async (req, res) => {
           (SELECT COUNT(*)::int FROM audit_requests WHERE is_test = FALSE AND created_at > NOW() - INTERVAL '30 days') as leads_30d,
           (SELECT COUNT(*)::int FROM payments WHERE status='paid' AND paid_at > NOW() - INTERVAL '30 days') as paid_30d
       `),
+      // Referrer + path metrics are stored with the GH-returned CUMULATIVE
+      // 14-day count under day=today. Each daily refresh writes a new row,
+      // so SUMming across 14 days inflates by up to 14x. Use DISTINCT ON
+      // to take the latest snapshot per (repo, referrer/path) instead.
       pool.query(`
-        SELECT meta->>'referrer' as referrer, SUM(value)::int as count, subject as repo
-        FROM intel_snapshots
-        WHERE source='github' AND metric='referrer' AND day > CURRENT_DATE - INTERVAL '14 days'
-        GROUP BY meta->>'referrer', subject
+        SELECT meta->>'referrer' as referrer, value::int as count, subject as repo
+        FROM (
+          SELECT DISTINCT ON (subject) subject, meta, value, day
+          FROM intel_snapshots
+          WHERE source='github' AND metric='referrer'
+            AND day > CURRENT_DATE - INTERVAL '14 days'
+          ORDER BY subject, day DESC
+        ) latest
         ORDER BY count DESC LIMIT 20
       `),
       pool.query(`
-        SELECT meta->>'path' as path, meta->>'title' as title, SUM(value)::int as count, subject as repo
-        FROM intel_snapshots
-        WHERE source='github' AND metric='path' AND day > CURRENT_DATE - INTERVAL '14 days'
-        GROUP BY meta->>'path', meta->>'title', subject
+        SELECT meta->>'path' as path, meta->>'title' as title, value::int as count, subject as repo
+        FROM (
+          SELECT DISTINCT ON (subject) subject, meta, value, day
+          FROM intel_snapshots
+          WHERE source='github' AND metric='path'
+            AND day > CURRENT_DATE - INTERVAL '14 days'
+          ORDER BY subject, day DESC
+        ) latest
         ORDER BY count DESC LIMIT 20
       `),
     ]);

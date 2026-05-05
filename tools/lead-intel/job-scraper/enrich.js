@@ -14,6 +14,7 @@
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
+const { deriveDomain: smartDerive } = require('./derive-domain');
 
 const KEY_PATHS = [
   process.env.HUNTER_API_KEY ? null : null,  // env wins below if set
@@ -51,27 +52,11 @@ function scorePosition(pos) {
   return 0;
 }
 
-// Domain derivation: try job.url / job.apply_url first, fall back to
-// guess from company name.
-function deriveDomain(job) {
-  const candidates = [job.url, job.apply_url].filter(Boolean);
-  for (const u of candidates) {
-    try {
-      const host = new URL(u).hostname.toLowerCase().replace(/^www\./, '');
-      // Skip generic job-board / aggregator hosts
-      if (/(^|\.)(remoteok|weworkremotely|news\.ycombinator|hn\.algolia|workatastartup|wellfound|dice|indeed|glassdoor|linkedin|ycombinator|github)\.com$/i.test(host)) {
-        continue;
-      }
-      return host;
-    } catch {}
-  }
-  // Fallback: synthesize from company name
-  const slug = (job.company || '')
-    .toLowerCase()
-    .replace(/&/g, 'and')
-    .replace(/[^a-z0-9]/g, '');
-  if (!slug) return null;
-  return slug + '.com';
+// Domain derivation now lives in derive-domain.js (multi-slug variants +
+// description-text URL extraction + HEAD-check verification).
+async function deriveDomain(job) {
+  const r = await smartDerive(job, { verify: true });
+  return r.domain;
 }
 
 async function hunterDomainSearch(domain, key) {
@@ -128,10 +113,13 @@ async function main() {
   const jobs = JSON.parse(fs.readFileSync(args.input, 'utf8'));
   console.log(`[enrich] input: ${args.input} (${jobs.length} jobs)`);
 
-  // Group by domain so we make 1 Hunter call per company, not per job
+  // Group by domain so we make 1 Hunter call per company, not per job.
+  // Domain derivation is async (HEAD-checks); resolve serially to avoid
+  // blasting target sites with parallel requests.
+  console.log('[enrich] deriving domains (HEAD-check verified)...');
   const byDomain = new Map();
   for (const j of jobs) {
-    const domain = deriveDomain(j);
+    const domain = await deriveDomain(j);
     j._derived_domain = domain;
     if (!domain) continue;
     if (!byDomain.has(domain)) byDomain.set(domain, []);

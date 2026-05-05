@@ -1,0 +1,22 @@
+[
+  {
+    "action": "clip",
+    "text": "Hi Liam,\n\nSaw the Founding Engineer post for Haast on RemoteOK. The role's framing around agent, reliability, llm maps onto a problem I work on in production audits, and I wanted to surface a partnership-shaped angle (not a job application - reaching you direct as Co-Founder since the angle is more architecture-shaped than recruiting-shaped).\n\nWhat I do: in production agent audits I run, the recurring failure is the one where every individual call is policy-compliant and self-reports success, but the COMPOSITION of a 5-7 call cascade drifts the working context into a distribution shape the model wasn't trained on. Call N returns coherent-looking but factually drifted output - no single call is \"the bug.\"\n\nThe layer that catches it is observation of rank ordering, score calibration, redundancy, and bimodality across the cascade. Cheap to compute, no ground-truth labels needed, runs alongside the system in production. It's not a replacement for any standard layer; it's the layer underneath that catches the cases threshold-based monitoring isn't built to see.\n\nI built a set of OSS sensors for this. Public teardown of the LangChain RAG quickstart shows what the analysis looks like in practice (5 of 6 queries flagged):\n\nhttps://github.com/kevin-luddy39/contrarianAI/tree/main/tools/retrieval-auditor/examples/langchain-quickstart-teardown\n\nIf a 30-min on whether the same distributional read adds signal to Haast's pipeline is useful, happy to do it free against a sample of your traffic. The conversation is partnership-shaped (sensors live a layer above your existing monitoring), not a sales pitch.\n\nIf the conversation surfaces something worth a deeper look, I run a $15K Full Diagnostic engagement (8-12 page report with prioritized fix list across 5 sensors, 30-min walkthrough, 7 days of follow-up Q&A) and a $35K + onsite tier when the workflow needs hands-on architecture work. Both are downstream of the free 30-min - happy to never mention them again if the free conversation doesn't surface a fit.\n\nIf now isn't right, no follow-up from me.\n\nKevin Luddy\ncontrarianAI"
+  },
+  {
+    "action": "open_url",
+    "url": "https://mail.google.com/mail/?view=cm&fs=1&to=liam%40haast.io&su=Distributional+read+on+agent+cascade+composition"
+  },
+  {
+    "action": "wait_for_user",
+    "prompt": "Gmail compose open. To: liam@haast.io, Subject: Distributional read on agent cascade composition. Click body field. Auto-paste in 10s."
+  },
+  {
+    "action": "key",
+    "combo": "ctrl+v"
+  },
+  {
+    "action": "sleep",
+    "ms": 500
+  }
+]

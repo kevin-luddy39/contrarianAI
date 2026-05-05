@@ -1,0 +1,22 @@
+[
+  {
+    "action": "clip",
+    "text": "Hi Sarah,\n\nSaw the ML Engineer post for Trunk Tools, Inc. on RemoteOK. The role's framing around agent, orchestration, eval maps onto a problem I work on in production audits, and I wanted to surface a partnership-shaped angle (not a job application - reaching you direct as CEO since the angle is more architecture-shaped than recruiting-shaped).\n\nWhat I do: in production multi-agent systems I audit, the recurring failure is the one where every individual agent call passes its own check but the CROSS-AGENT composition drifts the working context off-distribution. The system reports success at every step; the user sees the wrong outcome.\n\nThe layer that catches it is observation of distributional moments per-call AND per-cascade - rank ordering, score calibration, redundancy. Cheap to compute, no ground-truth labels needed, runs alongside the system in production. It's not a replacement for any standard layer; it's the layer underneath that catches the cases threshold-based monitoring isn't built to see.\n\nI built a set of OSS sensors for this. Public teardown of the LangChain RAG quickstart shows what the analysis looks like in practice (5 of 6 queries flagged):\n\nhttps://github.com/kevin-luddy39/contrarianAI/tree/main/tools/retrieval-auditor/examples/langchain-quickstart-teardown\n\nIf a 30-min on whether the same distributional read adds signal to Trunk Tools, Inc.'s pipeline is useful, happy to do it free against a sample of your traffic. The conversation is partnership-shaped (sensors live a layer above your existing monitoring), not a sales pitch.\n\nIf the conversation surfaces something worth a deeper look, I run a $15K Full Diagnostic engagement (8-12 page report with prioritized fix list across 5 sensors, 30-min walkthrough, 7 days of follow-up Q&A) and a $35K + onsite tier when the workflow needs hands-on architecture work. Both are downstream of the free 30-min - happy to never mention them again if the free conversation doesn't surface a fit.\n\nIf now isn't right, no follow-up from me.\n\nKevin Luddy\ncontrarianAI"
+  },
+  {
+    "action": "open_url",
+    "url": "https://mail.google.com/mail/?view=cm&fs=1&to=sarah%40trunktools.com&su=Distributional+read+on+multi-agent+composition"
+  },
+  {
+    "action": "wait_for_user",
+    "prompt": "Gmail compose open. To: sarah@trunktools.com, Subject: Distributional read on multi-agent composition. Click body field. Auto-paste in 10s."
+  },
+  {
+    "action": "key",
+    "combo": "ctrl+v"
+  },
+  {
+    "action": "sleep",
+    "ms": 500
+  }
+]

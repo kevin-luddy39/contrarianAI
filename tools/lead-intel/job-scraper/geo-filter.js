@@ -6,6 +6,13 @@
 
 const REMOTE_RE = /\b(remote|anywhere|distributed|work\s+from\s+home|wfh|virtual)\b/i;
 
+// Non-US callouts that disqualify even "Remote" postings. Many jobs
+// say "Remote - EU only" or "Remote LATAM" or "UK based, remote" —
+// these all fail US-only mode.
+const NON_US_LOCATION_RE = /\b(emea|eu\s+only|europe\s+only|uk\s+only|britain|united\s+kingdom|ireland|germany|france|spain|italy|portugal|netherlands|denmark|sweden|norway|finland|switzerland|austria|poland|romania|ukraine|latam|latin\s+america|brazil|mexico|argentina|colombia|chile|apac|asia[- ]pacific|asia\s+only|india\s+only|philippines|singapore|japan|china|hong\s+kong|australia|new\s+zealand|nz\s+only|canada\s+only|toronto|vancouver|montreal|africa)\b/i;
+// Strong US positive signals that override ambiguous "Remote"
+const US_POSITIVE_RE = /\b(united\s+states|usa\b|us\s+based|us\s+only|us\s+remote|americas|americas\s+only|pst|est|cst|mst|et\s+timezone|pt\s+timezone|ct\s+timezone|us\s+timezone|north\s+america)\b/i;
+
 // City-name patterns that mean "in 2hr radius of 28429". Matches as
 // case-insensitive substrings against the location string.
 const IN_RANGE_CITIES = [
@@ -34,16 +41,42 @@ const NATIONAL_RE = /\b(usa|us|united\s+states|nationwide)\b/i;
 // Onsite-only signals — disqualifying when the city is out-of-range
 const ONSITE_ONLY_RE = /\b(onsite\s+only|in[- ]office|no\s+remote|must\s+relocate|relocation\s+required)\b/i;
 
-function classify(job) {
+function classify(job, opts = {}) {
+  const { usOnly = false } = opts;
   const loc = (job.location || '').trim();
   const desc = job.description || '';
   const haystack = `${loc} ${desc}`;
+  const headDesc = desc.slice(0, 800);
 
   if (!loc && !desc) return { ok: true, reason: 'no-location-data', flag: 'unknown' };
 
-  // 1. Remote — always accept
-  if (REMOTE_RE.test(loc) || REMOTE_RE.test(desc.slice(0, 600))) {
-    return { ok: true, reason: 'remote' };
+  // US-only mode: reject obvious non-US callouts BEFORE any accept rule.
+  // Exception: if the posting also has a strong US positive signal AND
+  // mentions another region, treat as multi-region (US-eligible).
+  if (usOnly) {
+    const isNonUs = NON_US_LOCATION_RE.test(haystack);
+    const isUsPositive = US_POSITIVE_RE.test(haystack) ||
+      [...IN_RANGE_CITIES.slice(0, 30)].some(r => r.test(haystack));
+    if (isNonUs && !isUsPositive) {
+      return { ok: false, reason: 'non-us-location', location: loc };
+    }
+    // Bare "Remote" with no US-positive signal AND with non-US headquarters
+    // mentioned in the description — borderline. Reject when truly ambiguous.
+    if (REMOTE_RE.test(loc) && !isUsPositive && /\bheadquarters?\s*:?\s*(?!.*(usa|united\s+states|us\b))/i.test(headDesc)) {
+      // If headquarters is mentioned in desc but not US, reject
+      const hq = headDesc.match(/headquarters?\s*:?\s*([^<\n]{0,80})/i);
+      if (hq && !US_POSITIVE_RE.test(hq[1]) && !IN_RANGE_CITIES.some(r => r.test(hq[1]))) {
+        if (NON_US_LOCATION_RE.test(hq[1])) {
+          return { ok: false, reason: 'non-us-headquarters', location: loc, hq: hq[1].trim() };
+        }
+      }
+    }
+  }
+
+  // 1. Remote — accept
+  if (REMOTE_RE.test(loc) || REMOTE_RE.test(headDesc)) {
+    const flag = usOnly && !US_POSITIVE_RE.test(haystack) ? 'verify-us-eligibility' : undefined;
+    return { ok: true, reason: 'remote', ...(flag ? { flag } : {}) };
   }
 
   // 2. In-range city
@@ -60,4 +93,4 @@ function classify(job) {
   return { ok: false, reason: 'out-of-range', location: loc };
 }
 
-module.exports = { classify, IN_RANGE_CITIES, REMOTE_RE };
+module.exports = { classify, IN_RANGE_CITIES, REMOTE_RE, NON_US_LOCATION_RE, US_POSITIVE_RE };

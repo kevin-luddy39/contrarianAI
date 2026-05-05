@@ -32,7 +32,7 @@ const REPO_ROOT = path.join(__dirname, '..', '..', '..');
 function parseArgs(argv) {
   const out = {
     output: null, minScore: 12, since: null, sources: Object.keys(SOURCES),
-    max: 30, dedupWindow: 14, stealth: true,
+    max: 30, dedupWindow: 14, stealth: true, usOnly: false,
   };
   for (let i = 2; i < argv.length; i++) {
     const a = argv[i];
@@ -50,8 +50,9 @@ function parseArgs(argv) {
     else if (a === '--max') out.max = parseInt(argv[++i], 10);
     else if (a === '--dedup-window') out.dedupWindow = parseInt(argv[++i], 10);
     else if (a === '--no-stealth') out.stealth = false;
+    else if (a === '--us-only') out.usOnly = true;
     else if (a === '--help' || a === '-h') {
-      console.log('Usage: node cli-jobs.js [--since 7d] [--min-score 12] [--max 30] [--dedup-window 14] [--no-stealth]');
+      console.log('Usage: node cli-jobs.js [--since 7d] [--min-score 12] [--max 30] [--dedup-window 14] [--no-stealth] [--us-only]');
       process.exit(0);
     }
   }
@@ -67,7 +68,7 @@ async function main() {
   fs.mkdirSync(path.dirname(args.output), { recursive: true });
 
   console.log(`[apps] sources: ${args.sources.join(', ')} | min-score: ${args.minScore}`);
-  console.log(`[apps] geo: remote OR 2hr of Castle Hayne NC 28429`);
+  console.log(`[apps] geo: remote OR 2hr of Castle Hayne NC 28429${args.usOnly ? ' | US-ONLY mode (rejecting EU/UK/LATAM/Asia/etc)' : ''}`);
   console.log(`[apps] stealth: ${args.stealth ? `ON (excluding companies in last ${args.dedupWindow}d outreach)` : 'OFF'}`);
   console.log(`[apps] output: ${args.output}`);
 
@@ -102,8 +103,9 @@ async function main() {
   }
 
   // Geo filter
-  filtered = filtered.map(j => ({ ...j, _geo: geoClassify(j) })).filter(j => j._geo.ok);
-  console.log(`[apps] after geo filter (remote OR 2hr radius): ${filtered.length}`);
+  const beforeGeo = filtered.length;
+  filtered = filtered.map(j => ({ ...j, _geo: geoClassify(j, { usOnly: args.usOnly }) })).filter(j => j._geo.ok);
+  console.log(`[apps] after geo filter${args.usOnly ? ' (US-only)' : ''}: ${filtered.length} (dropped ${beforeGeo - filtered.length})`);
 
   // ICP score (application-flavored)
   const scored = filtered.map(j => {

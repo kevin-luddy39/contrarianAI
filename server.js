@@ -39,6 +39,9 @@ async function initDb() {
   `);
   await pool.query(`ALTER TABLE audit_requests ADD COLUMN IF NOT EXISTS status TEXT DEFAULT 'new'`);
   await pool.query(`ALTER TABLE audit_requests ADD COLUMN IF NOT EXISTS is_test BOOLEAN NOT NULL DEFAULT FALSE`);
+  // One-time backfill 2026-05-05: mark known test rows (Kevin's own submissions
+  // from launch-week verification). Idempotent via the AND clause.
+  await pool.query(`UPDATE audit_requests SET is_test = TRUE WHERE id IN (1, 2, 3) AND is_test = FALSE`);
   await pool.query(`
     CREATE TABLE IF NOT EXISTS payments (
       id SERIAL PRIMARY KEY,

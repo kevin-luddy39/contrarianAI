@@ -1,0 +1,22 @@
+[
+  {
+    "action": "clip",
+    "text": "Hi Calibrate Group AI team,\n\nI'm interested in the Senior Technical Lead role you posted on WeWorkRemotely (the founding technical hire who owns the entire technical vision and execution). The Apply button on the WWR listing leads to a blank page right now, so reaching you direct.\n\nFit shape:\n\n- 35+ years as a software architect / lead. Founded and ran Oculearn LLC as sole technical founder for 24 years (HIPAA-aware clinical SaaS, full lifecycle, Python+FastAPI+PostgreSQL).\n- Last six months running contrarianAI — built five OSS sensors for AI system observability (npm-installable: contrarianai-context-inspector, retrieval-auditor, tool-call-grader, predictor-corrector, audit-report-generator) and shipped five whitepapers. The thesis is application-layer: catch silent AI failures by reading the shape of intermediate signals, not by managing GPU clusters.\n- That maps to your role description's framing exactly. \"Application-layer engineering... AI-powered tools that solve real business problems... connecting QuickBooks to an AI agent that saves a business owner 10 hours a week\" is the kind of work I've been doing at Mercola IT (Health Coach app, multi-classifier MCP, Qdrant RAG for Dr. Mercola's published works) and at NexTech (XRP crypto POS with sub-5-second settlement, Boomi integration into supply-chain backends).\n- Daily Claude Code driver. Comfortable owning architecture, hands-on coding, and customer-facing technical conversations.\n- Located Castle Hayne NC (Eastern Time). Remote works well.\n\nResume attached. Happy to walk through any of the OSS work or prior architecture engagements in a call when convenient.\n\nKevin Luddy\nCastle Hayne, NC\ngithub.com/kevin-luddy39"
+  },
+  {
+    "action": "open_url",
+    "url": "https://mail.google.com/mail/?view=cm&fs=1&to=hello%40calibrategroup.ai&su=Senior+Technical+Lead+application+(WWR+apply+link+broken)"
+  },
+  {
+    "action": "wait_for_user",
+    "prompt": "Gmail compose open. To: hello@calibrategroup.ai, Subject: Senior Technical Lead application (WWR apply link broken). Click body field. Auto-paste in 10s. After paste: ATTACH RESUME PDF before sending."
+  },
+  {
+    "action": "key",
+    "combo": "ctrl+v"
+  },
+  {
+    "action": "sleep",
+    "ms": 500
+  }
+]

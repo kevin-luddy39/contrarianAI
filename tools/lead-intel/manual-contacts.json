@@ -323,5 +323,194 @@
         "by": "Kevin"
       }
     ]
+  },
+  {
+    "name": "Chess.com (rejected on review)",
+    "company": "Chess.com",
+    "tier": "passed_over",
+    "source": "job-scrape-review-2026-05-06",
+    "linkedin_url": null,
+    "email": null,
+    "twitter": null,
+    "role": null,
+    "bio": "",
+    "notes": "Reviewed via job-scraper on 2026-05-06 and rejected. Reason: passion-tax: requires opening chess.com account, signals enthusiast-recruiting + low-ball comp",
+    "next_action": "Auto-excluded from future scrapes via dedup-ledger 14d window. Re-evaluate after 2026-05-20 if reason becomes stale.",
+    "touchpoints": [
+      {
+        "ts": "2026-05-06",
+        "channel": "internal",
+        "action": "passed-over on review: passion-tax: requires opening chess.com account, signals enthusiast-recruiting + low-ball comp",
+        "by": "Kevin"
+      }
+    ]
+  },
+  {
+    "name": "Fusemachines (rejected on review)",
+    "company": "Fusemachines",
+    "tier": "passed_over",
+    "source": "job-scrape-review-2026-05-06",
+    "linkedin_url": null,
+    "email": null,
+    "twitter": null,
+    "role": null,
+    "bio": "",
+    "notes": "Reviewed via job-scraper on 2026-05-06 and rejected. Reason: Nepal HQ + agency model: pay scaled to home market, client-deliverable engineering, not architecture-voice",
+    "next_action": "Auto-excluded from future scrapes via dedup-ledger 14d window. Re-evaluate after 2026-05-20 if reason becomes stale.",
+    "touchpoints": [
+      {
+        "ts": "2026-05-06",
+        "channel": "internal",
+        "action": "passed-over on review: Nepal HQ + agency model: pay scaled to home market, client-deliverable engineering, not architecture-voice",
+        "by": "Kevin"
+      }
+    ]
+  },
+  {
+    "name": "Sanctuary Computer (rejected on review)",
+    "company": "Sanctuary Computer",
+    "tier": "passed_over",
+    "source": "job-scrape-review-2026-05-06",
+    "linkedin_url": null,
+    "email": null,
+    "twitter": null,
+    "role": null,
+    "bio": "",
+    "notes": "Reviewed via job-scraper on 2026-05-06 and rejected. Reason: contract-based + West Coast preference + pixel-perfect frontend design (Kevin is backend/architecture)",
+    "next_action": "Auto-excluded from future scrapes via dedup-ledger 14d window. Re-evaluate after 2026-05-20 if reason becomes stale.",
+    "touchpoints": [
+      {
+        "ts": "2026-05-06",
+        "channel": "internal",
+        "action": "passed-over on review: contract-based + West Coast preference + pixel-perfect frontend design (Kevin is backend/architecture)",
+        "by": "Kevin"
+      }
+    ]
+  },
+  {
+    "name": "Lemon.io (rejected on review)",
+    "company": "Lemon.io",
+    "tier": "passed_over",
+    "source": "job-scrape-review-2026-05-06",
+    "linkedin_url": null,
+    "email": null,
+    "twitter": null,
+    "role": null,
+    "bio": "",
+    "notes": "Reviewed via job-scraper on 2026-05-06 and rejected. Reason: data-annotator title = data labeling gig work, not engineering. Lemon.io is engineer marketplace",
+    "next_action": "Auto-excluded from future scrapes via dedup-ledger 14d window. Re-evaluate after 2026-05-20 if reason becomes stale.",
+    "touchpoints": [
+      {
+        "ts": "2026-05-06",
+        "channel": "internal",
+        "action": "passed-over on review: data-annotator title = data labeling gig work, not engineering. Lemon.io is engineer marketplace",
+        "by": "Kevin"
+      }
+    ]
+  },
+  {
+    "name": "Ssc Hr Solutions (rejected on review)",
+    "company": "Ssc Hr Solutions",
+    "tier": "passed_over",
+    "source": "job-scrape-review-2026-05-06",
+    "linkedin_url": null,
+    "email": null,
+    "twitter": null,
+    "role": null,
+    "bio": "",
+    "notes": "Reviewed via job-scraper on 2026-05-06 and rejected. Reason: Cairo Egypt HQ - body-shop pattern, not US-eligible architecture role",
+    "next_action": "Auto-excluded from future scrapes via dedup-ledger 14d window. Re-evaluate after 2026-05-20 if reason becomes stale.",
+    "touchpoints": [
+      {
+        "ts": "2026-05-06",
+        "channel": "internal",
+        "action": "passed-over on review: Cairo Egypt HQ - body-shop pattern, not US-eligible architecture role",
+        "by": "Kevin"
+      }
+    ]
+  },
+  {
+    "name": "CloudDevs (rejected on review)",
+    "company": "CloudDevs",
+    "tier": "passed_over",
+    "source": "job-scrape-review-2026-05-06",
+    "linkedin_url": null,
+    "email": null,
+    "twitter": null,
+    "role": null,
+    "bio": "",
+    "notes": "Reviewed via job-scraper on 2026-05-06 and rejected. Reason: Location: LATAMs only, not US-eligible",
+    "next_action": "Auto-excluded from future scrapes via dedup-ledger 14d window. Re-evaluate after 2026-05-20 if reason becomes stale.",
+    "touchpoints": [
+      {
+        "ts": "2026-05-06",
+        "channel": "internal",
+        "action": "passed-over on review: Location: LATAMs only, not US-eligible",
+        "by": "Kevin"
+      }
+    ]
+  },
+  {
+    "name": "Shields Health Solutions (rejected on review)",
+    "company": "Shields Health Solutions",
+    "tier": "passed_over",
+    "source": "job-scrape-review-2026-05-06",
+    "linkedin_url": null,
+    "email": null,
+    "twitter": null,
+    "role": null,
+    "bio": "",
+    "notes": "Reviewed via job-scraper on 2026-05-06 and rejected. Reason: Pharmacy Liaison title = clinical/patient-facing role, not engineering",
+    "next_action": "Auto-excluded from future scrapes via dedup-ledger 14d window. Re-evaluate after 2026-05-20 if reason becomes stale.",
+    "touchpoints": [
+      {
+        "ts": "2026-05-06",
+        "channel": "internal",
+        "action": "passed-over on review: Pharmacy Liaison title = clinical/patient-facing role, not engineering",
+        "by": "Kevin"
+      }
+    ]
+  },
+  {
+    "name": "Waterworks (rejected on review)",
+    "company": "Waterworks",
+    "tier": "passed_over",
+    "source": "job-scrape-review-2026-05-06",
+    "linkedin_url": null,
+    "email": null,
+    "twitter": null,
+    "role": null,
+    "bio": "",
+    "notes": "Reviewed via job-scraper on 2026-05-06 and rejected. Reason: Manager Client Support title = customer service mgr role, not engineering",
+    "next_action": "Auto-excluded from future scrapes via dedup-ledger 14d window. Re-evaluate after 2026-05-20 if reason becomes stale.",
+    "touchpoints": [
+      {
+        "ts": "2026-05-06",
+        "channel": "internal",
+        "action": "passed-over on review: Manager Client Support title = customer service mgr role, not engineering",
+        "by": "Kevin"
+      }
+    ]
+  },
+  {
+    "name": "Paperpile (rejected on review)",
+    "company": "Paperpile",
+    "tier": "passed_over",
+    "source": "job-scrape-review-2026-05-06",
+    "linkedin_url": null,
+    "email": null,
+    "twitter": null,
+    "role": null,
+    "bio": "",
+    "notes": "Reviewed via job-scraper on 2026-05-06 and rejected. Reason: Pay \u20ac60-90k EUR (~$66-99k USD) below $110k floor (Kevin 2026-05-06 criterion)",
+    "next_action": "Auto-excluded from future scrapes via dedup-ledger 14d window. Re-evaluate after 2026-05-20 if reason becomes stale.",
+    "touchpoints": [
+      {
+        "ts": "2026-05-06",
+        "channel": "internal",
+        "action": "passed-over on review: Pay \u20ac60-90k EUR (~$66-99k USD) below $110k floor (Kevin 2026-05-06 criterion)",
+        "by": "Kevin"
+      }
+    ]
   }
 ]

@@ -19,6 +19,7 @@ const { scoreJobForApplication } = require('./application-icp');
 const { dedupe } = require('./dedupe');
 const { classify: geoClassify } = require('./geo-filter');
 const { loadOutreachLedger, isCompanyInActiveOutreach } = require('./dedup-ledger');
+const { parseSalary, passesFloor } = require('./salary-parse');
 
 const SOURCES = {
   remoteok: require('./sources/remoteok'),
@@ -33,6 +34,7 @@ function parseArgs(argv) {
   const out = {
     output: null, minScore: 12, since: null, sources: Object.keys(SOURCES),
     max: 30, dedupWindow: 14, stealth: true, usOnly: false,
+    minSalary: 110000,  // USD floor per Kevin 2026-05-06
   };
   for (let i = 2; i < argv.length; i++) {
     const a = argv[i];
@@ -51,8 +53,10 @@ function parseArgs(argv) {
     else if (a === '--dedup-window') out.dedupWindow = parseInt(argv[++i], 10);
     else if (a === '--no-stealth') out.stealth = false;
     else if (a === '--us-only') out.usOnly = true;
+    else if (a === '--min-salary') out.minSalary = parseInt(argv[++i], 10);
+    else if (a === '--no-salary-filter') out.minSalary = 0;
     else if (a === '--help' || a === '-h') {
-      console.log('Usage: node cli-jobs.js [--since 7d] [--min-score 12] [--max 30] [--dedup-window 14] [--no-stealth] [--us-only]');
+      console.log('Usage: node cli-jobs.js [--since 7d] [--min-score 12] [--max 30] [--dedup-window 14] [--no-stealth] [--us-only] [--min-salary 110000] [--no-salary-filter]');
       process.exit(0);
     }
   }
@@ -106,6 +110,22 @@ async function main() {
   const beforeGeo = filtered.length;
   filtered = filtered.map(j => ({ ...j, _geo: geoClassify(j, { usOnly: args.usOnly }) })).filter(j => j._geo.ok);
   console.log(`[apps] after geo filter${args.usOnly ? ' (US-only)' : ''}: ${filtered.length} (dropped ${beforeGeo - filtered.length})`);
+
+  // Salary filter
+  if (args.minSalary > 0) {
+    const beforeSal = filtered.length;
+    let droppedDisclosed = 0;
+    filtered = filtered.map(j => {
+      const sal = parseSalary([j.title, j.description, JSON.stringify(j.tags || '')].join(' '));
+      const pass = passesFloor(sal, args.minSalary);
+      return { ...j, _salary: sal, _salary_check: pass };
+    }).filter(j => {
+      if (j._salary_check.ok) return true;
+      droppedDisclosed++;
+      return false;
+    });
+    console.log(`[apps] after salary floor ($${(args.minSalary/1000).toFixed(0)}k USD min): ${filtered.length} (dropped ${droppedDisclosed} disclosed-below-floor; undisclosed kept with flag)`);
+  }
 
   // ICP score (application-flavored)
   const scored = filtered.map(j => {

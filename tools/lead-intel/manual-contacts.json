@@ -659,5 +659,26 @@
         "by": "Kevin"
       }
     ]
+  },
+  {
+    "name": "Honor Foods (rejected on review)",
+    "company": "Honor Foods",
+    "tier": "passed_over",
+    "source": "job-scrape-review-2026-05-06",
+    "linkedin_url": null,
+    "email": null,
+    "twitter": null,
+    "role": "(target role: Front End Full Stack Developer)",
+    "bio": "Philadelphia PA. Logistics co. Stack: React/TS/JS + Java/Groovy/Grails/Spring/Postgres.",
+    "notes": "Reviewed via job-scraper on 2026-05-06 and rejected. Reason: JD opens \"front-end focused developer who loves clean UI\" \u2014 Kevin: \"the whole clean UI movement turns me off. Counterintuitive to business-first attitude. Also, dated.\" Same family as stack-obsession critique (feedback_stack_obsession_filter.md): companies optimizing for surface-polish signals instead of business outcomes filter out high-leverage architects.",
+    "next_action": "Auto-excluded 14d window.",
+    "touchpoints": [
+      {
+        "ts": "2026-05-06",
+        "channel": "internal",
+        "action": "passed-over: clean-UI-emphasis JD (dated, surface-polish > business-first)",
+        "by": "Kevin"
+      }
+    ]
   }
 ]

@@ -617,5 +617,26 @@
         "by": "Kevin"
       }
     ]
+  },
+  {
+    "name": "Calabrio (posting expired)",
+    "company": "Calabrio",
+    "tier": "passed_over",
+    "source": "job-scrape-review-2026-05-06",
+    "linkedin_url": null,
+    "email": null,
+    "twitter": null,
+    "role": "(target role: Engineer Software)",
+    "bio": "Verint subsidiary, large CX-AI enterprise. Was scored 20.",
+    "notes": "RemoteOK listing returned \"This job is not available anymore\" before review. Job filled/pulled. Could re-target via verint.com/careers if interested in the company.",
+    "next_action": "Auto-excluded from current 14d window.",
+    "touchpoints": [
+      {
+        "ts": "2026-05-06",
+        "channel": "internal",
+        "action": "passed-over: RemoteOK listing expired before review",
+        "by": "Kevin"
+      }
+    ]
   }
 ]

@@ -1,0 +1,122 @@
+[
+  {
+    "source": "reddit",
+    "sub": "MachineLearning",
+    "id": "1t4pe8c",
+    "author": "dacherrr",
+    "title": "Question about PLS-DA hyperparameter tuning [R]",
+    "text": "Hi all! I am a bioinformatician and I am working on learning some ML tools for some disease/biomarker stuff. I am working with sparse PLS-DA at the moment. Before actually tuning the model, I run on overall global model (without sparsity) to get an idea of what my data looks like and to get to a starting point. Here is what that global model ends up looking like:\n\n[global model](https://preview.redd.it/701knkltbdzg1.png?width=875&amp;format=png&amp;auto=webp&amp;s=d314aa8eb38128e3e7bf2bef8102f8073dac7289)\n\nSo from this, I'm seeing that I should include 2 latent components in my model tuning and I chose to use the centroids.dist. So I tune the model with two components, it gives me the # of features to keep on each component and then I run the final model. However, when I do performance assessment on the final model, it looks like this:\n\n[final model \\(sparse\\)](https://preview.redd.it/tc4ktlv5cdzg1.png?width=875&amp;format=png&amp;auto=webp&amp;s=95860f47ac13ff2b5c60d1ac71ec82cb68bf585f)\n\nI guess I am a little confused. From what I am reading online, and from my own data, error rates should go down with added components. It also doesn't make a ton of sense to me because I should have only picked the features that best distinguish two conditions, so again, I should be seeing error rates decrease.\n\nCan someone please help me understand what I'm seeing here and what could be causing this? I am still learning how all of this works, so amy sort of guidance is appreciated. Thank you!",
+    "url": "https://reddit.com/r/MachineLearning/comments/1t4pe8c/question_about_plsda_hyperparameter_tuning_r/",
+    "permalink": "/r/MachineLearning/comments/1t4pe8c/question_about_plsda_hyperparameter_tuning_r/",
+    "ups": 3,
+    "num_comments": 0,
+    "created_at": "2026-05-05T19:15:53.000Z",
+    "pain_score": 21,
+    "pain_tags": [
+      "help-request"
+    ],
+    "pain_anti": false
+  },
+  {
+    "source": "reddit",
+    "sub": "LocalLLaMA",
+    "id": "1t4tcmz",
+    "author": "quickreactor",
+    "title": "Smaller gguf getting way less tokens per second?? So confused!",
+    "text": "Noob here, Running Qwen3.6 35B A3B in LM Studio on a 3080 10GB + Ryzen 5 3600 on Windows 10.\n\nTried some unsloth quants with identical settings (GPU offload 40, MoE layers to CPU 40, context 8192, flash attention on).\n\nHere are my results\n\nQ4_K_XL (22.49GB) 24 tps\n\nIQ_4_XS (18.18GB ) 12tps\n\nOn llama.cpp its similar, 35 tokens vs 18\n\nWhy is the smaller model getting dramatically slower speeds?\n\nI simply cannot explain this and would love any theories or advice to help me figure out what I'm getting wrong?",
+    "url": "https://reddit.com/r/LocalLLaMA/comments/1t4tcmz/smaller_gguf_getting_way_less_tokens_per_second/",
+    "permalink": "/r/LocalLLaMA/comments/1t4tcmz/smaller_gguf_getting_way_less_tokens_per_second/",
+    "ups": 8,
+    "num_comments": 16,
+    "created_at": "2026-05-05T21:39:53.000Z",
+    "pain_score": 19,
+    "pain_tags": [
+      "help-request"
+    ],
+    "pain_anti": false
+  },
+  {
+    "source": "reddit",
+    "sub": "LLMDevs",
+    "id": "1t4e9ym",
+    "author": "TH_UNDER_BOI",
+    "title": "open source AI assistants ranked by tool call reliability",
+    "text": "Tool call reliability is the single most predictive capability for whether an open source AI assistant survives production use. Every other issue is recoverable. A tool call that silently fails or hallucinates its own arguments breaks the entire session and leaves no clear signal that anything went wrong. Ranking by how each option handles this.\n\nOpenClaw Capability is high once heavily tuned. Out of the box the rate of malformed arguments runs well above what the demos suggest, and the failure mode is almost always silent because the agent continues as if the call succeeded. Works fine after custom skill files enforce validation at the call boundary, which takes weeks to set up.\n\nVellum prevents silent tool call failures because every invocation is shown for approval before execution, which catches hallucinated parameters and malformed JSON args before they hit an API. Bottom line: the approval step turns invisible failures into visible ones, which is the core mechanic that makes tool calls trustworthy. Default behavior out of install, no skill file tuning required.\n\nHermes Reliability looks acceptable in the first few runs and degrades as the self learning loop overwrites working behavior with \"improvements\" generated from the system's own evaluation of earlier calls. The compounding failure mode makes it the hardest of the three to trust over time.\n\nThe test worth running on any of these is simple. Hand it a tool that returns an unexpected format on the third call. Watch what it does. If the answer is \"it improvises and keeps going,\" reliability is broken at the premise regardless of what the feature list says.",
+    "url": "https://reddit.com/r/LLMDevs/comments/1t4e9ym/open_source_ai_assistants_ranked_by_tool_call/",
+    "permalink": "/r/LLMDevs/comments/1t4e9ym/open_source_ai_assistants_ranked_by_tool_call/",
+    "ups": 7,
+    "num_comments": 9,
+    "created_at": "2026-05-05T12:40:15.000Z",
+    "pain_score": 18,
+    "pain_tags": [
+      "silent-fail"
+    ],
+    "pain_anti": false
+  },
+  {
+    "source": "reddit",
+    "sub": "LocalLLaMA",
+    "id": "1t4t33g",
+    "author": "Lopsided_Dot_4557",
+    "title": "Gemma 4 31B MTP Drafter on H100 -- Real Benchmarks + DFlash Comparison",
+    "text": "Just tested Gemma 4 31B with the new official MTP Drafter on my H100 today and compared the approach with DFlash to help you decide which one to use.\n\nWithout drafter: 13.7 tok/s. With MTP drafter: 27.4 tok/s. Nearly 2x faster with zero quality degradation.\n\nFor those who don't know what MTP drafter means -- a small lightweight companion model guesses the next 4 tokens ahead, the big 31B model just verifies them in a single pass. If the guesses are correct you get 4 tokens for the price of 1. Output is mathematically identical to running without the drafter.\n\nMTP drafter setup is dead simple. Two extra lines of Python, no vLLM, no special config, just HuggingFace Transformers. We also break down how DFlash differs and when you would choose one over the other.\n\nModels just dropped today on HuggingFace:\n\n* google/gemma-4-31B-it-assistant (the drafter)\n* google/gemma-4-31B-it (main model)\n\nFull tutorial with code below:\n\n[https://youtu.be/ak4OUOoOV08](https://youtu.be/ak4OUOoOV08)",
+    "url": "https://reddit.com/r/LocalLLaMA/comments/1t4t33g/gemma_4_31b_mtp_drafter_on_h100_real_benchmarks/",
+    "permalink": "/r/LocalLLaMA/comments/1t4t33g/gemma_4_31b_mtp_drafter_on_h100_real_benchmarks/",
+    "ups": 0,
+    "num_comments": 9,
+    "created_at": "2026-05-05T21:29:43.000Z",
+    "pain_score": 15,
+    "pain_tags": [
+      "mystery"
+    ],
+    "pain_anti": false
+  },
+  {
+    "source": "reddit",
+    "sub": "ExperiencedDevs",
+    "id": "1t3tdru",
+    "author": "_MrsBrightside_",
+    "title": "C# dev wanting to move on from a small team.",
+    "text": "I have 6 years experience with a small agency in dot net web development, it is my first programming job and I do enjoy the stress free environment but I feel out of touch with modern practices. I fear this will keep me stuck here.\n\nFor some context, when I started I had to learn webforms and after a while I asked if we could use Razor Pages instead, my boss is great and allowed me to do a POC. We did a couple apps in it and then Blazor Server was becoming more intriguing to me since my team is used to webforms. Me and a coworker have been using it for 2 years but the rest of the team stays on webforms so if anything hiccups it’s up to me only, even my other coworker relies on me to figure out bugs for him since I introduced us to the framework because he doesn’t bother to take a full fledged tutorial. He learns as he goes, as he says. My bosses are good as i mentioned and allow me to try new things and get us caught up to the times 😆 but there’s only so much I can do because I feel like I need a mentor and yet I am the mentor. My boss did get us copilot recently to test out so at least there’s that.\n\nWe don’t use Git, I’m starting to learn it and i already know it’s going to be an uphill battle trying to get my coworkers to use it too, we don’t do code reviews, I don’t publish our applications so no devops experience  (taken care of by other team member due to security policy), we don’t use entity framework (we use stored procedures in mssql), we don’t use micro services (all our apps are monolithic).\n\nI love that I can be a value to my team and that I am allowed to bring new ideas, I just don’t want to be the only one doing so. \n\nSo basically my question is if I was applying to your team, would you hire me? If not, what could I do to help with this gap in on work experience, side projects?",
+    "url": "https://reddit.com/r/ExperiencedDevs/comments/1t3tdru/c_dev_wanting_to_move_on_from_a_small_team/",
+    "permalink": "/r/ExperiencedDevs/comments/1t3tdru/c_dev_wanting_to_move_on_from_a_small_team/",
+    "ups": 60,
+    "num_comments": 74,
+    "created_at": "2026-05-04T20:18:02.000Z",
+    "pain_score": 15,
+    "pain_tags": [],
+    "pain_anti": false
+  },
+  {
+    "source": "reddit",
+    "sub": "Rag",
+    "id": "1t1lsai",
+    "author": "PenEquivalent5091",
+    "title": "Stuck in \"Tutorial Hell\" with RAG",
+    "text": "I've built two RAG pipelines so far: a basic one from a youtube tutorial and a more modular version with some help from claude. While I feel like I fully understand the concepts and the logic behind each component, I still can’t code them from a blank script without a reference or AI assistance.\n\n\n\nI'm looking for some advice on my next steps:\n\nShould I stay focused on my current stack and keep rebuilding it until I can do it solo from memory? \n\nOr should I start exploring more advanced techniques (like different retrieval methods, re-ranking, etc.) to keep the momentum going?\n\n\n\nAlso, I’m curious to hear how did you guys actually learn RAG to the point where you could build a pipeline from scratch? \n\n\n\nThanks for any help!",
+    "url": "https://reddit.com/r/Rag/comments/1t1lsai/stuck_in_tutorial_hell_with_rag/",
+    "permalink": "/r/Rag/comments/1t1lsai/stuck_in_tutorial_hell_with_rag/",
+    "ups": 12,
+    "num_comments": 31,
+    "created_at": "2026-05-02T10:04:26.000Z",
+    "pain_score": 13,
+    "pain_tags": [],
+    "pain_anti": false
+  },
+  {
+    "source": "reddit",
+    "sub": "datascience",
+    "id": "1ssohhu",
+    "author": "Fig_Towel_379",
+    "title": "Onsite interview anxiety: what to say when you don’t know an answer?",
+    "text": "I have an onsite interview coming up, not virtual, and it’s been a while since I’ve interviewed in person. The recruiter said the coding portion could cover anything from data structures and algorithms to SQL, pandas, or even live model building, so I’m expecting there will be things I don’t know.\n\nWhat’s really stressing me out is the idea of being in front of someone and blanking on a question. That feeling of just sitting there stuck feels embarrassing.\n\nIn that situation, what’s the best way to handle it? Is it better to say something like “Sorry, I can’t figure this out right now” or “I haven’t covered this topic before” and ask to move on?",
+    "url": "https://reddit.com/r/datascience/comments/1ssohhu/onsite_interview_anxiety_what_to_say_when_you/",
+    "permalink": "/r/datascience/comments/1ssohhu/onsite_interview_anxiety_what_to_say_when_you/",
+    "ups": 47,
+    "num_comments": 41,
+    "created_at": "2026-04-22T15:16:35.000Z",
+    "pain_score": 13,
+    "pain_tags": [],
+    "pain_anti": false
+  }
+]

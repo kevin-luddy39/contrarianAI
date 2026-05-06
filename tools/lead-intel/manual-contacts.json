@@ -302,5 +302,26 @@
         "by": "Kevin"
       }
     ]
+  },
+  {
+    "name": "Andromeda Cluster team",
+    "company": "Andromeda Cluster",
+    "tier": "application_sent",
+    "source": "job-application-2026-05-05",
+    "linkedin_url": null,
+    "email": null,
+    "twitter": null,
+    "role": "(target role: Senior Site Reliability Engineer - AI Infrastructure)",
+    "bio": "Founded by Nat Friedman + Daniel Gross. AI infra marketplace - GPU clusters, distributed training, multi-provider/multi-region orchestration. SF + Global Remote. Per RemoteOK posting + andromedacluster.io.",
+    "notes": "Kevin applied 2026-05-05 ~3pm EDT (before the application-intent pipeline was built). POST-HOC FIT NOTE: role is hardcore GPU-cluster-ops specialty (NVLink/NCCL/InfiniBand/RoCE), not application-layer AI. Kevin's strengths are app-layer (Bell Tuning sensors, Mercola IT Health Coach) not GPU-fleet sysadmin. Application sent regardless; modest expectations. If they reply: lean on the application-layer adjacency angle (your sensors observe their customers' training jobs from a different angle).",
+    "next_action": "Watch for response 7-14 days. Day-7 fallback 2026-05-12: optional LinkedIn ping if silent. If silent through 2026-05-19: log silent_close.",
+    "touchpoints": [
+      {
+        "ts": "2026-05-05T15:00",
+        "channel": "(application portal \u2014 not via this pipeline)",
+        "action": "Kevin applied to Senior SRE AI Infrastructure role. Pre-dates the application-scraper build.",
+        "by": "Kevin"
+      }
+    ]
   }
 ]

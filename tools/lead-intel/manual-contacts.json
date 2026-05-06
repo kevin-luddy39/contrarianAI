@@ -596,5 +596,26 @@
         "by": "Kevin"
       }
     ]
+  },
+  {
+    "name": "Toast (posting expired)",
+    "company": "Toast",
+    "tier": "passed_over",
+    "source": "job-scrape-review-2026-05-06",
+    "linkedin_url": null,
+    "email": null,
+    "twitter": null,
+    "role": "(target role: Senior Enterprise Process Engineer)",
+    "bio": "Restaurant POS platform, US HQ. Was scored 12 in app-ICP.",
+    "notes": "WeWorkRemotely listing pulled before Kevin could review (page returns \"no longer available\"). Job filled or removed. Could re-target via Toast careers page directly if interested in the company - but not from this scrape pass.",
+    "next_action": "Check toast.com/careers in next scrape pass if interested in Toast generally. Auto-excluded from current 14d window.",
+    "touchpoints": [
+      {
+        "ts": "2026-05-06",
+        "channel": "internal",
+        "action": "passed-over: WWR listing expired before review",
+        "by": "Kevin"
+      }
+    ]
   }
 ]

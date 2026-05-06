@@ -113,6 +113,7 @@
           "linkedin_followers": 1530,
           "location": "Bengaluru, Karnataka, India",
           "personal_brand": "EmiTechLogic",
+          "personal_email": "emi@emitechlogic.com (visible on LI cover photo - public-shared contact)",
           "education": "Anna University",
           "url": "(Kevin to capture from TDS when reading)",
           "fit_classification": "peer_amplifier (NOT buyer)",
@@ -128,7 +129,8 @@
           ],
           "next_action": "Wait for accept. If she accepts + warm-close reply (Nweke pattern): thumbs-up + content-led nurture. If she accepts + substantive reply (asks about retrieval-auditor / Bell Tuning method): swap teardown notes peer-to-peer, NO audit pitch (she's not a buyer; she's a builder + amplifier). If she asks about her own pipeline vs Bell Tuning: be honest about complementary scope, do NOT compete. If silent 7-14d: drop direct outreach, content-led nurture only.",
           "draft_connection_note": "Read your \"RAG Hallucinates / Self-Healing Layer\" on TDS. The \"silent production failure\" framing maps to what I've built - retrieval-auditor flagged 5/6 LangChain quickstart queries via rank inversion + score miscal. Wrote it up if useful.",
-          "amplifier_engagement_path": "If accept happens: comment substantively on her TDS article (public, not DM) once she's connected, with the kind of substance peer reply she'd value. Public engagement = her audience sees Kevin's voice. Don't pitch in the comment. If she likes/replies/shares Kevin's LinkedIn substance posts: real signal, peer-relationship is forming. Long-tail value > short-tail audit conversion."
+          "amplifier_engagement_path": "If accept happens: comment substantively on her TDS article (public, not DM) once she's connected, with the kind of substance peer reply she'd value. Public engagement = her audience sees Kevin's voice. Don't pitch in the comment. If she likes/replies/shares Kevin's LinkedIn substance posts: real signal, peer-relationship is forming. Long-tail value > short-tail audit conversion.",
+          "email_use_policy": "emi@emitechlogic.com is publicly-shared on her LI cover photo, so it's invited for contact. BUT do NOT use as the primary first-touch (LI connect-request is in flight). Use only if: (a) she doesn't accept LI in 14d AND Kevin still wants direct contact, OR (b) post-connect Touch #2 needs to share a long URL/PDF that LI DMs render badly. Treat as backup channel, not parallel push."
         },
         {
           "author": "Benjamin Nweke",

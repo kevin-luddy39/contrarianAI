@@ -41,6 +41,15 @@ const NATIONAL_RE = /\b(usa|us|united\s+states|nationwide)\b/i;
 // Onsite-only signals — disqualifying when the city is out-of-range
 const ONSITE_ONLY_RE = /\b(onsite\s+only|in[- ]office|no\s+remote|must\s+relocate|relocation\s+required)\b/i;
 
+// US-state residency restrictions hidden in description even when the
+// location field says "Remote". Patterns: "must reside in Texas",
+// "remote only in California", "candidates outside of Florida", etc.
+// Captures the in-range states (NC, SC) implicitly — a posting that
+// requires NC or SC residency would actually be ACCEPTED, so the regex
+// only flags when the required state is something OTHER than NC/SC.
+const STATE_RESTRICT_RE = /(?:must\s+reside|reside(?:nt)?\s+(?:of|in)|located?\s+in|remote\s+only\s+in|candidates?\s+(?:must\s+be\s+)?(?:in|outside\s+(?:of\s+)?))\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)\b/g;
+const KEVIN_HOME_STATES_RE = /\b(north\s+carolina|nc|south\s+carolina|sc)\b/i;
+
 function classify(job, opts = {}) {
   const { usOnly = false } = opts;
   const loc = (job.location || '').trim();
@@ -73,8 +82,21 @@ function classify(job, opts = {}) {
     }
   }
 
-  // 1. Remote — accept
+  // 1. Remote — accept, BUT first check for hidden state-residency
+  // restriction in description (e.g. "must reside in Texas")
   if (REMOTE_RE.test(loc) || REMOTE_RE.test(headDesc)) {
+    // Scan first 1500 chars of description for state-residency restrictions
+    const stateMatches = [...desc.slice(0, 1500).matchAll(STATE_RESTRICT_RE)];
+    for (const sm of stateMatches) {
+      const requiredState = sm[1];
+      if (!requiredState) continue;
+      // If the required state is one of Kevin's home states, fine
+      if (KEVIN_HOME_STATES_RE.test(requiredState)) continue;
+      // Skip generic words that the regex over-matched
+      if (/^(the|this|our|your|their|all|any|every|some|most|each|both|either)$/i.test(requiredState.trim())) continue;
+      // Real out-of-state restriction
+      return { ok: false, reason: 'state-residency-restricted', state: requiredState.trim(), location: loc };
+    }
     const flag = usOnly && !US_POSITIVE_RE.test(haystack) ? 'verify-us-eligibility' : undefined;
     return { ok: true, reason: 'remote', ...(flag ? { flag } : {}) };
   }

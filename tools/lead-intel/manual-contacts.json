@@ -638,5 +638,26 @@
         "by": "Kevin"
       }
     ]
+  },
+  {
+    "name": "Trace3 hiring team",
+    "company": "Trace3",
+    "tier": "application_sent",
+    "source": "job-application-2026-05-06",
+    "linkedin_url": null,
+    "email": null,
+    "twitter": null,
+    "role": "(target role: Sr. Cloud Solutions Architect | DevOps)",
+    "bio": "Irvine CA HQ. IT solutions / consulting firm. WeWorkRemotely posting.",
+    "notes": "Kevin applied 2026-05-06 via WWR Apply button. Yellow flag noted pre-application: consulting firm could mean client-facing solutions architect / pre-sales work, not pure architecture engineering. Also could mean substantive cloud architecture - JD-dependent.",
+    "next_action": "Watch for response 7-14 days. Day-7 fallback 2026-05-13 if silent. If silent through 2026-05-20: log silent_close.",
+    "touchpoints": [
+      {
+        "ts": "2026-05-06",
+        "channel": "application portal",
+        "action": "applied for Sr. Cloud Solutions Architect | DevOps via WWR-linked apply",
+        "by": "Kevin"
+      }
+    ]
   }
 ]

@@ -1,0 +1,12 @@
+User-agent: *
+Allow: /
+
+# Block admin + lead-intel dashboard from search indexes
+Disallow: /admin
+Disallow: /lead-intel.html
+Disallow: /dashboard.html
+Disallow: /payment-success.html
+Disallow: /api/
+
+# Sitemap location
+Sitemap: https://contrarianai-landing.onrender.com/sitemap.xml

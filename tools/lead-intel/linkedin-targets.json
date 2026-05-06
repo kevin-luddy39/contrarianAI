@@ -109,14 +109,26 @@
           "platform": "Towards Data Science",
           "published": "2026-05-05",
           "tds_handle": "@emmimalalexander",
-          "url": "(Kevin to capture from TDS / Medium when found)",
-          "fit": "very high - 'silent production failure' framing is verbatim Bell Tuning vocabulary; she built her own detection pipeline = active problem-space awareness; 25-min read = serious technical depth signal",
-          "linkedin": "Kevin to look up via https://www.linkedin.com/search/results/people/?keywords=Emmimal%20P%20Alexander - cross-check by recent activity matching TDS author profile",
-          "status": "pending_connect",
-          "touchpoints": [],
-          "next_action": "Send connect request with 270-char peer-substance note (draft_connection_note below). On accept: do NOT immediately push followup unless she opens with a question - Nweke pattern showed warm-close messages should NOT be re-opened. If she replies substantively about her detection pipeline: peer-discuss + offer to swap teardown notes. If silent 14d post-accept: drop to content-led nurture (she sees Kevin's LinkedIn posts).",
+          "linkedin_headline": "AI Engineer & Author | Agentic AI Systems | Neural Networks & Deep Learning",
+          "linkedin_followers": 1530,
+          "location": "Bengaluru, Karnataka, India",
+          "personal_brand": "EmiTechLogic",
+          "education": "Anna University",
+          "url": "(Kevin to capture from TDS when reading)",
+          "fit_classification": "peer_amplifier (NOT buyer)",
+          "fit_reason": "AI Engineer & Author with own technical brand (EmiTechLogic); Bengaluru-based IC role with India-scaled comp = unlikely $15K audit buyer; she's actively BUILDING in the space (her own self-healing detection pipeline); 1,530 followers in AI/agentic-AI = real peer-amplifier reach. Treat as substance-discussion peer, NOT prospect.",
+          "status": "connect_request_sent",
+          "touchpoints": [
+            {
+              "ts": "2026-05-06",
+              "channel": "LinkedIn",
+              "action": "connection request sent with 245-char peer-substance note referencing 'silent production failure' phrase + LangChain teardown 5/6 finding",
+              "by": "Kevin"
+            }
+          ],
+          "next_action": "Wait for accept. If she accepts + warm-close reply (Nweke pattern): thumbs-up + content-led nurture. If she accepts + substantive reply (asks about retrieval-auditor / Bell Tuning method): swap teardown notes peer-to-peer, NO audit pitch (she's not a buyer; she's a builder + amplifier). If she asks about her own pipeline vs Bell Tuning: be honest about complementary scope, do NOT compete. If silent 7-14d: drop direct outreach, content-led nurture only.",
           "draft_connection_note": "Read your \"RAG Hallucinates / Self-Healing Layer\" on TDS. The \"silent production failure\" framing maps to what I've built - retrieval-auditor flagged 5/6 LangChain quickstart queries via rank inversion + score miscal. Wrote it up if useful.",
-          "decision_to_check_post_connect": "Verify her LinkedIn bio: is she at a company (= potential Bell Tuning buyer), an independent researcher (= peer-amplifier only), or building/selling her own product (= peer-substance only, no audit pitch). Adjust Touch #2 accordingly."
+          "amplifier_engagement_path": "If accept happens: comment substantively on her TDS article (public, not DM) once she's connected, with the kind of substance peer reply she'd value. Public engagement = her audience sees Kevin's voice. Don't pitch in the comment. If she likes/replies/shares Kevin's LinkedIn substance posts: real signal, peer-relationship is forming. Long-tail value > short-tail audit conversion."
         },
         {
           "author": "Benjamin Nweke",

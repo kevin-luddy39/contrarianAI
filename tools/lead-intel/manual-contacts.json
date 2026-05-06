@@ -512,5 +512,68 @@
         "by": "Kevin"
       }
     ]
+  },
+  {
+    "name": "31 Green Ltd (rejected on review)",
+    "company": "31 Green Ltd",
+    "tier": "passed_over",
+    "source": "job-scrape-review-2026-05-06",
+    "linkedin_url": null,
+    "email": null,
+    "twitter": null,
+    "role": null,
+    "bio": "",
+    "notes": "Reviewed via job-scraper on 2026-05-06 and rejected. Reason: Pakistan HQ - body-shop pattern, scaled-down comp likely",
+    "next_action": "Auto-excluded from future scrapes via dedup-ledger 14d window.",
+    "touchpoints": [
+      {
+        "ts": "2026-05-06",
+        "channel": "internal",
+        "action": "passed-over: Pakistan HQ - body-shop pattern, scaled-down comp likely",
+        "by": "Kevin"
+      }
+    ]
+  },
+  {
+    "name": "Bjak (rejected on review)",
+    "company": "Bjak",
+    "tier": "passed_over",
+    "source": "job-scrape-review-2026-05-06",
+    "linkedin_url": null,
+    "email": null,
+    "twitter": null,
+    "role": null,
+    "bio": "",
+    "notes": "Reviewed via job-scraper on 2026-05-06 and rejected. Reason: Malaysia HQ - Asia-only, scaled-down comp likely",
+    "next_action": "Auto-excluded from future scrapes via dedup-ledger 14d window.",
+    "touchpoints": [
+      {
+        "ts": "2026-05-06",
+        "channel": "internal",
+        "action": "passed-over: Malaysia HQ - Asia-only, scaled-down comp likely",
+        "by": "Kevin"
+      }
+    ]
+  },
+  {
+    "name": "Anthill (rejected on review)",
+    "company": "Anthill",
+    "tier": "passed_over",
+    "source": "job-scrape-review-2026-05-06",
+    "linkedin_url": null,
+    "email": null,
+    "twitter": null,
+    "role": null,
+    "bio": "",
+    "notes": "Reviewed via job-scraper on 2026-05-06 and rejected. Reason: Bulgaria HQ - EU body-shop pattern despite \"first EU location\" framing",
+    "next_action": "Auto-excluded from future scrapes via dedup-ledger 14d window.",
+    "touchpoints": [
+      {
+        "ts": "2026-05-06",
+        "channel": "internal",
+        "action": "passed-over: Bulgaria HQ - EU body-shop pattern despite \"first EU location\" framing",
+        "by": "Kevin"
+      }
+    ]
   }
 ]

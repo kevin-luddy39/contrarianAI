@@ -575,5 +575,26 @@
         "by": "Kevin"
       }
     ]
+  },
+  {
+    "name": "Join (rejected on review)",
+    "company": "Join",
+    "tier": "passed_over",
+    "source": "job-scrape-review-2026-05-06",
+    "linkedin_url": null,
+    "email": null,
+    "twitter": null,
+    "role": null,
+    "bio": "",
+    "notes": "Reviewed via job-scraper on 2026-05-06 and rejected. Reason: requires deep React + Golang OR Postgres. Kevin has older JS (jQuery/AngularJS), zero Golang. Stack-locked filter that screens out polyglot architects who could ramp in days with AI codegen.",
+    "next_action": "Auto-excluded from future scrapes via dedup-ledger 14d window.",
+    "touchpoints": [
+      {
+        "ts": "2026-05-06",
+        "channel": "internal",
+        "action": "passed-over: stack-depth-locked role (React+Golang+Postgres)",
+        "by": "Kevin"
+      }
+    ]
   }
 ]

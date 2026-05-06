@@ -680,5 +680,53 @@
         "by": "Kevin"
       }
     ]
+  },
+  {
+    "name": "Tim Kersey",
+    "company": "Artium",
+    "tier": "audience_starred",
+    "source": "github-stargazer-2026-05-06",
+    "linkedin_url": null,
+    "email": "tim@artium.ai",
+    "twitter": null,
+    "role": "Director of Engineering",
+    "bio": "LA-based. 832 GH followers, 59 public repos. Recent work: eval.ts (TypeScript eval framework), codex (coding agent), zlinter (Zig linter). Active in eval/observability problem space.",
+    "notes": "HIGHEST-FIDELITY signal in entire dataset: personally starred BOTH contrarianAI (4/27) and context-inspector (4/16). Queue file ready: tools/sequencer/queues/audience-tap-2026-05-06/tim-kersey-artium.json. Peer-question framing - asks what drew his attention. NO sales pitch. NO link push. Same-company prospects via Hunter (held for Touch #2 if Tim engages): Cauri Jaye Dir AI, Henry Meller Co-Founder, Ross Hale CEO, John Wilger VP Eng, Shikhar Rastogi Dir Eng, Mark Whaley Sr Dir PM.",
+    "next_action": "Send via sequencer. If reply: respond peer-substance. If no reply 7d: do NOT nudge per push-drift memory. If Tim engages well, consider warm-intro to Cauri Jaye (Director of AI) as Touch #2 with Tim CC if appropriate.",
+    "touchpoints": [
+      {
+        "ts": "2026-04-16",
+        "channel": "github",
+        "action": "starred kevin-luddy39/context-inspector",
+        "by": "Tim Kersey"
+      },
+      {
+        "ts": "2026-04-27",
+        "channel": "github",
+        "action": "starred kevin-luddy39/contrarianAI (second star = high signal)",
+        "by": "Tim Kersey"
+      }
+    ]
+  },
+  {
+    "name": "Chidvi Doddi",
+    "company": null,
+    "tier": "audience_starred",
+    "source": "github-stargazer-2026-05-06",
+    "linkedin_url": "https://linkedin.com/in/chidvi-doddi/",
+    "email": null,
+    "twitter": null,
+    "role": null,
+    "bio": "145 GH followers, 14 public repos. Generalist projects (URL shortener, Connect4, Blackjack). No company listed. AI-pain signal weak vs Tim Kersey.",
+    "notes": "Starred kevin-luddy39/context-inspector 2026-04-16 (single star). Backup-touch only - no email path identified, only LinkedIn. Generalist projects don't suggest active AI-pain. Lower priority than Tim.",
+    "next_action": "Optional: LinkedIn connect request with single-line referencing the star. Skip unless Tim Kersey thread surfaces a need for broader audience-tap volume.",
+    "touchpoints": [
+      {
+        "ts": "2026-04-16",
+        "channel": "github",
+        "action": "starred kevin-luddy39/context-inspector",
+        "by": "Chidvi Doddi"
+      }
+    ]
   }
 ]

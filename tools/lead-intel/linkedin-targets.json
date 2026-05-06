@@ -103,6 +103,22 @@
       ],
       "candidates": [
         {
+          "author": "Emmimal P Alexander",
+          "title": "RAG Hallucinates - I Built a Self-Healing Layer That Fixes It in Real Time",
+          "subtitle": "How a silent production failure led me to build a detection pipeline that catches, fixes, and routes hallucinations before users ever see them",
+          "platform": "Towards Data Science",
+          "published": "2026-05-05",
+          "tds_handle": "@emmimalalexander",
+          "url": "(Kevin to capture from TDS / Medium when found)",
+          "fit": "very high - 'silent production failure' framing is verbatim Bell Tuning vocabulary; she built her own detection pipeline = active problem-space awareness; 25-min read = serious technical depth signal",
+          "linkedin": "Kevin to look up via https://www.linkedin.com/search/results/people/?keywords=Emmimal%20P%20Alexander - cross-check by recent activity matching TDS author profile",
+          "status": "pending_connect",
+          "touchpoints": [],
+          "next_action": "Send connect request with 270-char peer-substance note (draft_connection_note below). On accept: do NOT immediately push followup unless she opens with a question - Nweke pattern showed warm-close messages should NOT be re-opened. If she replies substantively about her detection pipeline: peer-discuss + offer to swap teardown notes. If silent 14d post-accept: drop to content-led nurture (she sees Kevin's LinkedIn posts).",
+          "draft_connection_note": "Read your \"RAG Hallucinates / Self-Healing Layer\" on TDS. The \"silent production failure\" framing maps to what I've built - retrieval-auditor flagged 5/6 LangChain quickstart queries via rank inversion + score miscal. Wrote it up if useful.",
+          "decision_to_check_post_connect": "Verify her LinkedIn bio: is she at a company (= potential Bell Tuning buyer), an independent researcher (= peer-amplifier only), or building/selling her own product (= peer-substance only, no audit pitch). Adjust Touch #2 accordingly."
+        },
+        {
           "author": "Benjamin Nweke",
           "title": "Why AI Engineers Are Moving Beyond LangChain to Native Agent Architectures",
           "platform": "Towards Data Science",

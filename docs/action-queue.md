@@ -4,126 +4,115 @@
 > Status flags: `[ ]` open, `[->]` in progress, `[x]` done, `[skip]` deferred/dropped.
 > Window: focus on NOW (1-3 items). NEXT and LATER stay parked until NOW empties.
 
-**Last refreshed:** 2026-05-04 (Mon) — after 1st queue rotation
+**Last refreshed:** 2026-05-06 (Wed) — start of day
 
 ---
 
-## NOW — do these in order, one at a time
+## NOW — do these in order
 
-### 1. `[ ]` Wait + reply window for today's 5 cold emails
+### 1. `[ ]` Apply to top 5 jobs (memos already drafted)
 
-5 emails out today. 7-day reply window. Day 7 fallback 2026-05-11 = LinkedIn-comment on each prospect's recent post (peer-substance, no DM nudge). If silent through 2026-05-18 = silent_close, drop from active pipeline.
+Open `tools/lead-intel/job-scraper/output/applications-2026-05-05-memos/INDEX.md`. Each top-5 row links to a per-job memo with:
+- Apply URL at top
+- Resume sections to emphasize
+- Cover-letter draft (edit before submitting)
+- Apply notes
 
-| Prospect | Contact | Channel |
-|---|---|---|
-| Lineation | hello@lineation.ai | hello@ (Hunter returned 0; domain too new) |
-| Eve | hello@helloeve.co | HN posting contact |
-| Wick | jadams@wick.io | CTO via Hunter |
-| VLM Run | sudeep@vlm.run | CEO via Hunter |
-| Gladly | gerad@gladly.ai | HN poster |
+| # | Score | Company | Role |
+|---|---|---|---|
+| 1 | 30 | **Chess.com** | Senior ML Engineer (remote) |
+| 2 | 28 | **Urban Legend** | Backend Engineer Mid-Senior (remote) |
+| 3 | 28 | **Fusemachines** | Applied AI Engineer Automation (remote) |
+| 4 | 27 | **Sanctuary Computer** | Senior Frontend Developer (remote) |
+| 5 | 24 | **Honor Foods** | Front End Full Stack Developer (remote) |
 
-No new outbound action today. Move to next NOW item below.
+Per memo: 5-15 min depending on portal complexity. Total session: 30-90 min for 5 applications.
+
+After each application, tell me which one + I'll log it (intent=application) so future job-scraper runs auto-exclude that company from the contrarianAI outreach pool too.
+
+### 2. `[ ]` Re-run job-scraper for fresh 7d-window postings
+
+Quick (2 min). May surface new postings overnight that score above current top.
+
+```
+node tools/lead-intel/job-scraper/cli-jobs.js --since 7d --us-only
+node tools/lead-intel/job-scraper/compose-application.js --top 15
+```
+
+If new top-3 emerge after this run, prioritize over the 5/5 batch.
 
 ---
 
-## NEXT — queued for today, after NOW empties
+## NEXT — queued for today
 
-### 4. `[ ]` HN karma-build comment #1 (Claude Code thread)
+### 3. `[ ]` Token rotate (security follow-up, 5 min)
 
-- BLOCKER: only proceed if `dang` has unflagged your dead comment OR you're willing to risk burning kevinluddy39 on another comment that may auto-die
-- Check: open https://news.ycombinator.com/threads?id=kevinluddy39 in incognito browser. If yesterday's comment is now visible there, you're un-flagged.
-- Target thread: https://news.ycombinator.com/item?id=47966935 (Ask HN: Claude Code dies with ANTHROPIC_API_KEY)
-- Reply: 4-6 sentence single paragraph from your WSL Claude Code experience. NO bullets, NO links, NO Bell Tuning name-drop.
-
-### 5. `[ ]` Token rotate (security follow-up)
-
-- After Item 1 in original queue (Render GH_TOKEN) is confirmed done: revoke + reissue the gho_ token that leaked into chat yesterday
+`gho_` token leaked into chat 2026-05-04. Hygiene fix:
 - Run: `gh auth refresh -h github.com` (browser flow, picks fresh token)
-- Update Render env var to new token value
+- Update Render `GH_TOKEN` env var to new token value
 
-### 6. `[ ]` npm package README CTA — `contrarianai-context-inspector`
+### 4. `[ ]` LinkedIn substance post — Nweke + network nurture
 
-- Edit README footer → add audit-buy hook (Stripe link + landing URL)
-- Bump patch version, republish via PowerShell ONLY
-
-### 7. `[ ]` LinkedIn substance post — content-led nurture for Nweke + others
-
-- Topic: "the buy-flow CTA placement insight" — observation that LinkedIn audiences route to GH/npm not landing, so audit-buy CTAs need to live IN the artifacts not on landing
-- No links to landing in the post. Substance only. Lets Nweke/Boris/etc see organic value, not push.
+20 min. Topic: "the buy-flow CTA placement insight" — observation that LinkedIn audiences route to GH/npm not landing, so audit-buy CTAs need to live IN the artifacts not on the landing-page hero. No link in post body. Substance only.
 
 ---
 
-## LATER — this week / blocked / lower priority
+## LATER — this week / lower priority
 
-### 8. `[ ]` Eve cold email (helloeve.co)
+### 5. `[ ]` npm package README CTA — `contrarianai-context-inspector`
 
-- Founder via Hunter.io. "Multi-agent voice engine, paying customers, agency channel" = budget signal.
-- Same template shape as Lineation, tuned for voice/multi-agent angle.
+Edit README footer → add audit-buy hook (Stripe link + landing URL). Bump patch version, republish via PowerShell ONLY (per `npm_publish_security_key.md` — hardware 2FA key won't work in WSL).
 
-### 9. `[ ]` Wick cold email (wick / @SHeinrichatWick)
+### 6. `[ ]` More cold-email outreach batches
 
-- HN posting contact. "Watch real users break them" = verbatim Bell Tuning value prop. Easy template.
+22 unenriched US-eligible candidates remain in yesterday's pool (top-5 was the first batch sent). Next batch (Urban Legend, Fusemachines, Sanctuary Computer, Honor Foods) overlaps with application Tier A targets — defer until application decisions made (don't pitch Bell Tuning to companies you're applying to).
 
-### 10. `[ ]` VLM Run cold email (vlm.run)
+Hunter budget: ~17 of 25 free credits remain this month.
 
-- Vision-language angle adds twist; honest-broker pitch since your sensors are text-side.
+### 7. `[ ]` Engineering Square second-channel switch
 
-### 11. `[ ]` Engineering Square cold email (@ESqHiring)
+Already dropped from outreach pipeline as staffing-firm. Skip unless evidence emerges they're a real product company.
 
-- "End-to-end accuracy" pain explicit. Reply via HN-convention contact in their posting.
+### 8. `[ ]` Product Hunt re-launch (decision parked)
 
-### 12. `[ ]` Gladly cold email (gladly.ai)
-
-- Customer-facing retail AI in production at Crate & Barrel, Sephora, REI. Big enough to have budget. LinkedIn warm-path to VP Eng.
-
-### 13. `[ ]` YC W26 batch second-channel switch (Burt, Panta, Corelayer, Tensol, Rinse)
-
-- Calendar trigger was 2026-04-30, likely missed. Check `manual-contacts.json` for status. If still pending: switch to X/email per their entries.
-
-### 14. `[ ]` LinkedIn karma-build target list (parallel to HN if Reddit/HN flagging persists)
-
-- If LinkedIn algo starts dampening reach, build comment-history on adjacent technical posts (5-10 over a week) before posting substance. Same pattern as Reddit/HN karma-build. Not urgent unless reach drops.
+Per `product_hunt_relaunch_decision.md` — re-evaluate after 2026-05-18 silent-close window OR 30+ Reddit karma (now N/A since Reddit paused). Means: re-evaluate after 2026-05-18.
 
 ---
 
-## DONE today
+## DONE — recent
 
-- `[x]` Render `GH_TOKEN` — env var added; live dashboard now has traffic API access. Token rotate sits in NEXT as security follow-up.
-- `[x]` Test-data cleanup migration — `is_test BOOLEAN` column added to `audit_requests`, all 3 existing rows (ids 1,2,3) marked TRUE, Pool 1 query + 5 funnel-count queries gated by `is_test = FALSE`, target-queries.sql Q1 same. Verified in Render shell. Pool 1 now returns 0 rows cleanly.
-- `[x]` Nweke thread close — connection + warm close + thumbs-up reaction logged in linkedin-targets.json; pivoted next_action to content-led nurture; feedback memory `feedback_outreach_pressure_drift.md` saved.
-- `[x]` Teardown README CTA placeholders filled (yesterday's pending) — GH source link + Bell Tuning landing URL now live in `tools/retrieval-auditor/examples/langchain-quickstart-teardown/README.md`.
-- `[x]` whitepaper.md CTA refresh in context-inspector — replaced pre-launch "free 1-hour, first 10 teams" framing + old `/bell-tuning` slug with the productized $2,500 Rapid Audit SKU pointing to `/bell-tuning-rapid-audit.html`. Commit `33a6840` pushed to context-inspector main.
-- `[x]` Lineation cold email sent — `hello@lineation.ai`, partnership framing, distributional-read-on-lineage angle. Hunter.io returned 0 (domain too new), used HN posting contact. Logged in `manual-contacts.json` (entry 16). Day-7 fallback 2026-05-11 if silent.
-- `[x]` Sequencer toolkit built — `tools/sequencer/` w/ clip.sh, type.ps1, click.ps1, seq.py. Removes manual click/type friction for future cold-email batches. Commit `aaf58e6` pushed.
-- `[x]` Sequencer fixes (commits `2cd0c91`, `9286902`): URL `&` handling via `open.ps1` -File parameter; TTY-fallback in `wait_for_user` so non-TTY runs (`!` shell) auto-pause instead of EOF-crashing.
-- `[x]` Eve cold email sent — `hello@helloeve.co`, voice-fidelity distributional-read pitch, sequencer-driven. manual-contacts.json entry 17. Day-7 fallback 2026-05-11.
-- `[x]` Wick cold email sent — Jason Adams CTO `jadams@wick.io` (via Hunter). Prompt-eval-drift pitch. Entry 18. Day-7 fallback 2026-05-11.
-- `[x]` VLM Run cold email sent — Sudeep Pillai CEO `sudeep@vlm.run` (via Hunter). VLM observability pitch (text-side→vision-side honest disclosure). Entry 19. Day-7 fallback 2026-05-11.
-- `[x]` Gladly cold email sent — `gerad@gladly.ai` (HN poster). Retail-CX silent-failure pitch. Entry 20. Day-7 fallback 2026-05-11.
-- `[x]` Engineering Square dropped — Hunter returned 100% recruiters/HR/sales/DevOps. Likely staffing/body-shop firm. Not Bell Tuning ICP. Saved a cold-email shot.
-- `[x]` Sequencer fixes (commits `2cd0c91`, `9286902`, `c3d29dc`): URL `&` handling via `open.ps1` -File parameter; TTY-fallback in `wait_for_user` so non-TTY runs auto-pause; key.ps1 separated from type.ps1 to fix combo-escape bug; auto-pause raised to 10s; queues end at body-pasted (manual send by Kevin).
-- `[x]` Hunter API key path support — `lookup-founder.py` now reads `.config/hunter.key.txt` in addition to env var and `/tmp/hunterkey`. `.gitignore` protects `.config/`, `*.key`, `*.key.txt` from accidental `git add .` (commit `639dd28`).
-- `[x]` Visit-tracker IP exclusions — added `172.58.252.4` (W5 phone tab) + `69.251.216.8` (W6 son's house, confirmed by Kevin) to default `EXCLUDED_IPS` in `server.js`. Future visit-stats reports filter both at source.
-- `[x]` Two cron triggers created for cold-email reply-window automation (Day-7 = 2026-05-11, Day-14 = 2026-05-18). IDs `trig_013hoQrwz6zJXfBV3UpuwpbR` + `trig_015wQUNt9gzxZT98aW3RZqx2`. Per-trigger fallback: if no Gmail MCP, summary commits to `docs/outreach/` so phone gets GitHub notification. Pre-fire blockers Kevin must fix: (a) `/web-setup` for repo access, (b) Gmail MCP at https://claude.ai/settings/connectors. Disable both at https://claude.ai/code/scheduled after fire to prevent annual repeat.
-- `[x]` Reddit karma-build #1 posted via `Late_Researcher232` to r/Rag embedding-latency thread. Pure ops content (HTTP keep-alive + dimensions param tip), no Bell Tuning. Karma delta TBD.
-- `[skip]` Pool 1 sweep — sweep ran 2026-05-04 morning but cohort was all test contacts; no real outreach occurred. Cleanup migration above prevents recurrence.
-- `[skip]` Starbridge melissamrec upgrade — LinkedIn search returns no match for that handle. Path dead. Starbridge falls back to original recruiting@ entry status (silent, can drop or wait).
-- `[skip]` Arzule (Jeffrey Lin) final-touch — dropped from active pipeline. Higher ROI elsewhere. Per `feedback_outreach_pressure_drift.md`: live signal (silence) confirms move-on, no further nudge.
-- `[?]` Joel Schwarzmann LinkedIn fallback — status unconfirmed, awaiting Kevin's update.
+- `[x]` 2026-05-06: Action queue refreshed; today's priority set; window-task-reminder validated as working pattern (saved to memory).
+- `[x]` 2026-05-05: Job-scraper application-intent path built. 22 US-eligible candidates, 15 memos at `output/applications-2026-05-05-memos/`. Reddit karma cadence paused, daily slot reallocated to job-scraper. InsightScout cold email evaluated + parked. Resume parsed, profile saved as memory.
+- `[x]` 2026-05-05: Job-scraper outreach-intent path: scrape + Hunter enrich + pitch composer. Sent Trunk Tools (Sarah Buchner CEO) + Haast (Liam King Co-Founder) cold emails via sequencer.
+- `[x]` 2026-05-05: Dashboard inflation bug fixed (intel_snapshots referrers/paths were 14x over-counted). Funnel verified Leads:0 after is_test backfill ran via initDb.
+- `[x]` 2026-05-05: Reddit karma-build #1 (r/Rag embedding latency) + #2 (r/LLMDevs agent access) posted. Karma 1→2. Hostile-OP scenario surfaced at #2 (deleted in time). Lessons saved to memory. Karma cadence then PAUSED.
+- `[x]` 2026-05-04: GH_TOKEN env added to Render. is_test column migration. Nweke thread closed warm. Teardown + whitepaper CTAs filled. Sequencer toolkit shipped + debugged. Hunter API integration. Visit-tracker IP exclusions live. 5 cold emails sent (Lineation, Eve, Wick CTO via Hunter, VLM Run CEO via Hunter, Gladly).
+- `[x]` 2026-05-04: Two cron triggers created for cold-email reply-window automation (Day-7 = 2026-05-11 `trig_013hoQrwz6zJXfBV3UpuwpbR`, Day-14 = 2026-05-18 `trig_015wQUNt9gzxZT98aW3RZqx2`). Pre-fire blockers Kevin must fix: GitHub access via `/web-setup`, Gmail MCP at https://claude.ai/settings/connectors. Disable both at https://claude.ai/code/scheduled after fire to prevent annual repeat.
 
-## Key finding 2026-05-04
+---
 
-**Form has captured 0 real leads in 25 days of running** (deployed 2026-04-09, today is 2026-05-04). All 3 audit_requests rows were Kevin's own test submissions. Implications:
-- The "0 leads / 0 paid" funnel reads in past traffic reports were not "low conversion of real demand," they were "no demand reaching the form at all." Different problem, different fix.
-- Confirms the channel-attribution finding from 2026-05-03: external readers route to GH/npm not landing → form is upstream of zero traffic that converts to fill it.
-- Action: prioritize NOW items #1 (Lineation cold email — push outbound) + #2 (whitepaper CTA — bring buy-flow into the artifact readers actually reach). Lead-form CTA on landing is downstream of a broken acquisition channel; fixing form copy/flow won't help until acquisition starts working.
+## Reply windows running (passive)
+
+| Prospect | Sent | Day-7 fallback | Day-14 silent-close |
+|---|---|---|---|
+| Lineation | 5/4 | 5/11 (cron-auto) | 5/18 (cron-auto) |
+| Eve | 5/4 | 5/11 (cron-auto) | 5/18 (cron-auto) |
+| Wick (Jason Adams CTO) | 5/4 | 5/11 (cron-auto) | 5/18 (cron-auto) |
+| VLM Run (Sudeep Pillai CEO) | 5/4 | 5/11 (cron-auto) | 5/18 (cron-auto) |
+| Gladly (gerad@) | 5/4 | 5/11 (cron-auto) | 5/18 (cron-auto) |
+| Trunk Tools (Sarah Buchner CEO) | 5/5 | 5/12 (manual review) | 5/19 (manual review) |
+| Haast (Liam King Co-Founder) | 5/5 | 5/12 (manual review) | 5/19 (manual review) |
+
+No replies as of 2026-05-06 morning per Kevin status check. Normal — 7-day window not closed yet.
 
 ---
 
 ## Notes
 
-- Per `feedback_outreach_pressure_drift.md`: parse recipient close-cues vs open-cues before drafting. Live signal overrides pre-written next_action.
-- Per `reddit_shadowban_playbook.md`: do NOT use `Southern_Cat5374` for new posts. Use `Late_Researcher232` only after confirming 30+ karma.
-- Per `npm_publish_security_key.md`: `npm publish` from PowerShell only (hardware 2FA key won't work in WSL).
-- Per `operating_principle_go_it_alone.md`: pain-first cold > warm-intro favors. No family network asks.
-- **New finding 2026-05-04**: Pool 1 in lead-intel dashboard was test data. Cleanup needed (see NOW #1) before any future Pool 1 references can be trusted.
+- Per `feedback_outreach_pressure_drift.md`: parse recipient close/open cues before drafting. Live signal overrides pre-written next_action.
+- Per `feedback_time_budget_calibration.md`: pre-revenue, ≤15 min build improvements just ship — no permission asked.
+- Per `feedback_reddit_hostile_op_check.md`: scan for OP bot-roasting before any Reddit post.
+- Per `reddit_paused_2026-05-05.md`: daily karma-build is dead. One-off Reddit only when thread bullseyes AND OP not identity-protective.
+- Per `npm_publish_security_key.md`: `npm publish` from PowerShell only (hardware 2FA).
+- Per `operating_principle_go_it_alone.md`: pain-first cold > warm-intro favors.
+- Per `windows_task_scheduler_reminder_works.md`: schtasks /SC ONCE pattern validated for same-day reminders.

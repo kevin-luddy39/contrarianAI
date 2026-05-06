@@ -728,5 +728,26 @@
         "by": "Chidvi Doddi"
       }
     ]
+  },
+  {
+    "name": "Martin Petrov",
+    "company": "(former colleague, AI Architect/Leader)",
+    "tier": "peer_validator",
+    "source": "former-colleague-2026-05-06",
+    "linkedin_url": "(Kevin to fill \u2014 1000+ followers per Kevin's note)",
+    "email": null,
+    "twitter": null,
+    "role": "AI Architect / Leader",
+    "bio": "Former colleague of Kevin. AI Architect / Leader with 1000+ LinkedIn followers. Spoke with Kevin about context-inspector statistical angle 2026-05-06.",
+    "notes": "CRITICAL FEEDBACK 2026-05-06: Martin reviewed the whitepaper after Kevin pointed him at it. His takeaway: whitepaper is too deep, content-heavy, hard to swallow within the attention budget cold-prospects have for such asks. Triggered the creation of `docs/30-sec-pitch.md` (variants A-D). Martin is bullseye buyer-shape (peer AI architect with reach); his read maps to all cold-prospects. Right next move: send him the 30-sec version, ask if THAT lands the value, treat his answer as ground-truth signal on whether the asset is fixed.",
+    "next_action": "Send Martin the 30-sec pitch (variant A from docs/30-sec-pitch.md) via LinkedIn DM (or email if Kevin has it). Frame as peer-substance: \"your feedback landed hard, here's the distilled version, does THIS land?\" If he validates: he becomes peer-amplifier (1000+ LI followers = real reach for content-led nurture). If he says still-too-dense: keep iterating before next cold-email batch.",
+    "touchpoints": [
+      {
+        "ts": "2026-05-06",
+        "channel": "(direct conversation)",
+        "action": "Kevin briefly described context-inspector statistical angle, pointed Martin at whitepaper. Martin: too deep for attention budget.",
+        "by": "Kevin/Martin"
+      }
+    ]
   }
 ]

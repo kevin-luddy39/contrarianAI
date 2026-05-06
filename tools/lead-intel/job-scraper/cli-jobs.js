@@ -20,6 +20,7 @@ const { dedupe } = require('./dedupe');
 const { classify: geoClassify } = require('./geo-filter');
 const { loadOutreachLedger, isCompanyInActiveOutreach } = require('./dedup-ledger');
 const { parseSalary, passesFloor } = require('./salary-parse');
+const { checkLive } = require('./liveness');
 
 const SOURCES = {
   remoteok: require('./sources/remoteok'),
@@ -55,8 +56,9 @@ function parseArgs(argv) {
     else if (a === '--us-only') out.usOnly = true;
     else if (a === '--min-salary') out.minSalary = parseInt(argv[++i], 10);
     else if (a === '--no-salary-filter') out.minSalary = 0;
+    else if (a === '--skip-liveness') out.skipLiveness = true;
     else if (a === '--help' || a === '-h') {
-      console.log('Usage: node cli-jobs.js [--since 7d] [--min-score 12] [--max 30] [--dedup-window 14] [--no-stealth] [--us-only] [--min-salary 110000] [--no-salary-filter]');
+      console.log('Usage: node cli-jobs.js [--since 7d] [--min-score 12] [--max 30] [--dedup-window 14] [--no-stealth] [--us-only] [--min-salary 110000] [--no-salary-filter] [--skip-liveness]');
       process.exit(0);
     }
   }
@@ -162,7 +164,27 @@ async function main() {
   final.sort((a, b) => (b.app_score || 0) - (a.app_score || 0));
   const limited = final.slice(0, args.max);
 
-  fs.writeFileSync(args.output, JSON.stringify(limited, null, 2));
+  // Liveness check — job-board listings (RemoteOK, WWR) often 200 with a
+  // body saying "no longer available." HEAD/GET + pattern-match body. Run
+  // serially with brief courtesy spacing to avoid hammering boards.
+  if (!args.skipLiveness) {
+    console.log(`[apps] checking liveness on ${limited.length} URLs (HEAD/GET + body pattern match)...`);
+    const livenessResults = [];
+    for (const j of limited) {
+      const url = j.apply_url || j.url;
+      if (!url) { livenessResults.push({ ...j, _liveness: { live: true, reason: 'no-url' } }); continue; }
+      const r = await checkLive(url);
+      livenessResults.push({ ...j, _liveness: r });
+      if (!r.live) console.log(`  DEAD: ${j.company} (${r.reason})`);
+      await new Promise(res => setTimeout(res, 250));  // courtesy pacing
+    }
+    const live = livenessResults.filter(j => j._liveness.live);
+    const dropped = livenessResults.length - live.length;
+    console.log(`[apps] after liveness check: ${live.length} (dropped ${dropped} dead listings)`);
+    fs.writeFileSync(args.output, JSON.stringify(live, null, 2));
+  } else {
+    fs.writeFileSync(args.output, JSON.stringify(limited, null, 2));
+  }
   console.log('');
   console.log(`[apps] wrote ${limited.length} application candidates to ${args.output}`);
   console.log('');

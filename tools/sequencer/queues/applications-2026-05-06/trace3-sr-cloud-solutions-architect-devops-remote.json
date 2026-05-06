@@ -1,0 +1,15 @@
+[
+  {
+    "action": "clip",
+    "text": "Hi Trace3 hiring team,\n\nI'm applying for the Sr. Cloud Solutions Architect | DevOps (Remote) role.\n\nI've architected production software for 35+ years across stacks (.Net Core, Python+FastAPI, Java+Spring Boot, embedded C/C++) and verticals (clinical SaaS, defense simulation, fintech, federal). Most recently as CTO/architect at Oculearn for 24 years building HIPAA-aware vision-therapy SaaS, and now as AI Architect at contrarianAI.\n\nWhat drew me to Trace3: the role description (sw-arch, senior) maps to work I've shipped recently and architecture decisions I've owned end-to-end.\n\nI'm based in Castle Hayne NC; remote works well for me, and I'm open to fully remote.\n\nResume + a few of the OSS projects mentioned above attached / linked. Happy to walk through any of the work in a call.\n\nKevin Luddy\nCastle Hayne, NC\ngithub.com/kevin-luddy39"
+  },
+  {
+    "action": "open_url",
+    "url": "https://weworkremotely.com/remote-jobs/trace3-sr-cloud-solutions-architect-devops-remote"
+  },
+  {
+    "action": "wait_for_user",
+    "prompt": "Job listing open. Click the APPLY button on the page → company portal opens. Cover letter is in clipboard (Ctrl+V where needed). Don't forget to attach resume. Auto-pause 15s, you don't need to do anything here.",
+    "fallback_sleep_ms": 15000
+  }
+]

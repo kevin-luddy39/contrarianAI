@@ -1,0 +1,15 @@
+[
+  {
+    "action": "clip",
+    "text": "Hi Toast hiring team,\n\nI'm applying for the Senior Enterprise Process Engineer role.\n\nDeep C#/.Net history: 25+ years across .Net Framework + .Net Core (versions 2.0 through 9), recently at Lockheed Martin (.Net 4.8 + AngularJS + PrimeNG + NgRx) and iDox Solutions (.Net Core 8/9 + C# + TypeScript on Power Platform migration).\n\nWhat drew me to Toast: the role description (dotnet, senior) maps to work I've shipped recently and architecture decisions I've owned end-to-end.\n\nI'm based in Castle Hayne NC; remote works well for me, and I'm open to fully remote.\n\nResume + a few of the OSS projects mentioned above attached / linked. Happy to walk through any of the work in a call.\n\nKevin Luddy\nCastle Hayne, NC\ngithub.com/kevin-luddy39"
+  },
+  {
+    "action": "open_url",
+    "url": "https://weworkremotely.com/remote-jobs/toast-senior-enterprise-process-engineer"
+  },
+  {
+    "action": "wait_for_user",
+    "prompt": "Job listing open. Click the APPLY button on the page → company portal opens. Cover letter is in clipboard (Ctrl+V where needed). Don't forget to attach resume. Auto-pause 15s, you don't need to do anything here.",
+    "fallback_sleep_ms": 15000
+  }
+]

@@ -182,14 +182,27 @@ function parseArgs(argv) {
   return out;
 }
 
+function buildQueue(job) {
+  const cover = composeMemo(job).match(/## Cover-letter draft \(edit before sending\)\n\n([\s\S]*?)\n\n## Apply notes/)?.[1] || '';
+  const url = job.apply_url || job.url;
+  return [
+    { action: 'clip', text: cover.trim() },
+    { action: 'open_url', url },
+    { action: 'wait_for_user', prompt: `Job listing open. Click the APPLY button on the page → company portal opens. Cover letter is in clipboard (Ctrl+V where needed). Don't forget to attach resume. Auto-pause 15s, you don't need to do anything here.`, fallback_sleep_ms: 15000 },
+  ];
+}
+
 function main() {
   const args = parseArgs(process.argv);
   const jobs = JSON.parse(fs.readFileSync(args.input, 'utf8'));
   fs.mkdirSync(args.outDir, { recursive: true });
+  const queuesDir = path.join(REPO_ROOT, 'tools', 'sequencer', 'queues', `applications-${new Date().toISOString().slice(0, 10)}`);
+  fs.mkdirSync(queuesDir, { recursive: true });
 
   const sorted = jobs.slice().sort((a, b) => (b.app_score || 0) - (a.app_score || 0));
   const top = sorted.slice(0, args.top);
   console.log(`[compose-app] writing ${top.length} memos to ${args.outDir}`);
+  console.log(`[compose-app] writing ${top.length} sequencer queues to ${queuesDir}`);
 
   // Index file
   const indexLines = [
@@ -197,16 +210,18 @@ function main() {
     '',
     `Top ${top.length} candidates from ${jobs.length} scraped. Ranked by application-ICP score.`,
     '',
-    '| # | Score | Company | Role | Geo | Apply |',
-    '|---|---|---|---|---|---|',
+    '| # | Score | Company | Role | Geo | Memo | Sequencer queue |',
+    '|---|---|---|---|---|---|---|',
   ];
   for (let i = 0; i < top.length; i++) {
     const j = top[i];
     const slug = slugify(`${j.company}-${j.title}`);
     const memoPath = path.join(args.outDir, `${slug}.md`);
     fs.writeFileSync(memoPath, composeMemo(j));
-    const memoRel = path.relative(REPO_ROOT, memoPath);
-    indexLines.push(`| ${i + 1} | ${j.app_score} | ${j.company} | ${(j.title || '').slice(0, 50)} | ${j._geo?.reason || '?'} | [memo](${slug}.md) |`);
+    // Sequencer queue file
+    const queuePath = path.join(queuesDir, `${slug}.json`);
+    fs.writeFileSync(queuePath, JSON.stringify(buildQueue(j), null, 2));
+    indexLines.push(`| ${i + 1} | ${j.app_score} | ${j.company} | ${(j.title || '').slice(0, 50)} | ${j._geo?.reason || '?'} | [memo](${slug}.md) | \`${path.relative(REPO_ROOT, queuePath)}\` |`);
   }
   fs.writeFileSync(path.join(args.outDir, 'INDEX.md'), indexLines.join('\n') + '\n');
   console.log(`[compose-app] index: ${path.relative(REPO_ROOT, path.join(args.outDir, 'INDEX.md'))}`);

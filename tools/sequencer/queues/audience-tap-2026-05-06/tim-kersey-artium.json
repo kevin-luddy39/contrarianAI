@@ -1,0 +1,22 @@
+[
+  {
+    "action": "clip",
+    "text": "Hi Tim,\n\nNoticed you starred context-inspector and contrarianAI within a few days of each other in mid-April. Curious what drew the attention - context degradation, eval gaps, agent cascade observability, or something else?\n\nAsking partly because I'm always trying to figure out which of the Bell Tuning sensors is hitting people's actual production pain (vs which I think SHOULD be relevant). Your eval.ts repo and the codex agent work suggest you're already deep in the eval/observability problem space, which makes your read on what's missing more useful than most.\n\nIf anything in the work has been useful (or surfaced a gap I'm not addressing), genuinely interested to hear. If now isn't a good time, no worries - and happy to swap notes some other time when convenient.\n\nKevin Luddy\ncontrarianAI"
+  },
+  {
+    "action": "open_url",
+    "url": "https://mail.google.com/mail/?view=cm&fs=1&to=tim%40artium.ai&su=Saw+you+starred+context-inspector+%2B+contrarianAI+-+curious+what+brought+you+here"
+  },
+  {
+    "action": "wait_for_user",
+    "prompt": "Gmail compose open. To: tim@artium.ai, Subject: Saw you starred context-inspector + contrarianAI. Click body field. Auto-paste in 10s. (Note: this is a peer-question email, no resume needed.)"
+  },
+  {
+    "action": "key",
+    "combo": "ctrl+v"
+  },
+  {
+    "action": "sleep",
+    "ms": 500
+  }
+]

@@ -281,5 +281,26 @@
         "by": "Kevin"
       }
     ]
+  },
+  {
+    "name": "Calibrate Group AI team",
+    "company": "Calibrate Group AI",
+    "tier": "application_sent",
+    "source": "job-application-2026-05-06",
+    "linkedin_url": null,
+    "email": "hello@calibrategroup.ai",
+    "twitter": null,
+    "role": "(target role: Senior Technical Lead, founding technical hire)",
+    "bio": "Florida HQ. Application-layer AI tools 'connecting QuickBooks to an AI agent that saves a business owner 10 hours a week.' Posted on WeWorkRemotely. Apply button on WWR was broken (blank page) so cold-applied via hello@.",
+    "notes": "Kevin applied as candidate (intent=application, NOT outreach). WWR apply portal was dead so sent direct cold-application to hello@ referencing the WWR listing. Resume attached. Subject: 'Senior Technical Lead application (WWR apply link broken)'. Sent via job-scraper sequencer + manual resume attach.",
+    "next_action": "Watch for response 7-14 days. If silent through 2026-05-20: log silent_close. If response: standard application interview funnel. Do NOT pitch contrarianAI Bell Tuning to this company while application is in flight (stealth mode preserved).",
+    "touchpoints": [
+      {
+        "ts": "2026-05-06",
+        "channel": "email",
+        "action": "cold-application via hello@calibrategroup.ai for Senior Technical Lead role (WWR apply link was dead). Resume attached. Application-intent (NOT outreach).",
+        "by": "Kevin"
+      }
+    ]
   }
 ]
